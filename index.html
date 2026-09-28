@@ -1,0 +1,2315 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>AFK Journey • Rank Reward Tracker</title>
+    <style>
+      :root {
+        --bg: #0b1124;
+        --panel: #131d36;
+        --panel2: #1c2847;
+        --panel-border: #2c3f6e;
+        --text: #e6f0ff;
+        --muted: #8ca2cc;
+        --gold: #f8c244;
+        --gold-glow: rgba(248, 194, 68, 0.3);
+        --cyan: #6edbf8;
+        --purple: #9d52ff;
+        --green: #34d399;
+        --red: #fb7185;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-padding-top: env(safe-area-inset-top, 0px);
+        background: var(--bg);
+        min-height: 100%;
+      }
+      body {
+        margin: 0;
+        background-color: var(--bg);
+        background-image: radial-gradient(
+          ellipse 160% 120% at 50% 0%,
+          #152048 0%,
+          #101a36 35%,
+          var(--bg) 75%,
+          var(--bg) 100%
+        );
+        background-attachment: fixed;
+        color: var(--text);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        min-height: 100vh;
+      }
+      header {
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--panel-border);
+        background: rgba(0, 0, 0, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 19px;
+      }
+      header h1 span {
+        color: var(--gold);
+      }
+      header .sub {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px 16px 60px;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .tab {
+        padding: 9px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--panel-border);
+        background: var(--panel);
+        color: var(--muted);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.15s;
+      }
+      .tab:hover {
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+      .tab.active {
+        background: var(--panel2);
+        color: var(--gold);
+        border-color: var(--gold);
+        box-shadow: 0 0 8px var(--gold-glow);
+      }
+      .tab.tab-end {
+        margin-left: auto;
+      }
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 16px;
+      }
+      .card h2 {
+        margin: 0 0 14px;
+        font-size: 15px;
+        color: var(--gold);
+      }
+      .mode-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+      .mode-input label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .mode-input input {
+        width: 100%;
+        padding: 9px 11px;
+        border-radius: 8px;
+        border: 1px solid var(--panel-border);
+        background: #0b1124;
+        color: var(--text);
+        font-size: 14px;
+      }
+      .mode-input input:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+      .mode-input input.tiered {
+        font-weight: 700;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s,
+          color 0.15s;
+      }
+      .date-row {
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .date-row .mode-input {
+        max-width: 200px;
+      }
+      button.primary {
+        background: linear-gradient(180deg, var(--gold), #dba52f);
+        color: #1a1200;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      button.primary:hover {
+        filter: brightness(1.08);
+      }
+      button.ghost {
+        background: transparent;
+        border: 1px solid var(--panel-border);
+        color: var(--muted);
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      button.ghost:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      #todayResults {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 4px;
+      }
+      @media (max-width: 900px) {
+        #todayResults {
+          grid-template-columns: 1fr;
+        }
+      }
+      .day-summary {
+        grid-column: 1 / -1;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 12px 14px;
+      }
+      .day-summary-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--gold);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+      }
+      .day-summary-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 16px;
+      }
+      .day-sum-item {
+        font-size: 13px;
+        color: var(--text);
+      }
+      .day-sum-item strong {
+        margin-left: 2px;
+      }
+      .day-summary-ok {
+        font-size: 13px;
+        color: var(--green);
+        font-weight: 600;
+      }
+      .result-mode {
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 0;
+        background: var(--panel);
+        min-width: 0;
+      }
+      .result-mode .mode-title {
+        font-weight: 700;
+        color: var(--cyan);
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+      .bracket-note {
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      .reward-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+        border-top: 1px dashed var(--panel-border);
+        font-size: 12px;
+        gap: 8px;
+      }
+      .reward-row:first-of-type {
+        border-top: none;
+      }
+      .reward-name {
+        color: var(--text);
+      }
+      .reward-nums {
+        text-align: right;
+      }
+      .reward-got {
+        color: var(--green);
+        font-weight: 700;
+      }
+      .reward-missed {
+        color: var(--red);
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .reward-missed.zero {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .pct-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-left: 6px;
+      }
+      .pct-badge.ok {
+        background: rgba(52, 211, 153, 0.15);
+        color: var(--green);
+      }
+      .pct-badge.bad {
+        background: rgba(251, 113, 133, 0.15);
+        color: var(--red);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        text-align: left;
+        color: var(--gold);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 8px 10px;
+        border-bottom: 2px solid var(--panel-border);
+      }
+      td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--panel-border);
+        color: var(--text);
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .empty {
+        color: var(--muted);
+        text-align: center;
+        padding: 30px;
+        font-size: 13px;
+      }
+      .season-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin-top: 6px;
+      }
+      .season-box {
+        background: var(--panel2);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+      }
+      .season-box .cur-label {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .season-box .cur-val {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--red);
+        margin-top: 4px;
+      }
+      .season-box .cur-val.zero {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .season-box .cur-meta {
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .season-box .cur-meta strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .season-box .cur-pct {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 2px 7px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .season-box .cur-pct.bad {
+        background: rgba(251, 113, 133, 0.15);
+        color: var(--red);
+      }
+      .season-box .cur-pct.ok {
+        background: rgba(52, 211, 153, 0.15);
+        color: var(--green);
+      }
+      .history-toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .history-toolbar input[type='search'],
+      .history-toolbar input[type='date'] {
+        padding: 8px 11px;
+        border-radius: 8px;
+        border: 1px solid var(--panel-border);
+        background: #0b1124;
+        color: var(--text);
+        font-size: 13px;
+        min-width: 160px;
+      }
+      .history-toolbar input:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+      .history-toolbar .search-hint {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .pretty-date-wrap {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        max-width: 200px;
+      }
+      .pretty-date-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 9px 11px;
+        border-radius: 8px;
+        border: 1px solid var(--panel-border);
+        background: #0b1124;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: left;
+        font-family: inherit;
+      }
+      .pretty-date-btn:hover {
+        border-color: var(--cyan);
+      }
+      .pretty-date-btn:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+      .pretty-date-icon {
+        font-size: 14px;
+        opacity: 0.85;
+      }
+      .pretty-date-native {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        cursor: pointer;
+      }
+
+      .boss-table-wrap {
+        overflow-x: auto;
+      }
+      .boss-table-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .boss-table-wrap th {
+        text-align: left;
+        color: var(--gold);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 8px 10px;
+        border-bottom: 2px solid var(--panel-border);
+      }
+      .boss-table-wrap td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--panel-border);
+        color: var(--text);
+      }
+      .boss-table-wrap tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .boss-name {
+        color: var(--cyan);
+        font-weight: 600;
+      }
+      .season-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .del-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 15px;
+      }
+      .del-btn:hover {
+        color: var(--red);
+      }
+      /* Bracket distribution */
+      .dist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 4px;
+      }
+      .dist-mode {
+        background: var(--panel2);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 12px 14px;
+      }
+      .dist-mode .dist-title {
+        font-weight: 700;
+        color: var(--cyan);
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+      .dist-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 7px;
+        font-size: 12px;
+      }
+      .dist-row:last-child {
+        margin-bottom: 0;
+      }
+      .dist-label {
+        min-width: 72px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .dist-bar-wrap {
+        flex: 1;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.35);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .dist-bar {
+        height: 100%;
+        border-radius: 4px;
+        min-width: 0;
+        transition: width 0.25s ease;
+      }
+      .dist-pct {
+        min-width: 42px;
+        text-align: right;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .dist-count {
+        color: var(--muted);
+        font-size: 11px;
+        min-width: 28px;
+        text-align: right;
+      }
+      .dist-empty {
+        color: var(--muted);
+        font-size: 12px;
+        padding: 6px 0;
+      }
+
+      .boss-dist-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      @media (max-width: 1100px) {
+        .boss-dist-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 620px) {
+        .boss-dist-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .boss-dist-card {
+        background: var(--panel2);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 12px;
+        min-width: 0;
+      }
+      .boss-dist-card .boss-dist-name {
+        font-weight: 700;
+        color: var(--cyan);
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+      .boss-dist-card .boss-dist-days {
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 11px;
+        margin-left: 6px;
+      }
+      .boss-dist-card .dist-mode {
+        margin-bottom: 8px;
+        padding: 10px;
+      }
+      .boss-dist-card .dist-mode:last-child {
+        margin-bottom: 0;
+      }
+      .boss-dist-card .dist-title {
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+      .boss-dist-card .dist-label {
+        min-width: 58px;
+        font-size: 11px;
+      }
+      .boss-dist-card .dist-pct {
+        min-width: 36px;
+        font-size: 11px;
+      }
+      .boss-dist-card .dist-count {
+        font-size: 10px;
+        min-width: 24px;
+      }
+
+      .dist-miss-block {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--panel-border);
+      }
+      .dist-miss-heading {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
+      }
+      .dist-miss-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        padding: 3px 0;
+      }
+      .dist-miss-name {
+        color: var(--text);
+      }
+      .dist-miss-nums {
+        color: var(--red);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .dist-miss-nums.zero {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .dist-miss-pct {
+        font-weight: 500;
+        font-size: 11px;
+        margin-left: 4px;
+        opacity: 0.85;
+      }
+      /* Season sub-tabs */
+      .season-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      /* Inner subtabs (Season totals / Dream realm ranks) */
+      .season-tab {
+        padding: 7px 12px;
+        border-radius: 7px;
+        border: 1px solid var(--panel-border);
+        background: var(--panel2);
+        color: var(--muted);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+        transition: all 0.15s;
+      }
+      .season-tab:hover {
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+      .season-tab.active {
+        background: rgba(248, 194, 68, 0.12);
+        color: var(--gold);
+        border-color: var(--gold);
+      }
+      /* Season picker tabs (S8 — Veil of Memories) — larger, more prominent */
+      .season-tab.season-pick {
+        padding: 9px 14px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        background: var(--panel);
+        border-color: var(--panel-border);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+      }
+      .season-tab.season-pick:hover {
+        border-color: var(--cyan);
+        color: var(--cyan);
+        background: var(--panel2);
+      }
+      .season-tab.season-pick.active {
+        background: linear-gradient(
+          180deg,
+          rgba(248, 194, 68, 0.2),
+          rgba(248, 194, 68, 0.08)
+        );
+        color: var(--gold);
+        border-color: var(--gold);
+        box-shadow: 0 0 10px var(--gold-glow);
+      }
+      .season-tabs-picks {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--panel-border);
+      }
+      .season-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-left: auto;
+      }
+      select.season-select {
+        padding: 7px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--panel-border);
+        background: #0b1124;
+        color: var(--text);
+        font-size: 13px;
+      }
+      .season-tab-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .season-del {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        line-height: 1;
+      }
+      .season-del:hover {
+        color: var(--red);
+        background: rgba(251, 113, 133, 0.12);
+      }
+      /* Modals */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+      }
+      .modal-overlay[hidden] {
+        display: none;
+      }
+      .modal {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 14px;
+        padding: 22px 24px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+      .modal h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+        color: var(--gold);
+      }
+      .modal-desc {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+      .modal-check {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text);
+        margin-bottom: 16px;
+        cursor: pointer;
+      }
+      .modal-check input {
+        margin-top: 2px;
+        accent-color: var(--gold);
+      }
+      @media (max-width: 620px) {
+        .date-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .date-row .mode-input {
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>AFK Journey • <span>Rank Reward Tracker</span></h1>
+        <div class="sub">
+          Log your daily ranks, see what you earned vs. maximum potential rewards
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="tabs">
+        <button class="tab active" data-view="today">Today</button>
+        <button class="tab" data-view="season">Seasons</button>
+        <button class="tab" data-view="overall">Overall</button>
+        <button class="tab tab-end" data-view="history">History</button>
+      </div>
+
+      <!-- TODAY -->
+      <div class="view active" id="view-today">
+        <div class="card">
+          <h2>Enter today's ranks</h2>
+          <div class="date-row">
+            <div class="mode-input">
+              <label>Date</label>
+              <div class="pretty-date-wrap">
+                <button type="button" class="pretty-date-btn" id="entryDateBtn" title="Pick a date">
+                  <span id="entryDateLabel">—</span>
+                  <span class="pretty-date-icon" aria-hidden="true">📅</span>
+                </button>
+                <input type="date" id="entryDate" class="pretty-date-native" tabindex="-1" />
+              </div>
+            </div>
+            <div class="mode-input" style="max-width: 240px">
+              <label>Dream Realm boss</label>
+              <select id="entryBoss" style="
+                width: 100%;
+                padding: 9px 11px;
+                border-radius: 8px;
+                border: 1px solid var(--panel-border);
+                background: #0b1124;
+                color: var(--text);
+                font-size: 14px;
+              "></select>
+            </div>
+          </div>
+          <div class="mode-grid" id="rankInputs"></div>
+          <div style="margin-top: 16px; display: flex; gap: 10px">
+            <button class="primary" id="saveDayBtn">Save Day</button>
+            <span class="bracket-note" id="saveStatus"></span>
+          </div>
+        </div>
+        <div id="todayResults"></div>
+      </div>
+
+      <!-- OVERALL -->
+      <div class="view" id="view-overall">
+        <div class="card">
+          <div class="season-tabs" id="overallSubTabs" style="margin-bottom: 14px">
+            <button class="season-tab active" data-osub="totals">All-time totals</button>
+            <button class="season-tab" data-osub="bosses">Dream realm ranks</button>
+          </div>
+          <div id="overallSub-totals">
+            <div class="bracket-note" style="margin-bottom: 12px">
+              % of logged ranks in each bracket, and missed rewards vs maximum potential (all days)
+            </div>
+            <div class="dist-grid" id="overallDist"></div>
+            <h2 style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)">Missed vs maximum potential</h2>
+            <div class="season-grid" id="overallTotalsGrid"></div>
+          </div>
+          <div id="overallSub-bosses" style="display:none">
+            <div class="bracket-note" style="margin-bottom: 12px">
+              For each boss: share of ranks in each Dream Realm bracket
+            </div>
+            <div id="overallBossWrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="view" id="view-history">
+        <div class="card">
+          <h2>Past days</h2>
+          <div class="season-tabs" id="historySeasonTabs" style="margin-bottom: 12px"></div>
+          <div class="history-toolbar">
+            <input
+              type="search"
+              id="historySearch"
+              placeholder="Search date or boss"
+              autocomplete="off"
+            />
+            <span class="search-hint" id="historySearchHint"></span>
+          </div>
+          <div id="historyTableWrap">
+            <div class="empty">No days logged yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEASONS -->
+      <div class="view" id="view-season">
+        <div class="card">
+          <div class="season-meta">
+            <h2 style="margin: 0">Seasons</h2>
+            <div class="season-actions">
+              <button class="ghost" id="newSeasonBtn">+ New season</button>
+            </div>
+          </div>
+          <div class="season-tabs" id="seasonTabs"></div>
+          <div id="seasonContent">
+            <div class="season-tabs" id="seasonSubTabs" style="margin-bottom: 14px">
+              <button class="season-tab active" data-ssub="totals">Season totals</button>
+              <button class="season-tab" data-ssub="bosses">Dream realm ranks</button>
+            </div>
+            <div id="seasonSub-totals">
+              <div class="bracket-note" style="margin-bottom: 12px">
+                % of ranks in each bracket this season, and missed rewards vs maximum potential
+              </div>
+              <div class="dist-grid" id="seasonDist"></div>
+              <h2 style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)">Missed vs maximum potential</h2>
+              <div class="season-grid" id="seasonGrid"></div>
+            </div>
+            <div id="seasonSub-bosses" style="display:none">
+              <div class="bracket-note" style="margin-bottom: 12px">
+                For each boss: share of ranks in each Dream Realm bracket this season
+              </div>
+              <div id="seasonBossWrap"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New season modal -->
+    <div class="modal-overlay" id="newSeasonModal" hidden>
+      <div class="modal">
+        <h3>Start a new season</h3>
+        <p class="modal-desc">
+          Previous seasons stay available. Days from the start date onward count toward the new season.
+        </p>
+        <div class="mode-input" style="margin-bottom: 12px">
+          <label for="modalSeasonName">Season name</label>
+          <input type="text" id="modalSeasonName" placeholder="e.g. S9 — Season Name" value="" />
+        </div>
+        <div class="mode-input" style="margin-bottom: 18px">
+          <label for="modalSeasonStart">Start date</label>
+          <div class="pretty-date-wrap" style="max-width: none">
+            <button type="button" class="pretty-date-btn" id="modalSeasonStartBtn" title="Pick a date">
+              <span id="modalSeasonStartLabel">—</span>
+              <span class="pretty-date-icon" aria-hidden="true">📅</span>
+            </button>
+            <input type="date" id="modalSeasonStart" class="pretty-date-native" tabindex="-1" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" id="modalSeasonCancel">Cancel</button>
+          <button class="primary" id="modalSeasonConfirm">Create season</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm delete season modal -->
+    <div class="modal-overlay" id="deleteSeasonModal" hidden>
+      <div class="modal">
+        <h3>Delete season?</h3>
+        <p class="modal-desc" id="deleteSeasonMsg">
+          This removes the season from the list. Your daily rank history is kept unless you choose to delete those days too.
+        </p>
+        <label class="modal-check">
+          <input type="checkbox" id="deleteSeasonDays" />
+          Also delete rank days that fall only in this season
+        </label>
+        <div class="modal-actions">
+          <button class="ghost" id="modalDeleteCancel">Cancel</button>
+          <button class="primary" id="modalDeleteConfirm" style="background: linear-gradient(180deg, #fb7185, #e11d48); color: #fff;">
+            Delete season
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ---------- Reward tables ----------
+      const CURRENCIES = {
+        dreamFragment: { name: 'Dream Fragment', icon: '💠' },
+        tidalEssence: { name: 'Tidal Essence', icon: '🌊' },
+        temporalEssence: { name: 'Temporal Essence', icon: '⏳' },
+        seasonToken: { name: 'Season Token', icon: '🎫' },
+        twilightEssence: { name: 'Twilight Essence', icon: '🌘' },
+        diamonds: { name: 'Diamonds', icon: '💎' },
+      };
+
+      // Dream Realm daily boss rotation (8-day cycle).
+      // Anchor: Talking Root was the open boss on 2026-09-28 (from in-game timers).
+      // Order matches the in-game schedule list.
+      const DREAM_BOSSES = [
+        'Talking Root',
+        'Snow Stomper',
+        'Midnight Harvester',
+        'King Croaker',
+        'Novik',
+        'Mirage Frostspike',
+        'Marshtoad',
+        'Doomscourge',
+      ];
+      const DREAM_BOSS_ANCHOR = '2026-09-28'; // index 0 = Talking Root
+
+      const daysBetween = (a, b) => {
+        const da = new Date(a + 'T12:00:00');
+        const db = new Date(b + 'T12:00:00');
+        return Math.round((db - da) / 86400000);
+      };
+      const bossForDate = (dateStr) => {
+        if (!dateStr) return DREAM_BOSSES[0];
+        const delta = daysBetween(DREAM_BOSS_ANCHOR, dateStr);
+        const idx = ((delta % DREAM_BOSSES.length) + DREAM_BOSSES.length) % DREAM_BOSSES.length;
+        return DREAM_BOSSES[idx];
+      };
+
+      const MODES = {
+        drServer: {
+          label: 'Dream Realm — Server Rank',
+          brackets: [
+            {
+              min: 1,
+              max: 10,
+              r: { dreamFragment: 550, tidalEssence: 10, temporalEssence: 4 },
+            },
+            {
+              min: 11,
+              max: 20,
+              r: { dreamFragment: 450, tidalEssence: 8, temporalEssence: 3 },
+            },
+            {
+              min: 21,
+              max: 50,
+              r: { dreamFragment: 400, tidalEssence: 6, temporalEssence: 2 },
+            },
+            {
+              min: 51,
+              max: 100,
+              r: { dreamFragment: 350, tidalEssence: 6, temporalEssence: 1 },
+            },
+          ],
+        },
+        drDistrict: {
+          label: 'Dream Realm — District Rank',
+          brackets: [
+            {
+              min: 1,
+              max: 20,
+              r: { seasonToken: 215, temporalEssence: 2, twilightEssence: 4 },
+            },
+            {
+              min: 21,
+              max: 50,
+              r: { seasonToken: 200, temporalEssence: 2, twilightEssence: 3 },
+            },
+            {
+              min: 51,
+              max: 100,
+              r: { seasonToken: 185, temporalEssence: 2, twilightEssence: 2 },
+            },
+            {
+              min: 101,
+              max: 200,
+              r: { seasonToken: 170, temporalEssence: 2, twilightEssence: 2 },
+            },
+            {
+              min: 201,
+              max: 500,
+              r: { seasonToken: 155, temporalEssence: 2, twilightEssence: 1 },
+            },
+          ],
+        },
+        supremeArena: {
+          label: 'Supreme Arena',
+          brackets: [
+            {
+              min: 1,
+              max: 5,
+              r: { seasonToken: 8, twilightEssence: 360, diamonds: 500 },
+            },
+            {
+              min: 6,
+              max: 20,
+              r: { seasonToken: 8, twilightEssence: 360, diamonds: 500 },
+            },
+            {
+              min: 21,
+              max: 50,
+              r: { seasonToken: 6, twilightEssence: 330, diamonds: 450 },
+            },
+            {
+              min: 51,
+              max: 100,
+              r: { seasonToken: 4, twilightEssence: 300, diamonds: 400 },
+            },
+            {
+              min: 101,
+              max: 200,
+              r: { seasonToken: 3, twilightEssence: 280, diamonds: 380 },
+            },
+            {
+              min: 201,
+              max: 500,
+              r: { seasonToken: 2, twilightEssence: 250, diamonds: 340 },
+            },
+          ],
+        },
+      };
+
+      const STORAGE_KEY = 'afk_rank_tracker_days';
+      const SEASONS_KEY = 'afk_rank_tracker_seasons';
+      const ACTIVE_SEASON_KEY = 'afk_rank_tracker_active_season';
+      // Legacy single-start key (migrated on load)
+      const LEGACY_SEASON_KEY = 'afk_rank_tracker_season_start';
+
+      const TIER_COLORS = [
+        '#f8c244',
+        '#6edbf8',
+        '#9d52ff',
+        '#fb923c',
+        '#fb7185',
+        '#8ca2cc',
+      ];
+      const tierColorForIndex = (idx) =>
+        TIER_COLORS[Math.min(idx, TIER_COLORS.length - 1)];
+
+      const getBracket = (modeKey, rank) => {
+        if (!rank || rank < 1) return null;
+        return (
+          MODES[modeKey].brackets.find((b) => rank >= b.min && rank <= b.max) ||
+          null
+        );
+      };
+      const getBracketIndex = (modeKey, rank) => {
+        if (!rank || rank < 1) return -1;
+        return MODES[modeKey].brackets.findIndex(
+          (b) => rank >= b.min && rank <= b.max,
+        );
+      };
+
+      const bestRewards = (modeKey) => MODES[modeKey].brackets[0].r;
+
+      const computeMissed = (modeKey, rank) => {
+        const best = bestRewards(modeKey);
+        const bracket = getBracket(modeKey, rank);
+        const got = bracket ? bracket.r : {};
+        const missed = {};
+        Object.keys(best).forEach((c) => {
+          missed[c] = best[c] - (got[c] || 0);
+        });
+        return { bracket, got, missed, best };
+      };
+
+      const loadDays = () => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          const days = raw ? JSON.parse(raw) : {};
+          // Migrate renamed bosses
+          let dirty = false;
+          Object.keys(days).forEach((date) => {
+            if (days[date].boss === 'Unknown Nightmare') {
+              days[date].boss = 'Snow Stomper';
+              dirty = true;
+            }
+          });
+          if (dirty) {
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(days));
+            } catch (e) {}
+          }
+          return days;
+        } catch (e) {
+          return {};
+        }
+      };
+      const saveDays = (days) => {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(days));
+        } catch (e) {}
+      };
+
+      const todayStr = () => {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+
+      // Display-friendly date (storage stays YYYY-MM-DD)
+      const MONTHS_SHORT = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      ];
+      const formatDate = (iso) => {
+        if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
+        const [y, m, d] = iso.split('-').map(Number);
+        return `${MONTHS_SHORT[m - 1]} ${d}, ${y}`;
+      };
+
+      // ---------- Seasons (multi) ----------
+      // Official AFK Journey seasons (oldest → newest). start is inclusive;
+      // end is the next season's start (exclusive) when present.
+      const OFFICIAL_SEASONS = [
+        { id: 's1', name: 'Song of Strife', start: '2024-05-10' },
+        { id: 's2', name: 'Waves of Intrigue', start: '2024-09-19' },
+        { id: 's3', name: 'Chains of Eternity', start: '2025-01-17' },
+        { id: 's4', name: 'Echoes of Dissent', start: '2025-05-23' },
+        { id: 's5', name: 'Thorns of Devotion', start: '2025-09-26' },
+        { id: 's6', name: 'Tower of Memory', start: '2026-01-30' },
+        { id: 's7', name: 'Crown of Ashes', start: '2026-05-29' },
+        { id: 's8', name: 'Veil of Memories', start: '2026-09-23' },
+      ];
+
+      const loadSeasons = () => {
+        try {
+          const raw = localStorage.getItem(SEASONS_KEY);
+          if (raw) {
+            let list = JSON.parse(raw);
+            if (Array.isArray(list) && list.length) {
+              // Migrate generic "Season 8" / wrong start to official Veil of Memories
+              let dirty = false;
+              list = list.map((s) => {
+                if (
+                  s.id === 's8' ||
+                  s.name === 'Season 8' ||
+                  (s.name && s.name.includes('Season 8'))
+                ) {
+                  dirty = true;
+                  return {
+                    ...s,
+                    id: 's8',
+                    name: 'Veil of Memories',
+                    start: '2026-09-23',
+                  };
+                }
+                return s;
+              });
+              // Ensure current official season exists
+              if (!list.find((s) => s.id === 's8' || s.start === '2026-09-23')) {
+                list.push({
+                  id: 's8',
+                  name: 'Veil of Memories',
+                  start: '2026-09-23',
+                });
+                dirty = true;
+              }
+              if (dirty) saveSeasons(list);
+              return list;
+            }
+          }
+        } catch (e) {}
+        // First load: seed current season (and keep list minimal — past seasons
+        // can be added via + New season if needed for old data)
+        const initial = [
+          {
+            id: 's8',
+            name: 'Veil of Memories',
+            start: '2026-09-23',
+          },
+        ];
+        saveSeasons(initial);
+        return initial;
+      };
+      const saveSeasons = (list) => {
+        try {
+          localStorage.setItem(SEASONS_KEY, JSON.stringify(list));
+        } catch (e) {}
+      };
+      const getActiveSeasonId = () => {
+        try {
+          return localStorage.getItem(ACTIVE_SEASON_KEY);
+        } catch (e) {
+          return null;
+        }
+      };
+      const setActiveSeasonId = (id) => {
+        try {
+          localStorage.setItem(ACTIVE_SEASON_KEY, id);
+        } catch (e) {}
+      };
+
+      const getSeasonDateRange = (seasons, season) => {
+        const idx = seasons.findIndex((s) => s.id === season.id);
+        const start = season.start;
+        // End is day before next season starts, or open (null)
+        let end = null;
+        if (idx >= 0 && idx < seasons.length - 1) {
+          const nextStart = seasons[idx + 1].start;
+          // end exclusive: day before next
+          const d = new Date(nextStart + 'T12:00:00');
+          d.setDate(d.getDate() - 1);
+          end = d.toISOString().slice(0, 10);
+        }
+        return { start, end };
+      };
+
+      const dayInSeason = (date, range) => {
+        if (date < range.start) return false;
+        if (range.end && date > range.end) return false;
+        return true;
+      };
+
+      const seasonDayNumber = (date, seasonStart) => {
+        const n = daysBetween(seasonStart, date) + 1;
+        return n >= 1 ? n : null;
+      };
+
+      const findSeasonForDate = (date, seasons) => {
+        for (let i = seasons.length - 1; i >= 0; i--) {
+          const range = getSeasonDateRange(seasons, seasons[i]);
+          if (dayInSeason(date, range)) return seasons[i];
+        }
+        return null;
+      };
+
+      // Prefer S9 / Season 9 in the name; only trust short ids like s8 (not timestamps)
+      const seasonNumber = (season) => {
+        if (!season) return null;
+        if (season.number != null && season.number !== '') {
+          const n = parseInt(season.number, 10);
+          if (n >= 1 && n < 100) return String(n);
+        }
+        const name = String(season.name || '');
+        const fromName = name.match(/\bS(?:eason)?\s*(\d{1,2})\b/i);
+        if (fromName) return fromName[1];
+        const fromId = String(season.id || '').match(/^s(\d{1,2})$/i);
+        if (fromId) return fromId[1];
+        return null;
+      };
+      const seasonLabel = (season) => {
+        if (!season) return '';
+        const name = String(season.name || '').trim();
+        if (/^S\d{1,2}\s*[—–-]/.test(name)) return name;
+        const n = seasonNumber(season);
+        const bare = name.replace(/^S\d{1,2}\s*[—–-]\s*/i, '');
+        return n ? `S${n} — ${bare}` : bare;
+      };
+      const nextSeasonNumber = (seasons) => {
+        let max = 0;
+        seasons.forEach((s) => {
+          const n = parseInt(seasonNumber(s) || '0', 10);
+          if (n > max) max = n;
+        });
+        return max + 1;
+      };
+
+
+      // ---------- Bracket distribution ----------
+      // dateFilterFn: optional (date) => bool; if null, all days
+      const computeBracketDist = (days, dateFilterFn) => {
+        const result = {};
+        Object.keys(MODES).forEach((modeKey) => {
+          const brackets = MODES[modeKey].brackets;
+          const counts = brackets.map(() => 0);
+          let outside = 0;
+          let total = 0;
+          const missed = {};
+          const maxPossible = {};
+          const best = bestRewards(modeKey);
+          Object.keys(best).forEach((c) => {
+            missed[c] = 0;
+            maxPossible[c] = 0;
+          });
+          Object.keys(days).forEach((date) => {
+            if (dateFilterFn && !dateFilterFn(date)) return;
+            const rank = days[date].ranks[modeKey];
+            if (!rank) return;
+            total++;
+            const idx = getBracketIndex(modeKey, rank);
+            if (idx === -1) outside++;
+            else counts[idx]++;
+            const { missed: dayMissed } = computeMissed(modeKey, rank);
+            Object.keys(best).forEach((c) => {
+              missed[c] += dayMissed[c] || 0;
+              maxPossible[c] += best[c];
+            });
+          });
+          result[modeKey] = {
+            counts,
+            outside,
+            total,
+            brackets,
+            missed,
+            maxPossible,
+          };
+        });
+        return result;
+      };
+
+      const renderDist = (container, distData) => {
+        const modeKeys = Object.keys(MODES);
+        let anyData = false;
+        modeKeys.forEach((k) => {
+          if (distData[k].total > 0) anyData = true;
+        });
+        if (!anyData) {
+          container.innerHTML =
+            '<div class="empty" style="padding:16px;">No ranks logged yet for this period.</div>';
+          return;
+        }
+        container.innerHTML = modeKeys
+          .map((modeKey) => {
+            const {
+              counts,
+              outside,
+              total,
+              brackets,
+              missed,
+              maxPossible,
+            } = distData[modeKey];
+            if (total === 0) {
+              return `<div class="dist-mode">
+            <div class="dist-title">${MODES[modeKey].label}</div>
+            <div class="dist-empty">No ranks entered</div>
+          </div>`;
+            }
+            const rows = brackets
+              .map((b, idx) => {
+                const n = counts[idx];
+                const pct = Math.round((n / total) * 100);
+                const c = tierColorForIndex(idx);
+                const label =
+                  b.min === 1 ? `Top ${b.max}` : `${b.min}–${b.max}`;
+                return `<div class="dist-row">
+              <span class="dist-label" style="color:${c}">${label}</span>
+              <div class="dist-bar-wrap">
+                <div class="dist-bar" style="width:${pct}%;background:${c}"></div>
+              </div>
+              <span class="dist-pct" style="color:${c}">${pct}%</span>
+              <span class="dist-count">${n}/${total}</span>
+            </div>`;
+              })
+              .join('');
+            const outPct = Math.round((outside / total) * 100);
+            const outRow =
+              outside > 0
+                ? `<div class="dist-row">
+              <span class="dist-label" style="color:var(--red)">Outside</span>
+              <div class="dist-bar-wrap">
+                <div class="dist-bar" style="width:${outPct}%;background:var(--red)"></div>
+              </div>
+              <span class="dist-pct" style="color:var(--red)">${outPct}%</span>
+              <span class="dist-count">${outside}/${total}</span>
+            </div>`
+                : '';
+
+            // Missed currencies under the bracket bars
+            const missRows = Object.keys(missed)
+              .map((c) => {
+                const cur = CURRENCIES[c];
+                const missVal = missed[c] || 0;
+                const maxVal = maxPossible[c] || 0;
+                const pct =
+                  maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
+                const zero = missVal === 0;
+                const amount = zero
+                  ? '0'
+                  : '−' + missVal.toLocaleString();
+                return `<div class="dist-miss-row">
+              <span class="dist-miss-name">${cur.icon} ${cur.name}</span>
+              <span class="dist-miss-nums ${zero ? 'zero' : ''}">
+                ${amount}
+                <span class="dist-miss-pct">(${pct}% of potential)</span>
+              </span>
+            </div>`;
+              })
+              .join('');
+
+            return `<div class="dist-mode">
+            <div class="dist-title">${MODES[modeKey].label}</div>
+            ${rows}${outRow}
+            <div class="dist-miss-block">
+              <div class="dist-miss-heading">Missed vs maximum potential</div>
+              ${missRows}
+            </div>
+          </div>`;
+          })
+          .join('');
+      };
+
+      // ---------- UI: tabs ----------
+      // activateSubTab is assigned later; called on click after full script load
+      let activateSubTab = () => {};
+      let selectCurrentSeason = () => {};
+
+      document.querySelectorAll('.tab').forEach((tab) => {
+        tab.onclick = () => {
+          document
+            .querySelectorAll('.tab')
+            .forEach((t) => t.classList.remove('active'));
+          document
+            .querySelectorAll('.view')
+            .forEach((v) => v.classList.remove('active'));
+          tab.classList.add('active');
+          document
+            .getElementById('view-' + tab.dataset.view)
+            .classList.add('active');
+          if (tab.dataset.view === 'history') renderHistory();
+          if (tab.dataset.view === 'overall') {
+            activateSubTab('overallSubTabs', 'overallSub-', 'osub', 'totals');
+            renderOverall();
+          }
+          if (tab.dataset.view === 'season') {
+            selectCurrentSeason();
+            activateSubTab('seasonSubTabs', 'seasonSub-', 'ssub', 'totals');
+            renderSeason();
+          }
+        };
+      });
+
+      // ---------- UI: today inputs ----------
+      const rankInputsEl = document.getElementById('rankInputs');
+      Object.keys(MODES).forEach((key) => {
+        const div = document.createElement('div');
+        div.className = 'mode-input';
+        div.innerHTML = `<label>${MODES[key].label} — Rank</label><input type="number" min="1" class="tiered" id="rank_${key}" placeholder="e.g. 15" />`;
+        rankInputsEl.appendChild(div);
+      });
+      const entryDateEl = document.getElementById('entryDate');
+      const entryDateLabel = document.getElementById('entryDateLabel');
+      const syncEntryDateLabel = () => {
+        const v = entryDateEl.value || todayStr();
+        entryDateLabel.textContent = formatDate(v);
+      };
+      entryDateEl.value = todayStr();
+      syncEntryDateLabel();
+      entryDateEl.addEventListener('change', syncEntryDateLabel);
+      entryDateEl.addEventListener('input', syncEntryDateLabel);
+      document.getElementById('entryDateBtn').addEventListener('click', () => {
+        if (typeof entryDateEl.showPicker === 'function') {
+          try {
+            entryDateEl.showPicker();
+            return;
+          } catch (e) {}
+        }
+        entryDateEl.focus();
+        entryDateEl.click();
+      });
+
+      // Boss dropdown
+      const entryBossEl = document.getElementById('entryBoss');
+      DREAM_BOSSES.forEach((name) => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        entryBossEl.appendChild(opt);
+      });
+      let bossManualOverride = false;
+      const syncBossFromDate = () => {
+        if (bossManualOverride) return;
+        const date = document.getElementById('entryDate').value || todayStr();
+        entryBossEl.value = bossForDate(date);
+      };
+      entryBossEl.addEventListener('change', () => {
+        bossManualOverride = true;
+      });
+      syncBossFromDate();
+
+      const colorRankInput = (key) => {
+        const input = document.getElementById('rank_' + key);
+        const rank = parseInt(input.value, 10);
+        const idx = getBracketIndex(key, rank);
+        if (isNaN(rank) || idx === -1) {
+          input.style.borderColor = 'var(--panel-border)';
+          input.style.color = 'var(--text)';
+          input.style.boxShadow = 'none';
+          return;
+        }
+        const c = tierColorForIndex(idx);
+        input.style.borderColor = c;
+        input.style.color = c;
+        input.style.boxShadow = `0 0 8px ${c}55`;
+      };
+      Object.keys(MODES).forEach((key) => {
+        document
+          .getElementById('rank_' + key)
+          .addEventListener('input', () => colorRankInput(key));
+      });
+
+      const renderResultsForDay = (dayData, container) => {
+        container.innerHTML = '';
+        const date =
+          dayData.date ||
+          document.getElementById('entryDate').value ||
+          todayStr();
+        container.insertAdjacentHTML('beforeend', dayContextHtml(date));
+
+        const dayMissed = {};
+        Object.keys(CURRENCIES).forEach((c) => (dayMissed[c] = 0));
+        let anyRank = false;
+
+        Object.keys(MODES).forEach((modeKey) => {
+          const rank = dayData.ranks[modeKey];
+          const { bracket, got, missed, best } = computeMissed(modeKey, rank);
+          const box = document.createElement('div');
+          box.className = 'result-mode';
+
+          const totalBest = Object.values(best).reduce((a, b) => a + b, 0);
+          const totalMissed = Object.values(missed).reduce((a, b) => a + b, 0);
+          const pct = totalBest
+            ? Math.round((totalMissed / totalBest) * 100)
+            : 0;
+
+          if (rank) {
+            anyRank = true;
+            Object.keys(missed).forEach((c) => {
+              dayMissed[c] += missed[c] || 0;
+            });
+          }
+
+          let html = `<div class="mode-title">${MODES[modeKey].label}</div>`;
+          if (!rank) {
+            html += `<div class="bracket-note">No rank entered</div>`;
+          } else if (!bracket) {
+            html += `<div class="bracket-note">Rank <strong style="color: var(--red);">#${rank}</strong> — outside reward brackets (missed 100%)</div>`;
+          } else {
+            const idx = getBracketIndex(modeKey, rank);
+            const c = tierColorForIndex(idx);
+            html += `<div class="bracket-note">Rank <strong style="color: ${c};">#${rank}</strong> → bracket <strong style="color: ${c};">${bracket.min}-${bracket.max}</strong>
+          <span class="pct-badge ${pct === 0 ? 'ok' : 'bad'}">${pct}% missed</span></div>`;
+          }
+          Object.keys(best).forEach((c) => {
+            const cur = CURRENCIES[c];
+            const gotVal = got[c] || 0;
+            const missVal = missed[c] || 0;
+            const missHtml =
+              missVal > 0
+                ? `<span class="reward-missed">(-${missVal.toLocaleString()})</span>`
+                : '';
+            html += `<div class="reward-row">
+          <span class="reward-name">${cur.icon} ${cur.name}</span>
+          <span class="reward-nums">
+            <span class="reward-got">${gotVal.toLocaleString()}</span> / ${best[c].toLocaleString()}
+            ${missHtml}
+          </span>
+        </div>`;
+          });
+          box.innerHTML = html;
+          container.appendChild(box);
+        });
+
+        // Day summary — total missed across all modes
+        const missParts = Object.keys(dayMissed)
+          .filter((c) => dayMissed[c] > 0)
+          .map((c) => {
+            const cur = CURRENCIES[c];
+            return `<span class="day-sum-item"><span class="day-sum-icon">${cur.icon}</span> ${cur.name} <strong class="reward-missed">−${dayMissed[c].toLocaleString()}</strong></span>`;
+          });
+        const summary = document.createElement('div');
+        summary.className = 'day-summary';
+        if (!anyRank) {
+          summary.innerHTML =
+            '<div class="bracket-note" style="margin:0">No ranks entered for this day.</div>';
+        } else if (!missParts.length) {
+          summary.innerHTML =
+            '<div class="day-summary-title">Day summary</div><div class="day-summary-ok">Nothing missed — full potential rewards.</div>';
+        } else {
+          summary.innerHTML = `<div class="day-summary-title">Day summary · missed</div><div class="day-summary-items">${missParts.join('')}</div>`;
+        }
+        container.appendChild(summary);
+      };
+
+      document.getElementById('saveDayBtn').onclick = () => {
+        const date = document.getElementById('entryDate').value || todayStr();
+        const ranks = {};
+        Object.keys(MODES).forEach((key) => {
+          const val = parseInt(
+            document.getElementById('rank_' + key).value,
+            10,
+          );
+          ranks[key] = isNaN(val) ? null : val;
+        });
+        const boss = entryBossEl.value || bossForDate(date);
+        const days = loadDays();
+        days[date] = { date, ranks, boss };
+        saveDays(days);
+        document.getElementById('saveStatus').textContent = `Saved ${formatDate(date)} ✓`;
+        setTimeout(() => {
+          document.getElementById('saveStatus').textContent = '';
+        }, 2500);
+        renderResultsForDay(
+          days[date],
+          document.getElementById('todayResults'),
+        );
+        renderHistory();
+        renderOverall();
+        renderSeason();
+      };
+
+      const dayContextHtml = (date) => {
+        const seasons = loadSeasons();
+        const season = findSeasonForDate(date, seasons);
+        if (!season) {
+          return `<div class="bracket-note" style="margin-bottom:12px;grid-column:1/-1">${formatDate(date)}</div>`;
+        }
+        const dayNum = seasonDayNumber(date, season.start);
+        return `<div class="bracket-note" style="margin-bottom:12px;grid-column:1/-1;font-size:13px">
+          <strong style="color:var(--gold)">${seasonLabel(season)}</strong>
+          · Day <strong style="color:var(--text)">${dayNum}</strong>
+          · <span style="color:var(--muted)">${formatDate(date)}</span>
+        </div>`;
+      };
+
+      const preloadToday = () => {
+        const days = loadDays();
+        const date = document.getElementById('entryDate').value;
+        bossManualOverride = false;
+        if (days[date]) {
+          Object.keys(MODES).forEach((key) => {
+            const v = days[date].ranks[key];
+            document.getElementById('rank_' + key).value =
+              v !== null && v !== undefined ? v : '';
+            colorRankInput(key);
+          });
+          entryBossEl.value = days[date].boss || bossForDate(date);
+          bossManualOverride = !!days[date].boss;
+          renderResultsForDay(
+            days[date],
+            document.getElementById('todayResults'),
+          );
+        } else {
+          document.getElementById('todayResults').innerHTML = '';
+          Object.keys(MODES).forEach((key) => {
+            document.getElementById('rank_' + key).value = '';
+            colorRankInput(key);
+          });
+          syncBossFromDate();
+        }
+      };
+      document.getElementById('entryDate').onchange = preloadToday;
+      preloadToday();
+
+      // ---------- History ----------
+      // Returns { missed: {cur: n}, maxPossible: {cur: n} }
+      const computeTotalsForDays = (days, dateFilterFn) => {
+        const missed = {};
+        const maxPossible = {};
+        Object.keys(CURRENCIES).forEach((c) => {
+          missed[c] = 0;
+          maxPossible[c] = 0;
+        });
+        Object.keys(days).forEach((date) => {
+          if (dateFilterFn && !dateFilterFn(date)) return;
+          Object.keys(MODES).forEach((modeKey) => {
+            const rank = days[date].ranks[modeKey];
+            if (!rank) return;
+            const { missed: dayMissed, best } = computeMissed(modeKey, rank);
+            Object.keys(best).forEach((c) => {
+              missed[c] += dayMissed[c] || 0;
+              maxPossible[c] += best[c];
+            });
+          });
+        });
+        return { missed, maxPossible };
+      };
+
+      const renderTotalsGrid = (gridEl, totalsData) => {
+        const { missed, maxPossible } = totalsData;
+        gridEl.innerHTML = Object.keys(CURRENCIES)
+          .map((c) => {
+            const missVal = missed[c] || 0;
+            const maxVal = maxPossible[c] || 0;
+            const pct =
+              maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
+            const zero = missVal === 0;
+            const pctClass = zero ? 'ok' : 'bad';
+            const lostLabel = zero
+              ? '0 lost'
+              : `−${missVal.toLocaleString()} lost`;
+            return `
+      <div class="season-box">
+        <div class="cur-label">${CURRENCIES[c].icon} ${CURRENCIES[c].name}</div>
+        <div class="cur-val ${zero ? 'zero' : ''}">${lostLabel}</div>
+        <div class="cur-meta">of <strong>${maxVal.toLocaleString()}</strong> potential</div>
+        <span class="cur-pct ${pctClass}">${pct}% missed</span>
+      </div>`;
+          })
+          .join('');
+      };
+
+      // Per-boss bracket distribution for Dream Realm modes
+      const DR_MODE_KEYS = ['drServer', 'drDistrict'];
+
+      const computeBossBracketDist = (days, dateFilterFn) => {
+        // stats[boss][modeKey] = { counts[], outside, total, brackets }
+        const stats = {};
+        const ensure = (boss) => {
+          if (!stats[boss]) {
+            stats[boss] = {};
+            DR_MODE_KEYS.forEach((mk) => {
+              const brackets = MODES[mk].brackets;
+              stats[boss][mk] = {
+                counts: brackets.map(() => 0),
+                outside: 0,
+                total: 0,
+                brackets,
+              };
+            });
+          }
+          return stats[boss];
+        };
+        Object.keys(days).forEach((date) => {
+          if (dateFilterFn && !dateFilterFn(date)) return;
+          const d = days[date];
+          const boss = d.boss || bossForDate(date);
+          const entry = ensure(boss);
+          DR_MODE_KEYS.forEach((mk) => {
+            const rank = d.ranks[mk];
+            if (!rank) return;
+            const slot = entry[mk];
+            slot.total++;
+            const idx = getBracketIndex(mk, rank);
+            if (idx === -1) slot.outside++;
+            else slot.counts[idx]++;
+          });
+        });
+        return stats;
+      };
+
+      const renderBossBracketDist = (container, stats) => {
+        const names = [
+          ...DREAM_BOSSES,
+          ...Object.keys(stats).filter((b) => !DREAM_BOSSES.includes(b)),
+        ];
+        const active = names.filter((b) => {
+          const s = stats[b];
+          return s && DR_MODE_KEYS.some((mk) => s[mk].total > 0);
+        });
+        if (!active.length) {
+          container.innerHTML =
+            '<div class="empty" style="padding:16px;">No Dream Realm ranks logged for this period.</div>';
+          return;
+        }
+        const cards = active
+          .map((boss) => {
+            const entry = stats[boss];
+            const modeBlocks = DR_MODE_KEYS.map((mk) => {
+              const { counts, outside, total, brackets } = entry[mk];
+              const shortLabel =
+                mk === 'drServer' ? 'Server rank' : 'District rank';
+              if (total === 0) {
+                return `<div class="dist-mode">
+              <div class="dist-title">${shortLabel}</div>
+              <div class="dist-empty">No ranks</div>
+            </div>`;
+              }
+              const rows = brackets
+                .map((b, idx) => {
+                  const n = counts[idx];
+                  const pct = Math.round((n / total) * 100);
+                  const c = tierColorForIndex(idx);
+                  const label =
+                    b.min === 1 ? `Top ${b.max}` : `${b.min}–${b.max}`;
+                  return `<div class="dist-row">
+              <span class="dist-label" style="color:${c}">${label}</span>
+              <div class="dist-bar-wrap">
+                <div class="dist-bar" style="width:${pct}%;background:${c}"></div>
+              </div>
+              <span class="dist-pct" style="color:${c}">${pct}%</span>
+              <span class="dist-count">${n}/${total}</span>
+            </div>`;
+                })
+                .join('');
+              const outPct = Math.round((outside / total) * 100);
+              const outRow =
+                outside > 0
+                  ? `<div class="dist-row">
+              <span class="dist-label" style="color:var(--red)">Outside</span>
+              <div class="dist-bar-wrap">
+                <div class="dist-bar" style="width:${outPct}%;background:var(--red)"></div>
+              </div>
+              <span class="dist-pct" style="color:var(--red)">${outPct}%</span>
+              <span class="dist-count">${outside}/${total}</span>
+            </div>`
+                  : '';
+              return `<div class="dist-mode">
+            <div class="dist-title">${shortLabel}</div>
+            ${rows}${outRow}
+          </div>`;
+            }).join('');
+            const dayHint = DR_MODE_KEYS.reduce(
+              (m, mk) => Math.max(m, entry[mk].total),
+              0,
+            );
+            return `<div class="boss-dist-card">
+          <div class="boss-dist-name">
+            ${boss}<span class="boss-dist-days">${dayHint} day${dayHint === 1 ? '' : 's'}</span>
+          </div>
+          ${modeBlocks}
+        </div>`;
+          })
+          .join('');
+        container.innerHTML = `<div class="boss-dist-grid">${cards}</div>`;
+      };
+
+      const renderOverall = () => {
+        const days = loadDays();
+        const dist = computeBracketDist(days, null);
+        renderDist(document.getElementById('overallDist'), dist);
+        renderBossBracketDist(
+          document.getElementById('overallBossWrap'),
+          computeBossBracketDist(days, null),
+        );
+        const totals = computeTotalsForDays(days, null);
+        renderTotalsGrid(document.getElementById('overallTotalsGrid'), totals);
+      };
+
+      // Subtabs: Overall & Season inner views
+      activateSubTab = (tabsId, prefix, attr, key) => {
+        const tabsEl = document.getElementById(tabsId);
+        if (!tabsEl) return;
+        tabsEl.querySelectorAll('.season-tab').forEach((t) => {
+          const on = t.dataset[attr] === key;
+          t.classList.toggle('active', on);
+        });
+        ['bosses', 'totals'].forEach((k) => {
+          const el = document.getElementById(prefix + k);
+          if (el) el.style.display = k === key ? '' : 'none';
+        });
+      };
+
+      const wirePanelSubTabs = (tabsId, prefix, attr) => {
+        const tabsEl = document.getElementById(tabsId);
+        if (!tabsEl || tabsEl.dataset.wired) return;
+        tabsEl.dataset.wired = '1';
+        tabsEl.querySelectorAll('.season-tab').forEach((btn) => {
+          btn.onclick = () => {
+            activateSubTab(tabsId, prefix, attr, btn.dataset[attr]);
+          };
+        });
+      };
+      wirePanelSubTabs('overallSubTabs', 'overallSub-', 'osub');
+      wirePanelSubTabs('seasonSubTabs', 'seasonSub-', 'ssub');
+
+      // History filter: 'all' or season id
+      let historySeasonFilter = 'all';
+
+      const renderHistorySeasonTabs = () => {
+        const seasons = loadSeasons();
+        const tabsEl = document.getElementById('historySeasonTabs');
+        if (!tabsEl) return;
+        tabsEl.classList.add('season-tabs-picks');
+        const items = [
+          { id: 'all', label: 'All seasons' },
+          ...[...seasons].reverse().map((s) => ({ id: s.id, label: seasonLabel(s) })),
+        ];
+        if (
+          historySeasonFilter !== 'all' &&
+          !seasons.find((s) => s.id === historySeasonFilter)
+        ) {
+          historySeasonFilter = 'all';
+        }
+        tabsEl.innerHTML = items
+          .map((it) => {
+            const active = it.id === historySeasonFilter ? ' active' : '';
+            const pick = it.id !== 'all' ? ' season-pick' : '';
+            return `<button class="season-tab${pick}${active}" data-hid="${it.id}">${it.label}</button>`;
+          })
+          .join('');
+        tabsEl.querySelectorAll('.season-tab').forEach((btn) => {
+          btn.onclick = () => {
+            historySeasonFilter = btn.dataset.hid;
+            renderHistory();
+          };
+        });
+      };
+
+      const renderHistory = () => {
+        const days = loadDays();
+        const seasons = loadSeasons();
+        renderHistorySeasonTabs();
+
+        let allDates = Object.keys(days).sort().reverse();
+        if (historySeasonFilter !== 'all') {
+          const season = seasons.find((s) => s.id === historySeasonFilter);
+          if (season) {
+            const range = getSeasonDateRange(seasons, season);
+            allDates = allDates.filter((d) => dayInSeason(d, range));
+          }
+        }
+
+        const wrap = document.getElementById('historyTableWrap');
+        const searchEl = document.getElementById('historySearch');
+        const hintEl = document.getElementById('historySearchHint');
+        const q = (searchEl?.value || '').trim().toLowerCase();
+
+        const dates = q
+          ? allDates.filter((d) => {
+              const boss = (days[d].boss || bossForDate(d)).toLowerCase();
+              return d.toLowerCase().includes(q) || boss.includes(q);
+            })
+          : allDates;
+
+        if (hintEl) {
+          if (!allDates.length) {
+            hintEl.textContent = '';
+          } else if (q) {
+            hintEl.textContent = `${dates.length} of ${allDates.length} day${allDates.length === 1 ? '' : 's'}`;
+          } else {
+            hintEl.textContent = `${allDates.length} day${allDates.length === 1 ? '' : 's'}`;
+          }
+        }
+
+        if (!Object.keys(days).length) {
+          wrap.innerHTML = '<div class="empty">No days logged yet.</div>';
+          return;
+        }
+        if (!allDates.length) {
+          wrap.innerHTML =
+            '<div class="empty">No days logged in this season.</div>';
+          return;
+        }
+        if (!dates.length) {
+          wrap.innerHTML = `<div class="empty">No days match “${q}”.</div>`;
+          return;
+        }
+        let html = `<div style="overflow-x:auto;"><table><thead><tr>
+      <th>Season day</th>
+      <th>Date</th>
+      <th>Dream Realm Boss</th>
+      ${Object.keys(MODES)
+        .map((k) => `<th>${MODES[k].label}</th>`)
+        .join('')}<th></th>
+    </tr></thead><tbody>`;
+        dates.forEach((date) => {
+          const d = days[date];
+          let totalMissed = 0;
+          const rankCells = Object.keys(MODES)
+            .map((key) => {
+              const rank = d.ranks[key];
+              if (!rank) return '<td class="bracket-note">—</td>';
+              const { missed } = computeMissed(key, rank);
+              totalMissed += Object.values(missed).reduce((a, b) => a + b, 0);
+              const idx = getBracketIndex(key, rank);
+              const c = idx === -1 ? 'var(--red)' : tierColorForIndex(idx);
+              return `<td style="color: ${c}; font-weight: 700;">#${rank}</td>`;
+            })
+            .join('');
+          const bossName = d.boss || bossForDate(date);
+          const season = findSeasonForDate(date, seasons);
+          const dayNum = season
+            ? seasonDayNumber(date, season.start)
+            : null;
+          const dayLabel = dayNum
+            ? `Day ${dayNum}${season ? ` · ${seasonLabel(season)}` : ''}`
+            : '—';
+          html += `<tr>
+        <td style="color:var(--muted);font-size:12px;white-space:nowrap">${dayLabel}</td>
+        <td style="white-space:nowrap">${formatDate(date)}</td>
+        <td style="color: var(--cyan); font-weight: 600;">${bossName}</td>
+        ${rankCells}
+        <td><button class="del-btn" onclick="deleteDay('${date}')" title="Delete">🗑</button></td>
+      </tr>`;
+        });
+        html += '</tbody></table></div>';
+        wrap.innerHTML = html;
+      };
+
+      document.getElementById('historySearch').addEventListener('input', () => {
+        renderHistory();
+      });
+
+      window.deleteDay = (date) => {
+        const days = loadDays();
+        delete days[date];
+        saveDays(days);
+        renderHistory();
+        renderOverall();
+        renderSeason();
+      };
+
+      // ---------- Season ----------
+      let activeSeasonId = null;
+      let pendingDeleteSeasonId = null;
+
+      // Always jump to the latest season when opening the Seasons tab
+      selectCurrentSeason = () => {
+        const seasons = loadSeasons();
+        if (!seasons.length) return;
+        activeSeasonId = seasons[seasons.length - 1].id;
+        setActiveSeasonId(activeSeasonId);
+      };
+
+      const renderSeasonTabs = (seasons) => {
+        const tabsEl = document.getElementById('seasonTabs');
+        tabsEl.classList.add('season-tabs-picks');
+        if (!activeSeasonId || !seasons.find((s) => s.id === activeSeasonId)) {
+          activeSeasonId = seasons[seasons.length - 1].id;
+          setActiveSeasonId(activeSeasonId);
+        }
+        // Newest first (left)
+        const ordered = [...seasons].reverse();
+        tabsEl.innerHTML = ordered
+          .map((s) => {
+            const active = s.id === activeSeasonId ? ' active' : '';
+            const canDelete = seasons.length > 1;
+            const delBtn = canDelete
+              ? `<button class="season-del" data-del-sid="${s.id}" title="Delete season">🗑</button>`
+              : '';
+            return `<span class="season-tab-wrap">
+            <button class="season-tab season-pick${active}" data-sid="${s.id}">
+              ${seasonLabel(s)}
+            </button>${delBtn}
+          </span>`;
+          })
+          .join('');
+        tabsEl.querySelectorAll('.season-tab').forEach((btn) => {
+          btn.onclick = () => {
+            activeSeasonId = btn.dataset.sid;
+            setActiveSeasonId(activeSeasonId);
+            renderSeason();
+          };
+        });
+        tabsEl.querySelectorAll('.season-del').forEach((btn) => {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            openDeleteSeasonModal(btn.dataset.delSid);
+          };
+        });
+      };
+
+      const renderSeason = () => {
+        const seasons = loadSeasons();
+        activeSeasonId = getActiveSeasonId() || seasons[seasons.length - 1].id;
+        renderSeasonTabs(seasons);
+
+        const season =
+          seasons.find((s) => s.id === activeSeasonId) ||
+          seasons[seasons.length - 1];
+        const range = getSeasonDateRange(seasons, season);
+        const days = loadDays();
+
+        const inSeason = (date) => dayInSeason(date, range);
+
+        // Bracket distribution first (on top)
+        const dist = computeBracketDist(days, inSeason);
+        renderDist(document.getElementById('seasonDist'), dist);
+
+        // Boss bracket dist this season
+        renderBossBracketDist(
+          document.getElementById('seasonBossWrap'),
+          computeBossBracketDist(days, inSeason),
+        );
+
+        // Season totals under distribution
+        const totals = computeTotalsForDays(days, inSeason);
+        renderTotalsGrid(document.getElementById('seasonGrid'), totals);
+      };
+
+      // ---------- New season modal ----------
+      const syncModalSeasonStartLabel = () => {
+        const el = document.getElementById('modalSeasonStart');
+        const lab = document.getElementById('modalSeasonStartLabel');
+        if (el && lab) lab.textContent = formatDate(el.value || todayStr());
+      };
+
+      const openNewSeasonModal = () => {
+        const seasons = loadSeasons();
+        const nextNum = nextSeasonNumber(seasons);
+        document.getElementById('modalSeasonName').value = '';
+        document.getElementById('modalSeasonName').placeholder =
+          `e.g. S${nextNum} — Season Name`;
+        document.getElementById('modalSeasonStart').value = todayStr();
+        syncModalSeasonStartLabel();
+        document.getElementById('newSeasonModal').hidden = false;
+        document.getElementById('modalSeasonName').focus();
+      };
+      const closeNewSeasonModal = () => {
+        document.getElementById('newSeasonModal').hidden = true;
+      };
+
+      document.getElementById('newSeasonBtn').onclick = openNewSeasonModal;
+      document.getElementById('modalSeasonCancel').onclick = closeNewSeasonModal;
+      document.getElementById('newSeasonModal').onclick = (e) => {
+        if (e.target.id === 'newSeasonModal') closeNewSeasonModal();
+      };
+      document.getElementById('modalSeasonStart').addEventListener('change', syncModalSeasonStartLabel);
+      document.getElementById('modalSeasonStart').addEventListener('input', syncModalSeasonStartLabel);
+      document.getElementById('modalSeasonStartBtn').addEventListener('click', () => {
+        const el = document.getElementById('modalSeasonStart');
+        if (typeof el.showPicker === 'function') {
+          try {
+            el.showPicker();
+            return;
+          } catch (e) {}
+        }
+        el.focus();
+        el.click();
+      });
+
+      document.getElementById('modalSeasonConfirm').onclick = () => {
+        let name = document.getElementById('modalSeasonName').value.trim();
+        const start = document.getElementById('modalSeasonStart').value;
+        if (!name) {
+          document.getElementById('modalSeasonName').focus();
+          return;
+        }
+        if (!start || !/^\d{4}-\d{2}-\d{2}$/.test(start)) {
+          document.getElementById('modalSeasonStart').focus();
+          return;
+        }
+        const seasons = loadSeasons();
+        let num = null;
+        const nameNum = name.match(/\bS(?:eason)?\s*(\d{1,2})\b/i);
+        if (nameNum) num = parseInt(nameNum[1], 10);
+        if (!num) num = nextSeasonNumber(seasons);
+        // Normalize bare names to "S9 — Name" without doubling
+        if (!/^S\d{1,2}\s*[—–-]/.test(name)) {
+          const bare = name.replace(/^S(?:eason)?\s*\d{1,2}\s*[—–-]?\s*/i, '');
+          name = `S${num} — ${bare || 'New Season'}`;
+        }
+        const id = 's' + num;
+        // Avoid id collision
+        let finalId = id;
+        if (seasons.some((s) => s.id === finalId)) {
+          finalId = id + '-' + Date.now().toString(36);
+        }
+        seasons.push({ id: finalId, name, start, number: num });
+        saveSeasons(seasons);
+        activeSeasonId = finalId;
+        setActiveSeasonId(finalId);
+        closeNewSeasonModal();
+        renderSeason();
+      };
+
+      // ---------- Delete season modal ----------
+      const openDeleteSeasonModal = (seasonId) => {
+        const seasons = loadSeasons();
+        if (seasons.length <= 1) return;
+        const season = seasons.find((s) => s.id === seasonId);
+        if (!season) return;
+        pendingDeleteSeasonId = seasonId;
+        document.getElementById('deleteSeasonDays').checked = false;
+        document.getElementById('deleteSeasonMsg').textContent =
+          `Remove “${seasonLabel(season)}” (from ${formatDate(season.start)}) from the list? Your daily rank history is kept unless you also delete those days.`;
+        document.getElementById('deleteSeasonModal').hidden = false;
+      };
+      const closeDeleteSeasonModal = () => {
+        pendingDeleteSeasonId = null;
+        document.getElementById('deleteSeasonModal').hidden = true;
+      };
+
+      document.getElementById('modalDeleteCancel').onclick =
+        closeDeleteSeasonModal;
+      document.getElementById('deleteSeasonModal').onclick = (e) => {
+        if (e.target.id === 'deleteSeasonModal') closeDeleteSeasonModal();
+      };
+      document.getElementById('modalDeleteConfirm').onclick = () => {
+        if (!pendingDeleteSeasonId) return;
+        const seasons = loadSeasons();
+        if (seasons.length <= 1) {
+          closeDeleteSeasonModal();
+          return;
+        }
+        const idx = seasons.findIndex((s) => s.id === pendingDeleteSeasonId);
+        if (idx === -1) {
+          closeDeleteSeasonModal();
+          return;
+        }
+        const season = seasons[idx];
+        const range = getSeasonDateRange(seasons, season);
+        const alsoDays = document.getElementById('deleteSeasonDays').checked;
+
+        if (alsoDays) {
+          const days = loadDays();
+          Object.keys(days).forEach((date) => {
+            if (dayInSeason(date, range)) delete days[date];
+          });
+          saveDays(days);
+        }
+
+        seasons.splice(idx, 1);
+        saveSeasons(seasons);
+
+        if (activeSeasonId === pendingDeleteSeasonId) {
+          activeSeasonId = seasons[seasons.length - 1].id;
+          setActiveSeasonId(activeSeasonId);
+        }
+        closeDeleteSeasonModal();
+        renderSeason();
+        renderHistory();
+        renderOverall();
+      };
+
+      // Init seasons on first load (migrates legacy if needed)
+      loadSeasons();
+    </script>
+  </body>
+</html>
