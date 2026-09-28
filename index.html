@@ -204,6 +204,49 @@
           grid-template-columns: 1fr;
         }
       }
+      .day-results-header {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        margin-bottom: 4px;
+      }
+      .day-results-header .bracket-note {
+        margin: 0;
+      }
+      .day-miss-toggle {
+        flex-shrink: 0;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(248, 194, 68, 0.55);
+        background: rgba(248, 194, 68, 0.1);
+        color: var(--gold);
+        box-shadow: none;
+      }
+      .day-miss-toggle:hover {
+        background: rgba(248, 194, 68, 0.18);
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+      .day-miss-toggle.active {
+        border-color: rgba(251, 113, 133, 0.55);
+        background: rgba(251, 113, 133, 0.12);
+        color: var(--red);
+      }
+      .day-miss-toggle.active:hover {
+        background: rgba(251, 113, 133, 0.18);
+        border-color: var(--red);
+        color: var(--red);
+      }
+      .day-summary-block + .day-summary-block {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed var(--panel-border);
+      }
       .day-summary {
         grid-column: 1 / -1;
         background: var(--panel);
@@ -1603,16 +1646,46 @@
           .addEventListener('input', () => colorRankInput(key));
       });
 
+      // Today results: gains by default; toggle to reveal missed vs potential
+      let showMissedDetails = false;
+      let lastRenderedDayData = null;
+
       const renderResultsForDay = (dayData, container) => {
+        lastRenderedDayData = dayData;
         container.innerHTML = '';
         const date =
           dayData.date ||
           document.getElementById('entryDate').value ||
           todayStr();
-        container.insertAdjacentHTML('beforeend', dayContextHtml(date));
+
+        const header = document.createElement('div');
+        header.className = 'day-results-header';
+        header.innerHTML = dayContextHtml(date);
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className =
+          'ghost day-miss-toggle' + (showMissedDetails ? ' active' : '');
+        toggleBtn.textContent = showMissedDetails
+          ? 'Hide missed rewards'
+          : 'Show missed rewards';
+        toggleBtn.onclick = () => {
+          showMissedDetails = !showMissedDetails;
+          if (lastRenderedDayData) {
+            renderResultsForDay(
+              lastRenderedDayData,
+              document.getElementById('todayResults'),
+            );
+          }
+        };
+        header.appendChild(toggleBtn);
+        container.appendChild(header);
 
         const dayMissed = {};
-        Object.keys(CURRENCIES).forEach((c) => (dayMissed[c] = 0));
+        const dayGained = {};
+        Object.keys(CURRENCIES).forEach((c) => {
+          dayMissed[c] = 0;
+          dayGained[c] = 0;
+        });
         let anyRank = false;
 
         Object.keys(MODES).forEach((modeKey) => {
@@ -1632,56 +1705,95 @@
             Object.keys(missed).forEach((c) => {
               dayMissed[c] += missed[c] || 0;
             });
+            Object.keys(got).forEach((c) => {
+              dayGained[c] += got[c] || 0;
+            });
           }
 
           let html = `<div class="mode-title">${MODES[modeKey].label}</div>`;
           if (!rank) {
             html += `<div class="bracket-note">No rank entered</div>`;
           } else if (!bracket) {
-            html += `<div class="bracket-note">Rank <strong style="color: var(--red);">#${rank}</strong> — outside reward brackets (missed 100%)</div>`;
+            html += `<div class="bracket-note">Rank <strong style="color: var(--red);">#${rank}</strong> — outside reward brackets</div>`;
+            if (showMissedDetails) {
+              html += `<span class="pct-badge bad">100% missed</span>`;
+            }
           } else {
             const idx = getBracketIndex(modeKey, rank);
             const c = tierColorForIndex(idx);
-            html += `<div class="bracket-note">Rank <strong style="color: ${c};">#${rank}</strong> → bracket <strong style="color: ${c};">${bracket.min}-${bracket.max}</strong>
-          <span class="pct-badge ${pct === 0 ? 'ok' : 'bad'}">${pct}% missed</span></div>`;
+            html += `<div class="bracket-note">Rank <strong style="color: ${c};">#${rank}</strong> → bracket <strong style="color: ${c};">${bracket.min}-${bracket.max}</strong>`;
+            if (showMissedDetails) {
+              html += ` <span class="pct-badge ${pct === 0 ? 'ok' : 'bad'}">${pct}% missed</span>`;
+            }
+            html += `</div>`;
           }
           Object.keys(best).forEach((c) => {
             const cur = CURRENCIES[c];
             const gotVal = got[c] || 0;
             const missVal = missed[c] || 0;
-            const missHtml =
-              missVal > 0
-                ? `<span class="reward-missed">(-${missVal.toLocaleString()})</span>`
-                : '';
-            html += `<div class="reward-row">
+            if (showMissedDetails) {
+              const missHtml =
+                missVal > 0
+                  ? `<span class="reward-missed">(-${missVal.toLocaleString()})</span>`
+                  : '';
+              html += `<div class="reward-row">
           <span class="reward-name">${cur.icon} ${cur.name}</span>
           <span class="reward-nums">
             <span class="reward-got">${gotVal.toLocaleString()}</span> / ${best[c].toLocaleString()}
             ${missHtml}
           </span>
         </div>`;
+            } else {
+              // Gains only
+              html += `<div class="reward-row">
+          <span class="reward-name">${cur.icon} ${cur.name}</span>
+          <span class="reward-nums">
+            <span class="reward-got">${gotVal.toLocaleString()}</span>
+          </span>
+        </div>`;
+            }
           });
           box.innerHTML = html;
           container.appendChild(box);
         });
 
-        // Day summary — total missed across all modes
-        const missParts = Object.keys(dayMissed)
-          .filter((c) => dayMissed[c] > 0)
-          .map((c) => {
-            const cur = CURRENCIES[c];
-            return `<span class="day-sum-item"><span class="day-sum-icon">${cur.icon}</span> ${cur.name} <strong class="reward-missed">−${dayMissed[c].toLocaleString()}</strong></span>`;
-          });
+        // Day summary — always gains; also missed when toggled
         const summary = document.createElement('div');
         summary.className = 'day-summary';
         if (!anyRank) {
           summary.innerHTML =
             '<div class="bracket-note" style="margin:0">No ranks entered for this day.</div>';
-        } else if (!missParts.length) {
-          summary.innerHTML =
-            '<div class="day-summary-title">Day summary</div><div class="day-summary-ok">Nothing missed — full potential rewards.</div>';
         } else {
-          summary.innerHTML = `<div class="day-summary-title">Day summary · missed</div><div class="day-summary-items">${missParts.join('')}</div>`;
+          const gainParts = Object.keys(dayGained)
+            .filter((c) => dayGained[c] > 0)
+            .map((c) => {
+              const cur = CURRENCIES[c];
+              return `<span class="day-sum-item"><span class="day-sum-icon">${cur.icon}</span> ${cur.name} <strong class="reward-got">+${dayGained[c].toLocaleString()}</strong></span>`;
+            });
+          let html = `<div class="day-summary-block">
+            <div class="day-summary-title">Gained rewards</div>
+            <div class="day-summary-items">${gainParts.join('') || '<span class="bracket-note">No rewards gained</span>'}</div>
+          </div>`;
+          if (showMissedDetails) {
+            const missParts = Object.keys(dayMissed)
+              .filter((c) => dayMissed[c] > 0)
+              .map((c) => {
+                const cur = CURRENCIES[c];
+                return `<span class="day-sum-item"><span class="day-sum-icon">${cur.icon}</span> ${cur.name} <strong class="reward-missed">−${dayMissed[c].toLocaleString()}</strong></span>`;
+              });
+            if (!missParts.length) {
+              html += `<div class="day-summary-block">
+                <div class="day-summary-title">Missed rewards</div>
+                <div class="day-summary-ok">Nothing missed — full potential rewards.</div>
+              </div>`;
+            } else {
+              html += `<div class="day-summary-block">
+                <div class="day-summary-title">Missed rewards</div>
+                <div class="day-summary-items">${missParts.join('')}</div>
+              </div>`;
+            }
+          }
+          summary.innerHTML = html;
         }
         container.appendChild(summary);
       };
@@ -1717,10 +1829,10 @@
         const seasons = loadSeasons();
         const season = findSeasonForDate(date, seasons);
         if (!season) {
-          return `<div class="bracket-note" style="margin-bottom:12px;grid-column:1/-1">${formatDate(date)}</div>`;
+          return `<div class="bracket-note">${formatDate(date)}</div>`;
         }
         const dayNum = seasonDayNumber(date, season.start);
-        return `<div class="bracket-note" style="margin-bottom:12px;grid-column:1/-1;font-size:13px">
+        return `<div class="bracket-note" style="font-size:13px">
           <strong style="color:var(--gold)">${seasonLabel(season)}</strong>
           · Day <strong style="color:var(--text)">${dayNum}</strong>
           · <span style="color:var(--muted)">${formatDate(date)}</span>
