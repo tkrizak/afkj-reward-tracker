@@ -868,7 +868,8 @@
       <div>
         <h1>AFK Journey • <span>Rank Reward Tracker</span></h1>
         <div class="sub">
-          Log your daily ranks, see what you earned vs. maximum potential rewards
+          Log your daily ranks, see what you earned vs. maximum potential
+          rewards
         </div>
       </div>
     </header>
@@ -889,24 +890,37 @@
             <div class="mode-input">
               <label>Date</label>
               <div class="pretty-date-wrap">
-                <button type="button" class="pretty-date-btn" id="entryDateBtn" title="Pick a date">
+                <button
+                  type="button"
+                  class="pretty-date-btn"
+                  id="entryDateBtn"
+                  title="Pick a date"
+                >
                   <span id="entryDateLabel">—</span>
                   <span class="pretty-date-icon" aria-hidden="true">📅</span>
                 </button>
-                <input type="date" id="entryDate" class="pretty-date-native" tabindex="-1" />
+                <input
+                  type="date"
+                  id="entryDate"
+                  class="pretty-date-native"
+                  tabindex="-1"
+                />
               </div>
             </div>
             <div class="mode-input" style="max-width: 240px">
               <label>Dream Realm boss</label>
-              <select id="entryBoss" style="
-                width: 100%;
-                padding: 9px 11px;
-                border-radius: 8px;
-                border: 1px solid var(--panel-border);
-                background: #0b1124;
-                color: var(--text);
-                font-size: 14px;
-              "></select>
+              <select
+                id="entryBoss"
+                style="
+                  width: 100%;
+                  padding: 9px 11px;
+                  border-radius: 8px;
+                  border: 1px solid var(--panel-border);
+                  background: #0b1124;
+                  color: var(--text);
+                  font-size: 14px;
+                "
+              ></select>
             </div>
           </div>
           <div class="mode-grid" id="rankInputs"></div>
@@ -921,19 +935,32 @@
       <!-- OVERALL -->
       <div class="view" id="view-overall">
         <div class="card">
-          <div class="season-tabs" id="overallSubTabs" style="margin-bottom: 14px">
-            <button class="season-tab active" data-osub="totals">All-time totals</button>
-            <button class="season-tab" data-osub="bosses">Dream realm ranks</button>
+          <div
+            class="season-tabs"
+            id="overallSubTabs"
+            style="margin-bottom: 14px"
+          >
+            <button class="season-tab active" data-osub="totals">
+              All-time totals
+            </button>
+            <button class="season-tab" data-osub="bosses">
+              Dream realm ranks
+            </button>
           </div>
           <div id="overallSub-totals">
             <div class="bracket-note" style="margin-bottom: 12px">
-              % of logged ranks in each bracket, and missed rewards vs maximum potential (all days)
+              % of logged ranks in each bracket, and missed rewards vs maximum
+              potential (all days)
             </div>
             <div class="dist-grid" id="overallDist"></div>
-            <h2 style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)">Missed vs maximum potential</h2>
+            <h2
+              style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)"
+            >
+              Missed vs maximum potential
+            </h2>
             <div class="season-grid" id="overallTotalsGrid"></div>
           </div>
-          <div id="overallSub-bosses" style="display:none">
+          <div id="overallSub-bosses" style="display: none">
             <div class="bracket-note" style="margin-bottom: 12px">
               For each boss: share of ranks in each Dream Realm bracket
             </div>
@@ -946,7 +973,11 @@
       <div class="view" id="view-history">
         <div class="card">
           <h2>Past days</h2>
-          <div class="season-tabs" id="historySeasonTabs" style="margin-bottom: 12px"></div>
+          <div
+            class="season-tabs"
+            id="historySeasonTabs"
+            style="margin-bottom: 12px"
+          ></div>
           <div class="history-toolbar">
             <input
               type="search"
@@ -973,21 +1004,35 @@
           </div>
           <div class="season-tabs" id="seasonTabs"></div>
           <div id="seasonContent">
-            <div class="season-tabs" id="seasonSubTabs" style="margin-bottom: 14px">
-              <button class="season-tab active" data-ssub="totals">Season totals</button>
-              <button class="season-tab" data-ssub="bosses">Dream realm ranks</button>
+            <div
+              class="season-tabs"
+              id="seasonSubTabs"
+              style="margin-bottom: 14px"
+            >
+              <button class="season-tab active" data-ssub="totals">
+                Season totals
+              </button>
+              <button class="season-tab" data-ssub="bosses">
+                Dream realm ranks
+              </button>
             </div>
             <div id="seasonSub-totals">
               <div class="bracket-note" style="margin-bottom: 12px">
-                % of ranks in each bracket this season, and missed rewards vs maximum potential
+                % of ranks in each bracket this season, and missed rewards vs
+                maximum potential
               </div>
               <div class="dist-grid" id="seasonDist"></div>
-              <h2 style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)">Missed vs maximum potential</h2>
+              <h2
+                style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)"
+              >
+                Missed vs maximum potential
+              </h2>
               <div class="season-grid" id="seasonGrid"></div>
             </div>
-            <div id="seasonSub-bosses" style="display:none">
+            <div id="seasonSub-bosses" style="display: none">
               <div class="bracket-note" style="margin-bottom: 12px">
-                For each boss: share of ranks in each Dream Realm bracket this season
+                For each boss: share of ranks in each Dream Realm bracket this
+                season
               </div>
               <div id="seasonBossWrap"></div>
             </div>
@@ -1001,20 +1046,36 @@
       <div class="modal">
         <h3>Start a new season</h3>
         <p class="modal-desc">
-          Previous seasons stay available. Days from the start date onward count toward the new season.
+          Previous seasons stay available. Days from the start date onward count
+          toward the new season.
         </p>
         <div class="mode-input" style="margin-bottom: 12px">
           <label for="modalSeasonName">Season name</label>
-          <input type="text" id="modalSeasonName" placeholder="e.g. S9 — Season Name" value="" />
+          <input
+            type="text"
+            id="modalSeasonName"
+            placeholder="e.g. S9 — Season Name"
+            value=""
+          />
         </div>
         <div class="mode-input" style="margin-bottom: 18px">
           <label for="modalSeasonStart">Start date</label>
           <div class="pretty-date-wrap" style="max-width: none">
-            <button type="button" class="pretty-date-btn" id="modalSeasonStartBtn" title="Pick a date">
+            <button
+              type="button"
+              class="pretty-date-btn"
+              id="modalSeasonStartBtn"
+              title="Pick a date"
+            >
               <span id="modalSeasonStartLabel">—</span>
               <span class="pretty-date-icon" aria-hidden="true">📅</span>
             </button>
-            <input type="date" id="modalSeasonStart" class="pretty-date-native" tabindex="-1" />
+            <input
+              type="date"
+              id="modalSeasonStart"
+              class="pretty-date-native"
+              tabindex="-1"
+            />
           </div>
         </div>
         <div class="modal-actions">
@@ -1029,7 +1090,8 @@
       <div class="modal">
         <h3>Delete season?</h3>
         <p class="modal-desc" id="deleteSeasonMsg">
-          This removes the season from the list. Your daily rank history is kept unless you choose to delete those days too.
+          This removes the season from the list. Your daily rank history is kept
+          unless you choose to delete those days too.
         </p>
         <label class="modal-check">
           <input type="checkbox" id="deleteSeasonDays" />
@@ -1037,7 +1099,14 @@
         </label>
         <div class="modal-actions">
           <button class="ghost" id="modalDeleteCancel">Cancel</button>
-          <button class="primary" id="modalDeleteConfirm" style="background: linear-gradient(180deg, #fb7185, #e11d48); color: #fff;">
+          <button
+            class="primary"
+            id="modalDeleteConfirm"
+            style="
+              background: linear-gradient(180deg, #fb7185, #e11d48);
+              color: #fff;
+            "
+          >
             Delete season
           </button>
         </div>
@@ -1078,7 +1147,9 @@
       const bossForDate = (dateStr) => {
         if (!dateStr) return DREAM_BOSSES[0];
         const delta = daysBetween(DREAM_BOSS_ANCHOR, dateStr);
-        const idx = ((delta % DREAM_BOSSES.length) + DREAM_BOSSES.length) % DREAM_BOSSES.length;
+        const idx =
+          ((delta % DREAM_BOSSES.length) + DREAM_BOSSES.length) %
+          DREAM_BOSSES.length;
         return DREAM_BOSSES[idx];
       };
 
@@ -1144,32 +1215,32 @@
             {
               min: 1,
               max: 5,
-              r: { seasonToken: 360, twilightEssence: 8, diamonds: 500 },
+              r: { seasonToken: 500, twilightEssence: 8, diamonds: 360 },
             },
             {
               min: 6,
               max: 20,
-              r: { seasonToken: 360, twilightEssence: 8, diamonds: 500 },
+              r: { seasonToken: 500, twilightEssence: 8, diamonds: 360 },
             },
             {
               min: 21,
               max: 50,
-              r: { seasonToken: 330, twilightEssence: 6, diamonds: 450 },
+              r: { seasonToken: 450, twilightEssence: 6, diamonds: 330 },
             },
             {
               min: 51,
               max: 100,
-              r: { seasonToken: 300, twilightEssence: 4, diamonds: 400 },
+              r: { seasonToken: 400, twilightEssence: 4, diamonds: 300 },
             },
             {
               min: 101,
               max: 200,
-              r: { seasonToken: 280, twilightEssence: 3, diamonds: 380 },
+              r: { seasonToken: 380, twilightEssence: 3, diamonds: 280 },
             },
             {
               min: 201,
               max: 500,
-              r: { seasonToken: 250, twilightEssence: 2, diamonds: 340 },
+              r: { seasonToken: 340, twilightEssence: 2, diamonds: 250 },
             },
           ],
         },
@@ -1257,8 +1328,18 @@
 
       // Display-friendly date (storage stays YYYY-MM-DD)
       const MONTHS_SHORT = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       const formatDate = (iso) => {
         if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
@@ -1305,7 +1386,9 @@
                 return s;
               });
               // Ensure current official season exists
-              if (!list.find((s) => s.id === 's8' || s.start === '2026-09-23')) {
+              if (
+                !list.find((s) => s.id === 's8' || s.start === '2026-09-23')
+              ) {
                 list.push({
                   id: 's8',
                   name: 'Veil of Memories',
@@ -1413,7 +1496,6 @@
         return max + 1;
       };
 
-
       // ---------- Bracket distribution ----------
       // dateFilterFn: optional (date) => bool; if null, all days
       const computeBracketDist = (days, dateFilterFn) => {
@@ -1469,14 +1551,8 @@
         }
         container.innerHTML = modeKeys
           .map((modeKey) => {
-            const {
-              counts,
-              outside,
-              total,
-              brackets,
-              missed,
-              maxPossible,
-            } = distData[modeKey];
+            const { counts, outside, total, brackets, missed, maxPossible } =
+              distData[modeKey];
             if (total === 0) {
               return `<div class="dist-mode">
             <div class="dist-title">${MODES[modeKey].label}</div>
@@ -1522,9 +1598,7 @@
                 const pct =
                   maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
                 const zero = missVal === 0;
-                const amount = zero
-                  ? '0'
-                  : '−' + missVal.toLocaleString();
+                const amount = zero ? '0' : '−' + missVal.toLocaleString();
                 return `<div class="dist-miss-row">
               <span class="dist-miss-name">${cur.icon} ${cur.name}</span>
               <span class="dist-miss-nums ${zero ? 'zero' : ''}">
@@ -1812,7 +1886,8 @@
         const days = loadDays();
         days[date] = { date, ranks, boss };
         saveDays(days);
-        document.getElementById('saveStatus').textContent = `Saved ${formatDate(date)} ✓`;
+        document.getElementById('saveStatus').textContent =
+          `Saved ${formatDate(date)} ✓`;
         setTimeout(() => {
           document.getElementById('saveStatus').textContent = '';
         }, 2500);
@@ -1898,8 +1973,7 @@
           .map((c) => {
             const missVal = missed[c] || 0;
             const maxVal = maxPossible[c] || 0;
-            const pct =
-              maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
+            const pct = maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
             const zero = missVal === 0;
             const pctClass = zero ? 'ok' : 'bad';
             const lostLabel = zero
@@ -2080,7 +2154,9 @@
         tabsEl.classList.add('season-tabs-picks');
         const items = [
           { id: 'all', label: 'All seasons' },
-          ...[...seasons].reverse().map((s) => ({ id: s.id, label: seasonLabel(s) })),
+          ...[...seasons]
+            .reverse()
+            .map((s) => ({ id: s.id, label: seasonLabel(s) })),
         ];
         if (
           historySeasonFilter !== 'all' &&
@@ -2176,9 +2252,7 @@
             .join('');
           const bossName = d.boss || bossForDate(date);
           const season = findSeasonForDate(date, seasons);
-          const dayNum = season
-            ? seasonDayNumber(date, season.start)
-            : null;
+          const dayNum = season ? seasonDayNumber(date, season.start) : null;
           const dayLabel = dayNum
             ? `Day ${dayNum}${season ? ` · ${seasonLabel(season)}` : ''}`
             : '—';
@@ -2308,23 +2382,30 @@
       };
 
       document.getElementById('newSeasonBtn').onclick = openNewSeasonModal;
-      document.getElementById('modalSeasonCancel').onclick = closeNewSeasonModal;
+      document.getElementById('modalSeasonCancel').onclick =
+        closeNewSeasonModal;
       document.getElementById('newSeasonModal').onclick = (e) => {
         if (e.target.id === 'newSeasonModal') closeNewSeasonModal();
       };
-      document.getElementById('modalSeasonStart').addEventListener('change', syncModalSeasonStartLabel);
-      document.getElementById('modalSeasonStart').addEventListener('input', syncModalSeasonStartLabel);
-      document.getElementById('modalSeasonStartBtn').addEventListener('click', () => {
-        const el = document.getElementById('modalSeasonStart');
-        if (typeof el.showPicker === 'function') {
-          try {
-            el.showPicker();
-            return;
-          } catch (e) {}
-        }
-        el.focus();
-        el.click();
-      });
+      document
+        .getElementById('modalSeasonStart')
+        .addEventListener('change', syncModalSeasonStartLabel);
+      document
+        .getElementById('modalSeasonStart')
+        .addEventListener('input', syncModalSeasonStartLabel);
+      document
+        .getElementById('modalSeasonStartBtn')
+        .addEventListener('click', () => {
+          const el = document.getElementById('modalSeasonStart');
+          if (typeof el.showPicker === 'function') {
+            try {
+              el.showPicker();
+              return;
+            } catch (e) {}
+          }
+          el.focus();
+          el.click();
+        });
 
       document.getElementById('modalSeasonConfirm').onclick = () => {
         let name = document.getElementById('modalSeasonName').value.trim();
