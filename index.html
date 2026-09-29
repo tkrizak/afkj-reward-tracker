@@ -21,6 +21,7 @@
         --purple: #9d52ff;
         --green: #34d399;
         --green-dark: #10b981;
+        --green-perfect: #34d399;
         --red: #fb7185;
         --red-dark: #f43f5e;
         box-sizing: border-box;
@@ -222,6 +223,14 @@
       .day-results-header .bracket-note {
         margin: 0;
       }
+      .day-section-title {
+        grid-column: 1 / -1;
+        font-size: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 4px 0 2px;
+      }
 
       .day-miss-toggle {
         flex-shrink: 0;
@@ -402,7 +411,7 @@
         font-weight: 700;
       }
       .reward-lost-val.zero {
-        color: var(--green);
+        color: #ffffff;
       }
       .reward-total-val {
         color: #ffffff;
@@ -519,14 +528,12 @@
         color: #fb7185;
       }
       .reward-pct.perfect-gain {
-        color: var(--green);
+        color: var(--gold);
         font-weight: 800;
-        text-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
       }
       .reward-pct.perfect-zero-loss {
-        color: var(--green);
+        color: var(--gold);
         font-weight: 800;
-        text-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
       }
       .reward-pct.total-loss {
         color: var(--red);
@@ -540,7 +547,7 @@
         font-size: 13px;
       }
       .reward-lost.zero {
-        color: var(--green);
+        color: #ffffff;
         font-weight: 600;
       }
       table {
@@ -603,11 +610,10 @@
         font-variant-numeric: tabular-nums;
       }
       .season-box .cur-val.partial-val {
-        color: var(--green);
+        color: var(--green-dark);
       }
       .season-box .cur-val.perfect-val {
         color: var(--green-dark);
-        text-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
       }
       .season-box .cur-val.lost-val {
         color: var(--red);
@@ -617,9 +623,8 @@
         text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);
       }
       .season-box .cur-val.lost-val.zero {
-        color: var(--text);
-        font-weight: 600;
-        text-shadow: none;
+        color: #ffffff;
+        font-weight: 800;
       }
       .season-box .cur-val.zero {
         color: var(--red-dark);
@@ -913,8 +918,8 @@
         font-weight: 600;
       }
       .dist-miss-nums {
-        color: var(--text);
-        font-weight: 600;
+        color: var(--green);
+        font-weight: 700;
         font-size: 14px;
         font-variant-numeric: tabular-nums;
       }
@@ -922,8 +927,8 @@
         color: var(--red);
       }
       .dist-miss-nums.lost-val.zero {
-        color: var(--text);
-        font-weight: 600;
+        color: #ffffff;
+        font-weight: 800;
       }
       .dist-miss-nums.zero {
         color: var(--red);
@@ -1108,7 +1113,7 @@
       <!-- TODAY -->
       <div class="view active" id="view-today">
         <div class="card">
-          <h2>Enter today's ranks</h2>
+          <h2>Enter today's rankings</h2>
           <div class="date-row">
             <div class="mode-input">
               <label>Date</label>
@@ -1188,8 +1193,8 @@
             </div>
             <div class="dist-grid" id="overallDist"></div>
             <div class="section-header-row">
-              <h2 id="overallTotalsTitle" style="color: var(--gold)">
-                TOTAL REWARDS <span style="color: var(--green)">GAINED</span>
+              <h2 id="overallTotalsTitle" style="color: var(--green)">
+                TOTAL REWARDS GAINED
               </h2>
             </div>
             <div class="season-grid" id="overallTotalsGrid"></div>
@@ -1268,9 +1273,8 @@
               </div>
               <div class="dist-grid" id="seasonDist"></div>
               <div class="section-header-row">
-                <h2 id="seasonTotalsTitle" style="color: var(--gold)">
-                  REWARDS <span style="color: var(--green)">GAINED</span> IN
-                  SEASON
+                <h2 id="seasonTotalsTitle" style="color: var(--green)">
+                  REWARDS GAINED IN SEASON
                 </h2>
               </div>
               <div class="season-grid" id="seasonGrid"></div>
@@ -1639,32 +1643,34 @@
             let list = JSON.parse(raw);
             if (Array.isArray(list) && list.length) {
               let dirty = false;
+              // One-time migration: legacy default id "s9" → "s8" / Season 8.
+              // Do NOT rewrite user-created seasons by name (that hid new seasons).
               list = list.map((s) => {
-                if (
-                  s.id === 's9' ||
-                  s.name === 'Season 9' ||
-                  (s.name && s.name.includes('Season 9'))
-                ) {
+                if (s.id === 's9') {
                   dirty = true;
                   return {
                     ...s,
-                    id: 's9',
-                    name: 'Season 9',
-                    start: '2026-09-23',
+                    id: 's8',
+                    name:
+                      s.name === 'Season 9' || !s.name
+                        ? 'Season 8'
+                        : s.name,
+                    start: s.start || '2026-09-23',
                   };
                 }
                 return s;
               });
-              if (
-                !list.find((s) => s.id === 's9' || s.start === '2026-09-23')
-              ) {
-                list.push({
-                  id: 's9',
-                  name: 'Season 9',
-                  start: '2026-09-23',
-                });
-                dirty = true;
-              }
+              // Drop accidental duplicate ids (e.g. after older buggy migrations)
+              const seen = new Set();
+              list = list.filter((s) => {
+                if (!s.id || seen.has(s.id)) {
+                  dirty = true;
+                  return false;
+                }
+                seen.add(s.id);
+                return true;
+              });
+              list.sort((a, b) => a.start.localeCompare(b.start));
               if (dirty) saveSeasons(list);
               return list;
             }
@@ -1672,8 +1678,8 @@
         } catch (e) {}
         const initial = [
           {
-            id: 's9',
-            name: 'Season 9',
+            id: 's8',
+            name: 'Season 8',
             start: '2026-09-23',
           },
         ];
@@ -1699,13 +1705,18 @@
       };
 
       const getSeasonDateRange = (seasons, season) => {
-        const idx = seasons.findIndex((s) => s.id === season.id);
+        // seasons are sorted by start date; end is day before the next season starts
+        const sorted = [...seasons].sort((a, b) =>
+          a.start.localeCompare(b.start),
+        );
+        const idx = sorted.findIndex((s) => s.id === season.id);
         const start = season.start;
         let end = null;
-        if (idx >= 0 && idx < seasons.length - 1) {
-          const nextStart = seasons[idx + 1].start;
-          const d = new Date(nextStart + 'T12:00:00');
-          d.setDate(d.getDate() - 1);
+        if (idx >= 0 && idx < sorted.length - 1) {
+          const nextStart = sorted[idx + 1].start;
+          // pure YYYY-MM-DD arithmetic — avoid timezone shifts from Date/toISOString
+          const d = new Date(nextStart + 'T12:00:00Z');
+          d.setUTCDate(d.getUTCDate() - 1);
           end = d.toISOString().slice(0, 10);
         }
         return { start, end };
@@ -1879,12 +1890,12 @@
                       : 'lost-val';
 
                   const valColor = isZero
-                    ? 'color:var(--text); font-weight:600;'
+                    ? 'color:#ffffff; font-weight:800;'
                     : isTotalLoss
                       ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
                       : 'color:var(--red); font-weight:750;';
                   const pctStyle = isZero
-                    ? 'color:var(--text); font-weight:600;'
+                    ? 'color:#ffffff; font-weight:800;'
                     : isTotalLoss
                       ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
                       : 'color:var(--red); font-weight:750;';
@@ -1905,14 +1916,12 @@
 
                   const valColor = isZero
                     ? 'color:var(--red); font-weight:800;'
-                    : isFull
-                      ? 'color:var(--text); font-weight:600;'
-                      : 'color:var(--green); font-weight:750;';
+                    : 'color:var(--green-dark); font-weight:750;';
                   const pctColor = isZero
                     ? 'color:var(--red); font-weight:800;'
                     : isFull
-                      ? 'color:var(--text); font-weight:600;'
-                      : 'color:var(--green); font-weight:750;';
+                      ? 'color:var(--gold); font-weight:800;'
+                      : 'color:var(--green-dark); font-weight:750;';
 
                   return `<div class="dist-miss-row">
                 <span class="dist-miss-name">${renderItemBadge(cur)}</span>
@@ -2065,6 +2074,16 @@
         header.appendChild(toggleBtn);
         container.appendChild(header);
 
+        const sectionTitle = document.createElement('div');
+        sectionTitle.className = 'day-section-title';
+        sectionTitle.style.color = showTodayLost
+          ? 'var(--red)'
+          : 'var(--green)';
+        sectionTitle.textContent = showTodayLost
+          ? 'Rewards lost by mode'
+          : 'Rewards gained by mode';
+        container.appendChild(sectionTitle);
+
         const dayLost = {};
         const dayGained = {};
         const dayMax = {};
@@ -2123,12 +2142,12 @@
                   : 'reward-lost-val';
 
               const valColor = isZero
-                ? 'color:var(--text); font-weight:600;'
+                ? 'color:#ffffff; font-weight:800;'
                 : isTotalLoss
                   ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
                   : 'color:var(--red); font-weight:750;';
               const pctStyle = isZero
-                ? 'color:var(--text); font-weight:600;'
+                ? 'color:#ffffff; font-weight:800;'
                 : isTotalLoss
                   ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
                   : 'color:var(--red); font-weight:750;';
@@ -2147,14 +2166,12 @@
 
               const valColor = isZero
                 ? 'color:var(--red); font-weight:800;'
-                : isFull
-                  ? 'color:var(--text); font-weight:600;'
-                  : 'color:var(--green); font-weight:750;';
+                : 'color:var(--green-dark); font-weight:750;';
               const pctStyle = isZero
                 ? 'color:var(--red); font-weight:800;'
                 : isFull
-                  ? 'color:var(--text); font-weight:600;'
-                  : 'color:var(--green); font-weight:750;';
+                  ? 'color:var(--gold); font-weight:800;'
+                  : 'color:var(--green-dark); font-weight:750;';
 
               html += `<div class="reward-row">
           <span class="reward-name">${renderItemBadge(cur)}</span>
@@ -2200,14 +2217,12 @@
 
                 const valColor = isZero
                   ? 'color:var(--red); font-weight:800;'
-                  : isFull
-                    ? 'color:var(--text); font-weight:600;'
-                    : 'color:var(--green); font-weight:750;';
+                  : 'color:var(--green-dark); font-weight:750;';
                 const pctStyle = isZero
                   ? 'color:var(--red); font-weight:800;'
                   : isFull
-                    ? 'color:var(--text); font-weight:600;'
-                    : 'color:var(--green); font-weight:750;';
+                    ? 'color:var(--gold); font-weight:800;'
+                    : 'color:var(--green-dark); font-weight:750;';
 
                 return `<div class="day-summary-row">
                   <span class="day-sum-item">${renderItemBadge(cur)}</span>
@@ -2217,19 +2232,19 @@
 
             if (isPerfectDay) {
               summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--gold);">TODAY'S TOTAL <span style="color: var(--green);">GAINED</span> REWARDS</div>
+                <div class="day-summary-title" style="color: var(--green);">Total gained rewards</div>
                 <div class="day-summary-ok" style="margin-bottom: 12px;">🌟 PERFECT! 100% MAXIMUM REWARDS GAINED 🌟</div>
                 <div class="day-summary-items horizontal-grid">${gainParts.join('')}</div>
               </div>`;
             } else if (isTotalZeroDay) {
               summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--gold);">TODAY'S TOTAL <span style="color: var(--green);">GAINED</span> REWARDS</div>
+                <div class="day-summary-title" style="color: var(--green);">Total gained rewards</div>
                 <div class="day-summary-bad" style="margin-bottom: 12px;">⚠️ NO REWARDS GAINED (0%) ⚠️</div>
                 <div class="day-summary-items horizontal-grid">${gainParts.join('')}</div>
               </div>`;
             } else {
               summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--gold);">TODAY'S TOTAL <span style="color: var(--green);">GAINED</span> REWARDS</div>
+                <div class="day-summary-title" style="color: var(--green);">Total gained rewards</div>
                 <div class="day-summary-items horizontal-grid">${gainParts.join('') || '<span class="bracket-note">No rewards gained</span>'}</div>
               </div>`;
             }
@@ -2244,140 +2259,323 @@
                   maxVal > 0 ? Math.round((lostVal / maxVal) * 100) : 0;
                 const isZero = lostVal === 0;
                 const isTotalLoss = pct === 100 && maxVal > 0;
+                const valClass = isZero
+                  ? 'reward-lost-val zero'
+                  : isTotalLoss
+                    ? 'reward-lost-val total-loss-val'
+                    : 'reward-lost-val';
 
                 const valColor = isZero
-                  ? 'color:var(--text); font-weight:600;'
+                  ? 'color:#ffffff; font-weight:800;'
                   : isTotalLoss
                     ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
                     : 'color:var(--red); font-weight:750;';
                 const pctStyle = isZero
-                  ? 'color:var(--text); font-weight:600;'
+                  ? 'color:#ffffff; font-weight:800;'
                   : isTotalLoss
                     ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
                     : 'color:var(--red); font-weight:750;';
 
                 return `<div class="day-summary-row">
                   <span class="day-sum-item">${renderItemBadge(cur)}</span>
-                  <span class="day-sum-nums"><span style="${valColor}">${lostVal.toLocaleString()}</span><span style="color:#ffffff">/${maxVal.toLocaleString()}</span> <span class="reward-pct" style="${pctStyle}">(${pct}%)</span></span>
+                  <span class="day-sum-nums ${valClass}"><span style="${valColor}">${lostVal.toLocaleString()}</span><span style="color:#ffffff">/${maxVal.toLocaleString()}</span> <span class="reward-pct" style="${pctStyle}">(${pct}%)</span></span>
                 </div>`;
               });
-
+            let html = '';
             const totalLostSum = Object.values(dayLost).reduce(
               (a, b) => a + b,
               0,
             );
+            const totalMaxSum = Object.values(dayMax).reduce(
+              (a, b) => a + b,
+              0,
+            );
             if (totalLostSum === 0) {
-              summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">TODAY'S TOTAL <span style="color: var(--red);">LOST</span> REWARDS</div>
-                <div class="day-summary-ok" style="margin-bottom: 12px;">🌟 PERFECT! ZERO REWARDS LOST (0%) 🌟</div>
+              html = `<div class="day-summary-block">
+                <div class="day-summary-title" style="color: var(--red);">Total lost rewards</div>
+                <div class="day-summary-ok">✨ PERFECT! NOTHING LOST (0%) — MAXIMUM REWARDS ACHIEVED! ✨</div>
+              </div>`;
+            } else if (totalLostSum === totalMaxSum && totalMaxSum > 0) {
+              html = `<div class="day-summary-block">
+                <div class="day-summary-title" style="color: var(--red);">Total lost rewards</div>
+                <div class="day-summary-bad" style="margin-bottom: 12px;">💥 100% REWARDS LOST (ALL REWARDS MISSED) 💥</div>
                 <div class="day-summary-items horizontal-grid">${lostParts.join('')}</div>
               </div>`;
             } else {
-              summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">TODAY'S TOTAL <span style="color: var(--red);">LOST</span> REWARDS</div>
-                <div class="day-summary-items horizontal-grid">${lostParts.join('') || '<span class="bracket-note">No rewards lost</span>'}</div>
+              html = `<div class="day-summary-block">
+                <div class="day-summary-title" style="color: var(--red);">Total lost rewards</div>
+                <div class="day-summary-items horizontal-grid">${lostParts.join('')}</div>
               </div>`;
             }
+            summary.innerHTML = html;
           }
         }
         container.appendChild(summary);
       };
 
-      const dayContextHtml = (dateStr) => {
-        const seasons = loadSeasons();
-        const s = findSeasonForDate(dateStr, seasons);
-        const boss = bossForDate(dateStr);
-        let parts = [
-          `<span>Boss: <strong style="color:var(--cyan);">${boss}</strong></span>`,
-        ];
-        if (s) {
-          const sDay = seasonDayNumber(dateStr, s.start);
-          if (sDay !== null) {
-            parts.push(`<span>${seasonLabel(s)} • Day ${sDay}</span>`);
-          }
-        }
-        return `<div class="bracket-note" style="margin:0">${parts.join(' &nbsp;&bull;&nbsp; ')}</div>`;
-      };
-
       document.getElementById('saveDayBtn').onclick = () => {
         const date = document.getElementById('entryDate').value || todayStr();
-        const boss = document.getElementById('entryBoss').value;
         const ranks = {};
         Object.keys(MODES).forEach((key) => {
           const val = parseInt(
             document.getElementById('rank_' + key).value,
             10,
           );
-          if (!isNaN(val) && val > 0) ranks[key] = val;
+          ranks[key] = isNaN(val) ? null : val;
         });
-
+        const boss = entryBossEl.value || bossForDate(date);
         const days = loadDays();
-        days[date] = { date, boss, ranks };
+        days[date] = { date, ranks, boss };
         saveDays(days);
-
-        const statusEl = document.getElementById('saveStatus');
-        statusEl.textContent = 'Saved successfully!';
-        statusEl.style.color = 'var(--green)';
+        document.getElementById('saveStatus').textContent =
+          `Saved ${formatDate(date)} ✓`;
         setTimeout(() => {
-          statusEl.textContent = '';
+          document.getElementById('saveStatus').textContent = '';
         }, 2500);
-
         renderResultsForDay(
           days[date],
           document.getElementById('todayResults'),
         );
-      };
-
-      const loadCurrentDayInput = () => {
-        const date = document.getElementById('entryDate').value || todayStr();
-        const days = loadDays();
-        syncBossFromDate();
-        Object.keys(MODES).forEach((key) => {
-          const input = document.getElementById('rank_' + key);
-          const r = days[date] && days[date].ranks[key];
-          input.value = r != null ? r : '';
-          colorRankInput(key);
-        });
-        const existing = days[date] || {
-          date,
-          boss: document.getElementById('entryBoss').value,
-          ranks: {},
-        };
-        renderResultsForDay(existing, document.getElementById('todayResults'));
-      };
-      entryDateEl.addEventListener('change', loadCurrentDayInput);
-      entryDateEl.addEventListener('input', loadCurrentDayInput);
-      loadCurrentDayInput();
-
-      // Overall view
-      document.querySelectorAll('[data-osub]').forEach((btn) => {
-        btn.onclick = () => {
-          document
-            .querySelectorAll('#overallSubTabs .season-tab')
-            .forEach((t) => t.classList.remove('active'));
-          btn.classList.add('active');
-          const sub = btn.dataset.osub;
-          document.getElementById('overallSub-totals').style.display =
-            sub === 'totals' ? 'block' : 'none';
-          document.getElementById('overallSub-bosses').style.display =
-            sub === 'bosses' ? 'block' : 'none';
-          if (sub === 'bosses') renderOverallBosses();
-        };
-      });
-
-      const overallToggleBtn = document.getElementById('overallToggleBtn');
-      overallToggleBtn.onclick = () => {
-        showOverallLost = !showOverallLost;
-        overallToggleBtn.className =
-          'day-miss-toggle' + (showOverallLost ? ' active' : '');
-        overallToggleBtn.innerHTML = showOverallLost
-          ? 'Show <span style="color: var(--green)">gained</span> rewards'
-          : 'Show <span style="color: var(--red)">lost</span> rewards';
-        const titleEl = document.getElementById('overallTotalsTitle');
-        titleEl.innerHTML = showOverallLost
-          ? 'TOTAL REWARDS <span style="color: var(--red)">LOST</span>'
-          : 'TOTAL REWARDS <span style="color: var(--green)">GAINED</span>';
+        renderHistory();
         renderOverall();
+        renderSeason();
+      };
+
+      const dayContextHtml = (date) => {
+        const seasons = loadSeasons();
+        const season = findSeasonForDate(date, seasons);
+        if (!season) {
+          return `<div class="bracket-note">${formatDate(date)}</div>`;
+        }
+        const dayNum = seasonDayNumber(date, season.start);
+        return `<div class="bracket-note" style="font-size:13px">
+          <strong style="color:var(--gold)">${seasonLabel(season)}</strong>
+          · Day <strong style="color:var(--text)">${dayNum}</strong>
+          · <span style="color:var(--muted)">${formatDate(date)}</span>
+        </div>`;
+      };
+
+      const preloadToday = () => {
+        const days = loadDays();
+        const date = document.getElementById('entryDate').value;
+        bossManualOverride = false;
+        if (days[date]) {
+          Object.keys(MODES).forEach((key) => {
+            const v = days[date].ranks[key];
+            document.getElementById('rank_' + key).value =
+              v !== null && v !== undefined ? v : '';
+            colorRankInput(key);
+          });
+          entryBossEl.value = days[date].boss || bossForDate(date);
+          bossManualOverride = !!days[date].boss;
+          renderResultsForDay(
+            days[date],
+            document.getElementById('todayResults'),
+          );
+        } else {
+          document.getElementById('todayResults').innerHTML = '';
+          Object.keys(MODES).forEach((key) => {
+            document.getElementById('rank_' + key).value = '';
+            colorRankInput(key);
+          });
+          syncBossFromDate();
+        }
+      };
+      document.getElementById('entryDate').onchange = preloadToday;
+      preloadToday();
+
+      const computeTotalsForDays = (days, dateFilterFn) => {
+        const lost = {};
+        const gained = {};
+        const maxPossible = {};
+        Object.keys(CURRENCIES).forEach((c) => {
+          lost[c] = 0;
+          gained[c] = 0;
+          maxPossible[c] = 0;
+        });
+        Object.keys(days).forEach((date) => {
+          if (dateFilterFn && !dateFilterFn(date)) return;
+          Object.keys(MODES).forEach((modeKey) => {
+            const rank = days[date].ranks[modeKey];
+            if (!rank) return;
+            const {
+              lost: dayLost,
+              got: dayGot,
+              best,
+            } = computeLost(modeKey, rank);
+            Object.keys(best).forEach((c) => {
+              lost[c] += dayLost[c] || 0;
+              gained[c] += dayGot[c] || 0;
+              maxPossible[c] += best[c];
+            });
+          });
+        });
+        return { lost, gained, maxPossible };
+      };
+
+      const renderTotalsGrid = (gridEl, totalsData, showLost = false) => {
+        const { lost, gained, maxPossible } = totalsData;
+        gridEl.innerHTML = Object.keys(CURRENCIES)
+          .map((c) => {
+            const maxVal = maxPossible[c] || 0;
+            const cur = CURRENCIES[c];
+            if (showLost) {
+              const lostVal = lost[c] || 0;
+              const pct = maxVal > 0 ? Math.round((lostVal / maxVal) * 100) : 0;
+              const zero = lostVal === 0;
+              const isTotalLoss = pct === 100 && maxVal > 0;
+
+              const valColorStyle = zero
+                ? 'color: #ffffff;'
+                : isTotalLoss
+                  ? 'color: var(--red-dark); font-weight: 800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
+                  : 'color: #fb7185;';
+
+              return `
+        <div class="season-box">
+          <div class="cur-label">${renderItemBadge(cur)}</div>
+          <div class="cur-val" style="${zero ? 'color: #ffffff;' : isTotalLoss ? 'color: var(--red-dark); text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);' : 'color: var(--red);'}">
+            ${lostVal.toLocaleString()}<span class="total-num">/${maxVal.toLocaleString()}</span> (<span style="${valColorStyle}">${pct}%</span>)
+          </div>
+        </div>`;
+            } else {
+              const gainVal = gained[c] || 0;
+              const pct = maxVal > 0 ? Math.round((gainVal / maxVal) * 100) : 0;
+              const isFull = pct === 100 && maxVal > 0;
+              const zero = gainVal === 0 && maxVal > 0;
+
+              const valColorStyle = zero
+                ? 'color: var(--red-dark);'
+                : 'color: var(--green-dark);';
+              const pctColorStyle = zero
+                ? 'color: var(--red-dark);'
+                : isFull
+                  ? 'color: var(--gold); font-weight: 800;'
+                  : 'color: var(--green-dark);';
+
+              return `
+        <div class="season-box">
+          <div class="cur-label">${renderItemBadge(cur)}</div>
+          <div class="cur-val" style="${valColorStyle}">
+            ${gainVal.toLocaleString()}<span class="total-num">/${maxVal.toLocaleString()}</span> (<span style="${pctColorStyle}">${pct}%</span>)
+          </div>
+        </div>`;
+            }
+          })
+          .join('');
+      };
+
+      const DR_MODE_KEYS = ['drServer', 'drDistrict'];
+
+      const computeBossBracketDist = (days, dateFilterFn) => {
+        const stats = {};
+        const ensure = (boss) => {
+          if (!stats[boss]) {
+            stats[boss] = {};
+            DR_MODE_KEYS.forEach((mk) => {
+              const brackets = MODES[mk].brackets;
+              stats[boss][mk] = {
+                counts: brackets.map(() => 0),
+                outside: 0,
+                total: 0,
+                brackets,
+              };
+            });
+          }
+          return stats[boss];
+        };
+        Object.keys(days).forEach((date) => {
+          if (dateFilterFn && !dateFilterFn(date)) return;
+          const d = days[date];
+          const boss = d.boss || bossForDate(date);
+          const entry = ensure(boss);
+          DR_MODE_KEYS.forEach((mk) => {
+            const rank = d.ranks[mk];
+            if (!rank) return;
+            const slot = entry[mk];
+            slot.total++;
+            const idx = getBracketIndex(mk, rank);
+            if (idx === -1) slot.outside++;
+            else slot.counts[idx]++;
+          });
+        });
+        return stats;
+      };
+
+      const renderBossBracketDist = (container, stats) => {
+        const names = [
+          ...DREAM_BOSSES,
+          ...Object.keys(stats).filter((b) => !DREAM_BOSSES.includes(b)),
+        ];
+        const active = names.filter((b) => {
+          const s = stats[b];
+          return s && DR_MODE_KEYS.some((mk) => s[mk].total > 0);
+        });
+        if (!active.length) {
+          container.innerHTML =
+            '<div class="empty" style="padding:16px;">No Dream Realm ranks logged for this period.</div>';
+          return;
+        }
+        const cards = active
+          .map((boss) => {
+            const entry = stats[boss];
+            const modeBlocks = DR_MODE_KEYS.map((mk) => {
+              const { counts, outside, total, brackets } = entry[mk];
+              const shortLabel =
+                mk === 'drServer' ? 'Server rank' : 'District rank';
+              if (total === 0) {
+                return `<div class="dist-mode">
+              <div class="dist-title">${shortLabel}</div>
+              <div class="dist-empty">No ranks</div>
+            </div>`;
+              }
+              const rows = brackets
+                .map((b, idx) => {
+                  const n = counts[idx];
+                  const pct = Math.round((n / total) * 100);
+                  const c = tierColorForIndex(idx);
+                  const label =
+                    b.min === 1 ? `Top ${b.max}` : `${b.min}–${b.max}`;
+                  return `<div class="dist-row">
+              <span class="dist-label" style="color:${c}">${label}</span>
+              <div class="dist-bar-wrap">
+                <div class="dist-bar" style="width:${pct}%;background:${c}"></div>
+              </div>
+              <span class="dist-pct" style="color:${c}">${pct}%</span>
+              <span class="dist-count">${n}/${total}</span>
+            </div>`;
+                })
+                .join('');
+              const outPct = Math.round((outside / total) * 100);
+              const outRow =
+                outside > 0
+                  ? `<div class="dist-row">
+              <span class="dist-label" style="color:var(--red)">Outside</span>
+              <div class="dist-bar-wrap">
+                <div class="dist-bar" style="width:${outPct}%;background:var(--red)"></div>
+              </div>
+              <span class="dist-pct" style="color:var(--red)">${outPct}%</span>
+              <span class="dist-count">${outside}/${total}</span>
+            </div>`
+                  : '';
+              return `<div class="dist-mode">
+            <div class="dist-title">${shortLabel}</div>
+            ${rows}${outRow}
+          </div>`;
+            }).join('');
+            const dayHint = DR_MODE_KEYS.reduce(
+              (m, mk) => Math.max(m, entry[mk].total),
+              0,
+            );
+            return `<div class="boss-dist-card">
+          <div class="boss-dist-name">
+            ${boss}<span class="boss-dist-days">${dayHint} day${dayHint === 1 ? '' : 's'}</span>
+          </div>
+          ${modeBlocks}
+        </div>`;
+          })
+          .join('');
+        container.innerHTML = `<div class="boss-dist-grid">${cards}</div>`;
       };
 
       const renderOverall = () => {
@@ -2388,550 +2586,407 @@
           dist,
           showOverallLost,
         );
+        renderBossBracketDist(
+          document.getElementById('overallBossWrap'),
+          computeBossBracketDist(days, null),
+        );
+        const totals = computeTotalsForDays(days, null);
+        renderTotalsGrid(
+          document.getElementById('overallTotalsGrid'),
+          totals,
+          showOverallLost,
+        );
+      };
 
-        const totalsGrid = document.getElementById('overallTotalsGrid');
-        const totals = {};
-        const maxTotals = {};
-        Object.keys(CURRENCIES).forEach((c) => {
-          totals[c] = 0;
-          maxTotals[c] = 0;
+      const overallToggleBtn = document.getElementById('overallToggleBtn');
+      if (overallToggleBtn) {
+        overallToggleBtn.onclick = () => {
+          showOverallLost = !showOverallLost;
+          overallToggleBtn.classList.toggle('active', showOverallLost);
+          overallToggleBtn.innerHTML = showOverallLost
+            ? 'Show <span style="color: var(--green);">gained</span> rewards'
+            : 'Show <span style="color: var(--red);">lost</span> rewards';
+          const titleEl = document.getElementById('overallTotalsTitle');
+          if (titleEl) {
+            titleEl.style.color = showOverallLost
+              ? 'var(--red)'
+              : 'var(--green)';
+            titleEl.textContent = showOverallLost
+              ? 'TOTAL REWARDS LOST'
+              : 'TOTAL REWARDS GAINED';
+          }
+          renderOverall();
+        };
+      }
+
+      activateSubTab = (tabsId, prefix, attr, key) => {
+        const tabsEl = document.getElementById(tabsId);
+        if (!tabsEl) return;
+        tabsEl.querySelectorAll('.season-tab').forEach((t) => {
+          const on = t.dataset[attr] === key;
+          t.classList.toggle('active', on);
         });
-
-        Object.keys(days).forEach((date) => {
-          Object.keys(MODES).forEach((modeKey) => {
-            const rank = days[date].ranks[modeKey];
-            if (!rank) return;
-            const { lost, got, best } = computeLost(modeKey, rank);
-            Object.keys(best).forEach((c) => {
-              totals[c] += showOverallLost ? lost[c] || 0 : got[c] || 0;
-              maxTotals[c] += best[c] || 0;
-            });
-          });
+        ['bosses', 'totals'].forEach((k) => {
+          const el = document.getElementById(prefix + k);
+          if (el) el.style.display = k === key ? '' : 'none';
         });
+      };
 
-        totalsGrid.innerHTML = Object.keys(CURRENCIES)
-          .map((c) => {
-            const cur = CURRENCIES[c];
-            const val = totals[c];
-            const maxVal = maxTotals[c];
-            const pct = maxVal > 0 ? Math.round((val / maxVal) * 100) : 0;
-            const isZero = val === 0 && maxVal > 0;
-            const isPerfectOrFull = pct === 100 && maxVal > 0;
+      const wirePanelSubTabs = (tabsId, prefix, attr) => {
+        const tabsEl = document.getElementById(tabsId);
+        if (!tabsEl || tabsEl.dataset.wired) return;
+        tabsEl.dataset.wired = '1';
+        tabsEl.querySelectorAll('.season-tab').forEach((btn) => {
+          btn.onclick = () => {
+            activateSubTab(tabsId, prefix, attr, btn.dataset[attr]);
+          };
+        });
+      };
+      wirePanelSubTabs('overallSubTabs', 'overallSub-', 'osub');
+      wirePanelSubTabs('seasonSubTabs', 'seasonSub-', 'ssub');
 
-            if (showOverallLost) {
-              const isTotalLoss = isPerfectOrFull;
-              const valColor = isZero
-                ? 'color:var(--text); font-weight:600;'
-                : isTotalLoss
-                  ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
-                  : 'color:var(--red); font-weight:750;';
-              const pctColor = isZero
-                ? 'color:var(--text); font-weight:600;'
-                : isTotalLoss
-                  ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
-                  : 'color:var(--red); font-weight:750;';
+      let historySeasonFilter = 'all';
 
-              return `<div class="season-box">
-              <div class="cur-label">${renderItemBadge(cur)}</div>
-              <div class="cur-val lost-val ${isTotalLoss ? 'total-lost-val' : ''} ${isZero ? 'zero' : ''}">
-                <span style="${valColor}">${val.toLocaleString()}</span><span class="total-num">/${maxVal.toLocaleString()}</span>
-                <div style="font-size:13px; font-weight:700; margin-top:4px; ${pctColor}">(${pct}%)</div>
-              </div>
-            </div>`;
-            } else {
-              const valColor = isZero
-                ? 'color:var(--red); font-weight:800;'
-                : isPerfectOrFull
-                  ? 'color:var(--text); font-weight:600;'
-                  : 'color:var(--green); font-weight:750;';
-              const pctColor = isZero
-                ? 'color:var(--red); font-weight:800;'
-                : isPerfectOrFull
-                  ? 'color:var(--text); font-weight:600;'
-                  : 'color:var(--green); font-weight:750;';
-
-              return `<div class="season-box">
-              <div class="cur-label">${renderItemBadge(cur)}</div>
-              <div class="cur-val ${isZero ? 'zero' : ''}">
-                <span style="${valColor}">${val.toLocaleString()}</span><span class="total-num">/${maxVal.toLocaleString()}</span>
-                <div style="font-size:13px; font-weight:700; margin-top:4px; ${pctColor}">(${pct}%)</div>
-              </div>
-            </div>`;
-            }
+      const renderHistorySeasonTabs = () => {
+        const seasons = loadSeasons();
+        const tabsEl = document.getElementById('historySeasonTabs');
+        if (!tabsEl) return;
+        tabsEl.classList.add('season-tabs-picks');
+        const items = [
+          { id: 'all', label: 'All seasons' },
+          ...[...seasons]
+            .reverse()
+            .map((s) => ({ id: s.id, label: seasonLabel(s) })),
+        ];
+        if (
+          historySeasonFilter !== 'all' &&
+          !seasons.find((s) => s.id === historySeasonFilter)
+        ) {
+          historySeasonFilter = 'all';
+        }
+        tabsEl.innerHTML = items
+          .map((it) => {
+            const active = it.id === historySeasonFilter ? ' active' : '';
+            const pick = it.id !== 'all' ? ' season-pick' : '';
+            return `<button class="season-tab${pick}${active}" data-hid="${it.id}">${it.label}</button>`;
           })
           .join('');
+        tabsEl.querySelectorAll('.season-tab').forEach((btn) => {
+          btn.onclick = () => {
+            historySeasonFilter = btn.dataset.hid;
+            renderHistory();
+          };
+        });
       };
 
-      const renderOverallBosses = () => {
-        const wrap = document.getElementById('overallBossWrap');
-        const days = loadDays();
-        wrap.innerHTML = `<div class="boss-dist-grid">${DREAM_BOSSES.map(
-          (boss) => {
-            const bossDays = Object.keys(days).filter(
-              (d) => days[d].boss === boss,
-            );
-            const dist = computeBracketDist(days, (d) => days[d].boss === boss);
-            const totalDays = bossDays.length;
-            return `<div class="boss-dist-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span class="boss-dist-name">${boss}</span>
-            <span class="boss-dist-days">${totalDays} day${totalDays === 1 ? '' : 's'}</span>
-          </div>
-          ${Object.keys(MODES)
-            .map((modeKey) => {
-              const d = dist[modeKey];
-              const brackets = d.brackets;
-              const total = d.total;
-              if (total === 0) {
-                return `<div class="dist-mode"><div class="dist-title">${MODES[modeKey].label}</div><div class="dist-empty">No data</div></div>`;
-              }
-              const rows = brackets
-                .map((b, idx) => {
-                  const n = d.counts[idx];
-                  const pct = Math.round((n / total) * 100);
-                  const c = tierColorForIndex(idx);
-                  const label =
-                    b.min === 1 ? `Top ${b.max}` : `${b.min}–${b.max}`;
-                  return `<div class="dist-row">
-                  <span class="dist-label" style="color:${c}">${label}</span>
-                  <div class="dist-bar-wrap"><div class="dist-bar" style="width:${pct}%;background:${c}"></div></div>
-                  <span class="dist-pct" style="color:${c}">${pct}%</span>
-                  <span class="dist-count">${n}/${total}</span>
-                </div>`;
-                })
-                .join('');
-              return `<div class="dist-mode">
-              <div class="dist-title">${MODES[modeKey].label}</div>
-              ${rows}
-            </div>`;
-            })
-            .join('')}
-        </div>`;
-          },
-        ).join('')}</div>`;
-      };
-
-      // History view
       const renderHistory = () => {
-        const wrap = document.getElementById('historyTableWrap');
         const days = loadDays();
-        const keys = Object.keys(days).sort().reverse();
-        if (keys.length === 0) {
+        const seasons = loadSeasons();
+        renderHistorySeasonTabs();
+
+        let allDates = Object.keys(days).sort().reverse();
+        if (historySeasonFilter !== 'all') {
+          const season = seasons.find((s) => s.id === historySeasonFilter);
+          if (season) {
+            const range = getSeasonDateRange(seasons, season);
+            allDates = allDates.filter((d) => dayInSeason(d, range));
+          }
+        }
+
+        const wrap = document.getElementById('historyTableWrap');
+        const searchEl = document.getElementById('historySearch');
+        const hintEl = document.getElementById('historySearchHint');
+        const q = (searchEl?.value || '').trim().toLowerCase();
+
+        const dates = q
+          ? allDates.filter((d) => {
+              const boss = (days[d].boss || bossForDate(d)).toLowerCase();
+              return d.toLowerCase().includes(q) || boss.includes(q);
+            })
+          : allDates;
+
+        if (hintEl) {
+          if (!allDates.length) {
+            hintEl.textContent = '';
+          } else if (q) {
+            hintEl.textContent = `${dates.length} of ${allDates.length} day${allDates.length === 1 ? '' : 's'}`;
+          } else {
+            hintEl.textContent = `${allDates.length} day${allDates.length === 1 ? '' : 's'}`;
+          }
+        }
+
+        if (!Object.keys(days).length) {
           wrap.innerHTML = '<div class="empty">No days logged yet.</div>';
           return;
         }
-        const query = (
-          document.getElementById('historySearch').value || ''
-        ).toLowerCase();
-        const filtered = keys.filter((date) => {
-          if (!query) return true;
-          const d = days[date];
-          const boss = (d.boss || '').toLowerCase();
-          const fmt = formatDate(date).toLowerCase();
-          return (
-            date.includes(query) || boss.includes(query) || fmt.includes(query)
-          );
-        });
-
-        document.getElementById('historySearchHint').textContent =
-          query && filtered.length !== keys.length
-            ? `Showing ${filtered.length} of ${keys.length} days`
-            : `${keys.length} day${keys.length === 1 ? '' : 's'} logged`;
-
-        if (filtered.length === 0) {
-          wrap.innerHTML = '<div class="empty">No matching days found.</div>';
+        if (!allDates.length) {
+          wrap.innerHTML =
+            '<div class="empty">No days logged in this season.</div>';
           return;
         }
-
-        wrap.innerHTML = `<div class="boss-table-wrap"><table>
-        <thead><tr>
-          <th>Date</th>
-          <th>Dream Realm Boss</th>
-          ${Object.keys(MODES)
-            .map(
-              (m) => `<th>${MODES[m].label.split('—').pop().trim()} Rank</th>`,
-            )
-            .join('')}
-          <th style="text-align:right;">Actions</th>
-        </tr></thead>
-        <tbody>
-          ${filtered
-            .map((date) => {
-              const d = days[date];
-              return `<tr>
-              <td style="font-weight:600; white-space:nowrap;">${formatDate(date)}</td>
-              <td class="boss-name">${d.boss || '—'}</td>${Object.keys(MODES)
-                .map((m) => {
-                  const r = d.ranks[m];
-                  if (!r) return '<td style="color:var(--muted)">—</td>';
-                  const idx = getBracketIndex(m, r);
-                  const c = idx !== -1 ? tierColorForIndex(idx) : 'var(--red)';
-                  return `<td><strong style="color:${c}">#${r}</strong></td>`;
-                })
-                .join('')}
-              <td style="text-align:right; white-space:nowrap;">
-                <button class="ghost" style="padding:4px 8px; font-size:11px;" onclick="editDay('${date}')">Edit</button>
-                <button class="del-btn" style="margin-left:8px;" onclick="deleteDay('${date}')" title="Delete day">🗑️</button>
-              </td>
-            </tr>`;
-            })
-            .join('')}
-        </tbody>
-      </table></div>`;
-      };
-
-      document
-        .getElementById('historySearch')
-        .addEventListener('input', renderHistory);
-
-      window.editDay = (date) => {
-        document.getElementById('entryDate').value = date;
-        syncEntryDateLabel();
-        const days = loadDays();
-        const d = days[date];
-        if (d) {
-          bossManualOverride = true;
-          document.getElementById('entryBoss').value =
-            d.boss || bossForDate(date);
-          Object.keys(MODES).forEach((key) => {
-            document.getElementById('rank_' + key).value =
-              d.ranks[key] != null ? d.ranks[key] : '';
-            colorRankInput(key);
-          });
-          renderResultsForDay(d, document.getElementById('todayResults'));
+        if (!dates.length) {
+          wrap.innerHTML = `<div class="empty">No days match “${q}”.</div>`;
+          return;
         }
-        document
-          .querySelectorAll('.tab')
-          .forEach((t) => t.classList.remove('active'));
-        document
-          .querySelectorAll('.view')
-          .forEach((v) => v.classList.remove('active'));
-        document.querySelector('[data-view="today"]').classList.add('active');
-        document.getElementById('view-today').classList.add('active');
+        let html = `<div style="overflow-x:auto;"><table><thead><tr>
+      <th>Season day</th>
+      <th>Date</th>
+      <th>Dream Realm Boss</th>
+      ${Object.keys(MODES)
+        .map((k) => `<th>${MODES[k].label}</th>`)
+        .join('')}<th></th>
+    </tr></thead><tbody>`;
+        dates.forEach((date) => {
+          const d = days[date];
+          let totalLost = 0;
+          const rankCells = Object.keys(MODES)
+            .map((key) => {
+              const rank = d.ranks[key];
+              if (!rank) return '<td class="bracket-note">—</td>';
+              const { lost } = computeLost(key, rank);
+              totalLost += Object.values(lost).reduce((a, b) => a + b, 0);
+              const idx = getBracketIndex(key, rank);
+              const c = idx === -1 ? 'var(--red)' : tierColorForIndex(idx);
+              return `<td style="color: ${c}; font-weight: 700;">#${rank}</td>`;
+            })
+            .join('');
+          const bossName = d.boss || bossForDate(date);
+          const season = findSeasonForDate(date, seasons);
+          const dayNum = season ? seasonDayNumber(date, season.start) : null;
+          const dayLabel = dayNum
+            ? `Day ${dayNum}${season ? ` · ${seasonLabel(season)}` : ''}`
+            : '—';
+          html += `<tr>
+        <td style="color:var(--muted);font-size:12px;white-space:nowrap">${dayLabel}</td>
+        <td style="white-space:nowrap">${formatDate(date)}</td>
+        <td style="color: var(--cyan); font-weight: 600;">${bossName}</td>
+        ${rankCells}
+        <td><button class="del-btn" onclick="deleteDay('${date}')" title="Delete">🗑</button></td>
+      </tr>`;
+        });
+        html += '</tbody></table></div>';
+        wrap.innerHTML = html;
       };
+
+      document.getElementById('historySearch').addEventListener('input', () => {
+        renderHistory();
+      });
 
       window.deleteDay = (date) => {
-        if (!confirm(`Delete logged entry for ${formatDate(date)}?`)) return;
         const days = loadDays();
         delete days[date];
         saveDays(days);
         renderHistory();
-      };
-
-      // Seasons view
-      let currentSeasonId = null;
-
-      const renderSeasonTabs = () => {
-        const seasons = loadSeasons();
-        const tabsEl = document.getElementById('seasonTabs');
-        if (!currentSeasonId && seasons.length) currentSeasonId = seasons[0].id;
-
-        tabsEl.innerHTML = seasons
-          .map((s) => {
-            const active = s.id === currentSeasonId ? ' active' : '';
-            const label = seasonLabel(s);
-            const canDel = seasons.length > 1;
-            const delBtn = canDel
-              ? `<button class="season-del" onclick="event.stopPropagation(); promptDeleteSeason('${s.id}')" title="Delete season">×</button>`
-              : '';
-            return `<div class="season-tab-wrap"><button class="season-tab season-pick${active}" onclick="switchSeason('${s.id}')">${label}</button>${delBtn}</div>`;
-          })
-          .join('');
-      };
-
-      window.switchSeason = (id) => {
-        currentSeasonId = id;
-        setActiveSeasonId(id);
-        renderSeasonTabs();
+        renderOverall();
         renderSeason();
       };
+
+      let activeSeasonId = null;
+      let pendingDeleteSeasonId = null;
 
       selectCurrentSeason = () => {
         const seasons = loadSeasons();
-        const activeId = getActiveSeasonId();
-        if (activeId && seasons.find((s) => s.id === activeId)) {
-          currentSeasonId = activeId;
-        } else if (seasons.length) {
-          currentSeasonId = seasons[0].id;
+        if (!seasons.length) return;
+        const stored = getActiveSeasonId();
+        if (stored && seasons.find((s) => s.id === stored)) {
+          activeSeasonId = stored;
+        } else {
+          // fall back to the latest season by start date
+          const sorted = [...seasons].sort((a, b) =>
+            a.start.localeCompare(b.start),
+          );
+          activeSeasonId = sorted[sorted.length - 1].id;
         }
-        renderSeasonTabs();
+        setActiveSeasonId(activeSeasonId);
       };
 
-      document.querySelectorAll('[data-ssub]').forEach((btn) => {
-        btn.onclick = () => {
-          document
-            .querySelectorAll('#seasonSubTabs .season-tab')
-            .forEach((t) => t.classList.remove('active'));
-          btn.classList.add('active');
-          const sub = btn.dataset.ssub;
-          document.getElementById('seasonSub-totals').style.display =
-            sub === 'totals' ? 'block' : 'none';
-          document.getElementById('seasonSub-bosses').style.display =
-            sub === 'bosses' ? 'block' : 'none';
-          if (sub === 'bosses') renderSeasonBosses();
-        };
-      });
-
-      const seasonToggleBtn = document.getElementById('seasonToggleBtn');
-      seasonToggleBtn.onclick = () => {
-        showSeasonLost = !showSeasonLost;
-        seasonToggleBtn.className =
-          'day-miss-toggle' + (showSeasonLost ? ' active' : '');
-        seasonToggleBtn.innerHTML = showSeasonLost
-          ? 'Show <span style="color: var(--green)">gained</span> rewards'
-          : 'Show <span style="color: var(--red)">lost</span> rewards';
-        const titleEl = document.getElementById('seasonTotalsTitle');
-        titleEl.innerHTML = showSeasonLost
-          ? 'REWARDS <span style="color: var(--red)">LOST</span> IN SEASON'
-          : 'REWARDS <span style="color: var(--green)">GAINED</span> IN SEASON';
-        renderSeason();
+      const renderSeasonTabs = (seasons) => {
+        const tabsEl = document.getElementById('seasonTabs');
+        tabsEl.classList.add('season-tabs-picks');
+        if (!activeSeasonId || !seasons.find((s) => s.id === activeSeasonId)) {
+          activeSeasonId = seasons[seasons.length - 1].id;
+          setActiveSeasonId(activeSeasonId);
+        }
+        const ordered = [...seasons].reverse();
+        tabsEl.innerHTML = ordered
+          .map((s) => {
+            const active = s.id === activeSeasonId ? ' active' : '';
+            const canDelete = seasons.length > 1;
+            const delBtn = canDelete
+              ? `<button class="season-del" data-del-sid="${s.id}" title="Delete season">🗑</button>`
+              : '';
+            return `<span class="season-tab-wrap">
+            <button class="season-tab season-pick${active}" data-sid="${s.id}">
+              ${seasonLabel(s)}
+            </button>${delBtn}
+          </span>`;
+          })
+          .join('');
+        tabsEl.querySelectorAll('.season-tab').forEach((btn) => {
+          btn.onclick = () => {
+            activeSeasonId = btn.dataset.sid;
+            setActiveSeasonId(activeSeasonId);
+            renderSeason();
+          };
+        });
+        tabsEl.querySelectorAll('.season-del').forEach((btn) => {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            openDeleteSeasonModal(btn.dataset.delSid);
+          };
+        });
       };
 
       const renderSeason = () => {
         const seasons = loadSeasons();
+        renderSeasonTabs(seasons);
         const season =
-          seasons.find((s) => s.id === currentSeasonId) || seasons[0];
+          seasons.find((s) => s.id === activeSeasonId) || seasons[0];
         if (!season) return;
         const range = getSeasonDateRange(seasons, season);
+        const days = loadDays();
         const filterFn = (d) => dayInSeason(d, range);
 
-        const days = loadDays();
         const dist = computeBracketDist(days, filterFn, showSeasonLost);
         renderDist(document.getElementById('seasonDist'), dist, showSeasonLost);
-
-        const seasonGrid = document.getElementById('seasonGrid');
-        const totals = {};
-        const maxTotals = {};
-        Object.keys(CURRENCIES).forEach((c) => {
-          totals[c] = 0;
-          maxTotals[c] = 0;
-        });
-
-        Object.keys(days).forEach((date) => {
-          if (!filterFn(date)) return;
-          Object.keys(MODES).forEach((modeKey) => {
-            const rank = days[date].ranks[modeKey];
-            if (!rank) return;
-            const { lost, got, best } = computeLost(modeKey, rank);
-            Object.keys(best).forEach((c) => {
-              totals[c] += showSeasonLost ? lost[c] || 0 : got[c] || 0;
-              maxTotals[c] += best[c] || 0;
-            });
-          });
-        });
-
-        seasonGrid.innerHTML = Object.keys(CURRENCIES)
-          .map((c) => {
-            const cur = CURRENCIES[c];
-            const val = totals[c];
-            const maxVal = maxTotals[c];
-            const pct = maxVal > 0 ? Math.round((val / maxVal) * 100) : 0;
-            const isZero = val === 0 && maxVal > 0;
-            const isPerfectOrFull = pct === 100 && maxVal > 0;
-
-            if (showSeasonLost) {
-              const isTotalLoss = isPerfectOrFull;
-              const valColor = isZero
-                ? 'color:var(--text); font-weight:600;'
-                : isTotalLoss
-                  ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
-                  : 'color:var(--red); font-weight:750;';
-              const pctColor = isZero
-                ? 'color:var(--text); font-weight:600;'
-                : isTotalLoss
-                  ? 'color:var(--red-dark); font-weight:800; text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);'
-                  : 'color:var(--red); font-weight:750;';
-
-              return `<div class="season-box">
-              <div class="cur-label">${renderItemBadge(cur)}</div>
-              <div class="cur-val lost-val ${isTotalLoss ? 'total-lost-val' : ''} ${isZero ? 'zero' : ''}">
-                <span style="${valColor}">${val.toLocaleString()}</span><span class="total-num">/${maxVal.toLocaleString()}</span>
-                <div style="font-size:13px; font-weight:700; margin-top:4px; ${pctColor}">(${pct}%)</div>
-              </div>
-            </div>`;
-            } else {
-              const valColor = isZero
-                ? 'color:var(--red); font-weight:800;'
-                : isPerfectOrFull
-                  ? 'color:var(--text); font-weight:600;'
-                  : 'color:var(--green); font-weight:750;';
-              const pctColor = isZero
-                ? 'color:var(--red); font-weight:800;'
-                : isPerfectOrFull
-                  ? 'color:var(--text); font-weight:600;'
-                  : 'color:var(--green); font-weight:750;';
-
-              return `<div class="season-box">
-              <div class="cur-label">${renderItemBadge(cur)}</div>
-              <div class="cur-val ${isZero ? 'zero' : ''}">
-                <span style="${valColor}">${val.toLocaleString()}</span><span class="total-num">/${maxVal.toLocaleString()}</span>
-                <div style="font-size:13px; font-weight:700; margin-top:4px; ${pctColor}">(${pct}%)</div>
-              </div>
-            </div>`;
-            }
-          })
-          .join('');
-      };
-
-      const renderSeasonBosses = () => {
-        const wrap = document.getElementById('seasonBossWrap');
-        const seasons = loadSeasons();
-        const season =
-          seasons.find((s) => s.id === currentSeasonId) || seasons[0];
-        if (!season) return;
-        const range = getSeasonDateRange(seasons, season);
-        const filterFn = (d) => dayInSeason(d, range);
-
-        const days = loadDays();
-        wrap.innerHTML = `<div class="boss-dist-grid">${DREAM_BOSSES.map(
-          (boss) => {
-            const bossDays = Object.keys(days).filter(
-              (d) => filterFn(d) && days[d].boss === boss,
-            );
-            const dist = computeBracketDist(
-              days,
-              (d) => filterFn(d) && days[d].boss === boss,
-            );
-            const totalDays = bossDays.length;
-            return `<div class="boss-dist-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span class="boss-dist-name">${boss}</span>
-            <span class="boss-dist-days">${totalDays} day${totalDays === 1 ? '' : 's'}</span>
-          </div>
-          ${Object.keys(MODES)
-            .map((modeKey) => {
-              const d = dist[modeKey];
-              const brackets = d.brackets;
-              const total = d.total;
-              if (total === 0) {
-                return `<div class="dist-mode"><div class="dist-title">${MODES[modeKey].label}</div><div class="dist-empty">No data</div></div>`;
-              }
-              const rows = brackets
-                .map((b, idx) => {
-                  const n = d.counts[idx];
-                  const pct = Math.round((n / total) * 100);
-                  const c = tierColorForIndex(idx);
-                  const label =
-                    b.min === 1 ? `Top ${b.max}` : `${b.min}–${b.max}`;
-                  return `<div class="dist-row">
-                  <span class="dist-label" style="color:${c}">${label}</span>
-                  <div class="dist-bar-wrap"><div class="dist-bar" style="width:${pct}%;background:${c}"></div></div>
-                  <span class="dist-pct" style="color:${c}">${pct}%</span>
-                  <span class="dist-count">${n}/${total}</span>
-                </div>`;
-                })
-                .join('');
-              return `<div class="dist-mode">
-              <div class="dist-title">${MODES[modeKey].label}</div>
-              ${rows}
-            </div>`;
-            })
-            .join('')}
-        </div>`;
-          },
-        ).join('')}</div>`;
-      };
-
-      // New season modal handlers
-      const newSeasonModal = document.getElementById('newSeasonModal');
-      document.getElementById('newSeasonBtn').onclick = () => {
-        const seasons = loadSeasons();
-        const n = nextSeasonNumber(seasons);
-        document.getElementById('modalSeasonName').value = `Season ${n}`;
-        const modalStart = document.getElementById('modalSeasonStart');
-        const modalStartLabel = document.getElementById(
-          'modalSeasonStartLabel',
+        renderBossBracketDist(
+          document.getElementById('seasonBossWrap'),
+          computeBossBracketDist(days, filterFn),
         );
-        modalStart.value = todayStr();
-        modalStartLabel.textContent = formatDate(modalStart.value);
-        newSeasonModal.hidden = false;
+        const totals = computeTotalsForDays(days, filterFn);
+        renderTotalsGrid(
+          document.getElementById('seasonGrid'),
+          totals,
+          showSeasonLost,
+        );
       };
+
+      const seasonToggleBtn = document.getElementById('seasonToggleBtn');
+      if (seasonToggleBtn) {
+        seasonToggleBtn.onclick = () => {
+          showSeasonLost = !showSeasonLost;
+          seasonToggleBtn.classList.toggle('active', showSeasonLost);
+          seasonToggleBtn.innerHTML = showSeasonLost
+            ? 'Show <span style="color: var(--green);">gained</span> rewards'
+            : 'Show <span style="color: var(--red);">lost</span> rewards';
+          const titleEl = document.getElementById('seasonTotalsTitle');
+          if (titleEl) {
+            titleEl.style.color = showSeasonLost
+              ? 'var(--red)'
+              : 'var(--green)';
+            titleEl.textContent = showSeasonLost
+              ? 'REWARDS LOST IN SEASON'
+              : 'REWARDS GAINED IN SEASON';
+          }
+          renderSeason();
+        };
+      }
+
+      const newSeasonModal = document.getElementById('newSeasonModal');
+      const modalSeasonName = document.getElementById('modalSeasonName');
       const modalSeasonStart = document.getElementById('modalSeasonStart');
       const modalSeasonStartLabel = document.getElementById(
         'modalSeasonStartLabel',
       );
-      const syncModalSeasonStartLabel = () => {
+      const syncModalStartLabel = () => {
         modalSeasonStartLabel.textContent = formatDate(
           modalSeasonStart.value || todayStr(),
         );
       };
-      modalSeasonStart.addEventListener('change', syncModalSeasonStartLabel);
-      modalSeasonStart.addEventListener('input', syncModalSeasonStartLabel);
-      document.getElementById('modalSeasonStartBtn').onclick = () => {
-        if (typeof modalSeasonStart.showPicker === 'function') {
-          try {
-            modalSeasonStart.showPicker();
-            return;
-          } catch (e) {}
-        }
-        modalSeasonStart.focus();
-        modalSeasonStart.click();
+
+      document.getElementById('newSeasonBtn').onclick = () => {
+        const seasons = loadSeasons();
+        const nextNum = nextSeasonNumber(seasons);
+        modalSeasonName.value = `Season ${nextNum}`;
+        modalSeasonStart.value = todayStr();
+        syncModalStartLabel();
+        newSeasonModal.hidden = false;
       };
+      document.getElementById('modalSeasonStart').onchange =
+        syncModalStartLabel;
+      document.getElementById('modalSeasonStart').oninput = syncModalStartLabel;
+      document
+        .getElementById('modalSeasonStartBtn')
+        .addEventListener('click', () => {
+          if (typeof modalSeasonStart.showPicker === 'function') {
+            try {
+              modalSeasonStart.showPicker();
+              return;
+            } catch (e) {}
+          }
+          modalSeasonStart.focus();
+          modalSeasonStart.click();
+        });
 
       document.getElementById('modalSeasonCancel').onclick = () => {
         newSeasonModal.hidden = true;
       };
       document.getElementById('modalSeasonConfirm').onclick = () => {
-        const name =
-          document.getElementById('modalSeasonName').value.trim() ||
-          'New Season';
-        const start =
-          document.getElementById('modalSeasonStart').value || todayStr();
+        const name = modalSeasonName.value.trim() || 'New Season';
+        const start = modalSeasonStart.value || todayStr();
         const seasons = loadSeasons();
         const id = 's_' + Date.now();
         seasons.push({ id, name, start });
         seasons.sort((a, b) => a.start.localeCompare(b.start));
         saveSeasons(seasons);
-        currentSeasonId = id;
+        activeSeasonId = id;
         setActiveSeasonId(id);
         newSeasonModal.hidden = true;
-        renderSeasonTabs();
         renderSeason();
+        renderHistory();
       };
 
-      // Delete season modal handlers
-      let seasonToDeleteId = null;
       const deleteSeasonModal = document.getElementById('deleteSeasonModal');
-      window.promptDeleteSeason = (id) => {
+      const deleteSeasonMsg = document.getElementById('deleteSeasonMsg');
+      const deleteSeasonDaysCheckbox =
+        document.getElementById('deleteSeasonDays');
+
+      const openDeleteSeasonModal = (sid) => {
         const seasons = loadSeasons();
-        const s = seasons.find((x) => x.id === id);
+        const s = seasons.find((x) => x.id === sid);
         if (!s) return;
-        seasonToDeleteId = id;
-        document.getElementById('deleteSeasonMsg').textContent =
-          `This removes "${seasonLabel(s)}" from the list. Your daily rank history is kept unless you choose to delete those days too.`;
-        document.getElementById('deleteSeasonDays').checked = false;
+        pendingDeleteSeasonId = sid;
+        deleteSeasonMsg.textContent = `This removes “${seasonLabel(s)}” from the list. Your daily rank history can be kept or removed below.`;
+        deleteSeasonDaysCheckbox.checked = false;
         deleteSeasonModal.hidden = false;
       };
+
       document.getElementById('modalDeleteCancel').onclick = () => {
         deleteSeasonModal.hidden = true;
-        seasonToDeleteId = null;
+        pendingDeleteSeasonId = null;
       };
       document.getElementById('modalDeleteConfirm').onclick = () => {
-        if (!seasonToDeleteId) return;
-        const seasons = loadSeasons();
-        const idx = seasons.findIndex((x) => x.id === seasonToDeleteId);
-        if (idx === -1) return;
-        const season = seasons[idx];
-        const range = getSeasonDateRange(seasons, season);
-        const alsoDeleteDays =
-          document.getElementById('deleteSeasonDays').checked;
+        if (!pendingDeleteSeasonId) return;
+        let seasons = loadSeasons();
+        const sid = pendingDeleteSeasonId;
+        const seasonToRemove = seasons.find((x) => x.id === sid);
+        const alsoDays = deleteSeasonDaysCheckbox.checked;
 
-        if (alsoDeleteDays) {
+        if (alsoDays && seasonToRemove) {
+          const range = getSeasonDateRange(seasons, seasonToRemove);
           const days = loadDays();
+          let changed = false;
           Object.keys(days).forEach((date) => {
-            if (dayInSeason(date, range)) delete days[date];
+            if (dayInSeason(date, range)) {
+              delete days[date];
+              changed = true;
+            }
           });
-          saveDays(days);
+          if (changed) saveDays(days);
         }
 
-        seasons.splice(idx, 1);
+        seasons = seasons.filter((x) => x.id !== sid);
         saveSeasons(seasons);
+        deleteSeasonModal.hidden = false;
         deleteSeasonModal.hidden = true;
-        seasonToDeleteId = null;
+        pendingDeleteSeasonId = null;
 
-        selectCurrentSeason();
-        renderSeasonTabs();
+        activeSeasonId = seasons[seasons.length - 1].id;
+        setActiveSeasonId(activeSeasonId);
+
         renderSeason();
+        renderHistory();
+        renderOverall();
       };
     </script>
   </body>
