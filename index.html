@@ -216,32 +216,41 @@
       .day-results-header .bracket-note {
         margin: 0;
       }
+
+      /* Default / Off State: Red ("Show lost rewards") */
       .day-miss-toggle {
         flex-shrink: 0;
         font-size: 13px;
         font-weight: 600;
         padding: 8px 14px;
         border-radius: 8px;
-        border: 1px solid rgba(248, 194, 68, 0.55);
-        background: rgba(248, 194, 68, 0.1);
-        color: var(--gold);
-        box-shadow: none;
+        cursor: pointer;
+        border: 1px solid rgba(251, 113, 133, 0.55);
+        background: rgba(251, 113, 133, 0.15);
+        color: var(--red);
+        box-shadow: 0 0 6px rgba(251, 113, 133, 0.1);
+        transition: all 0.2s ease;
       }
       .day-miss-toggle:hover {
-        background: rgba(248, 194, 68, 0.18);
-        border-color: var(--gold);
-        color: var(--gold);
+        background: rgba(251, 113, 133, 0.25);
+        border-color: var(--red);
+        color: #ffa1b0;
+        box-shadow: 0 0 10px rgba(251, 113, 133, 0.25);
       }
+      /* Active / On State: Green ("Show gained rewards") */
       .day-miss-toggle.active {
-        border-color: rgba(251, 113, 133, 0.55);
-        background: rgba(251, 113, 133, 0.12);
-        color: var(--red);
+        border: 1px solid rgba(52, 211, 153, 0.45);
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--green);
+        box-shadow: 0 0 6px rgba(52, 211, 153, 0.1);
       }
       .day-miss-toggle.active:hover {
-        background: rgba(251, 113, 133, 0.18);
-        border-color: var(--red);
-        color: var(--red);
+        background: rgba(52, 211, 153, 0.22);
+        border-color: var(--green);
+        color: #51f2b6;
+        box-shadow: 0 0 10px rgba(52, 211, 153, 0.25);
       }
+
       .day-summary-block + .day-summary-block {
         margin-top: 12px;
         padding-top: 12px;
@@ -264,15 +273,31 @@
       }
       .day-summary-items {
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px 16px;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .day-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 0;
+        border-top: 1px dashed var(--panel-border);
+        font-size: 13px;
+      }
+      .day-summary-row:first-child {
+        border-top: none;
       }
       .day-sum-item {
         font-size: 13px;
         color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
-      .day-sum-item strong {
-        margin-left: 2px;
+      .day-sum-nums {
+        font-weight: 700;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
       }
       .day-summary-ok {
         font-size: 13px;
@@ -315,35 +340,34 @@
       }
       .reward-nums {
         text-align: right;
+        font-variant-numeric: tabular-nums;
       }
       .reward-got {
         color: var(--green);
         font-weight: 700;
       }
-      .reward-missed {
+      .reward-lost-val {
+        color: var(--red);
+        font-weight: 700;
+      }
+      .reward-pct {
+        font-weight: 600;
+        margin-left: 2px;
+      }
+      .reward-pct.ok {
+        color: var(--green);
+      }
+      .reward-pct.bad {
+        color: var(--red);
+      }
+      .reward-lost {
         color: var(--red);
         font-weight: 700;
         font-size: 12px;
       }
-      .reward-missed.zero {
+      .reward-lost.zero {
         color: var(--muted);
         font-weight: 500;
-      }
-      .pct-badge {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        margin-left: 6px;
-      }
-      .pct-badge.ok {
-        background: rgba(52, 211, 153, 0.15);
-        color: var(--green);
-      }
-      .pct-badge.bad {
-        background: rgba(251, 113, 133, 0.15);
-        color: var(--red);
       }
       table {
         width: 100%;
@@ -375,7 +399,7 @@
       }
       .season-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 12px;
         margin-top: 6px;
       }
@@ -393,40 +417,18 @@
         letter-spacing: 0.04em;
       }
       .season-box .cur-val {
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 800;
+        color: var(--green);
+        margin-top: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+      .season-box .cur-val.lost-val {
         color: var(--red);
-        margin-top: 4px;
       }
       .season-box .cur-val.zero {
         color: var(--muted);
         font-weight: 600;
-      }
-      .season-box .cur-meta {
-        margin-top: 6px;
-        font-size: 11px;
-        color: var(--muted);
-        line-height: 1.4;
-      }
-      .season-box .cur-meta strong {
-        color: var(--text);
-        font-weight: 600;
-      }
-      .season-box .cur-pct {
-        display: inline-block;
-        margin-top: 4px;
-        padding: 2px 7px;
-        border-radius: 5px;
-        font-size: 11px;
-        font-weight: 700;
-      }
-      .season-box .cur-pct.bad {
-        background: rgba(251, 113, 133, 0.15);
-        color: var(--red);
-      }
-      .season-box .cur-pct.ok {
-        background: rgba(52, 211, 153, 0.15);
-        color: var(--green);
       }
       .history-toolbar {
         display: flex;
@@ -534,6 +536,19 @@
         flex-wrap: wrap;
         gap: 10px;
         margin-bottom: 14px;
+      }
+      .section-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 18px 0 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .section-header-row h2 {
+        margin: 0;
+        font-size: 14px;
+        color: var(--gold);
       }
       .del-btn {
         background: none;
@@ -676,7 +691,7 @@
       .dist-miss-heading {
         font-size: 11px;
         font-weight: 700;
-        color: var(--muted);
+        color: var(--gold);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         margin-bottom: 6px;
@@ -692,9 +707,12 @@
         color: var(--text);
       }
       .dist-miss-nums {
-        color: var(--red);
+        color: var(--green);
         font-weight: 700;
         font-variant-numeric: tabular-nums;
+      }
+      .dist-miss-nums.lost-val {
+        color: var(--red);
       }
       .dist-miss-nums.zero {
         color: var(--muted);
@@ -714,7 +732,6 @@
         flex-wrap: wrap;
         align-items: center;
       }
-      /* Inner subtabs (Season totals / Dream realm ranks) */
       .season-tab {
         padding: 7px 12px;
         border-radius: 7px;
@@ -735,7 +752,6 @@
         color: var(--gold);
         border-color: var(--gold);
       }
-      /* Season picker tabs (S8 — Veil of Memories) — larger, more prominent */
       .season-tab.season-pick {
         padding: 9px 14px;
         border-radius: 9px;
@@ -799,7 +815,6 @@
         color: var(--red);
         background: rgba(251, 113, 133, 0.12);
       }
-      /* Modals */
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -868,8 +883,7 @@
       <div>
         <h1>AFK Journey • <span>Rank Reward Tracker</span></h1>
         <div class="sub">
-          Log your daily ranks, see what you earned vs. maximum potential
-          rewards
+          Log your daily ranks, see what you earned vs. maximum rewards
         </div>
       </div>
     </header>
@@ -949,15 +963,19 @@
           </div>
           <div id="overallSub-totals">
             <div class="bracket-note" style="margin-bottom: 12px">
-              % of logged ranks in each bracket, and missed rewards vs maximum
-              potential (all days)
+              Rank brackets for each mode (all days)
             </div>
             <div class="dist-grid" id="overallDist"></div>
-            <h2
-              style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)"
-            >
-              Missed vs maximum potential
-            </h2>
+            <div class="section-header-row">
+              <h2 id="overallTotalsTitle">Earned vs maximum rewards</h2>
+              <button
+                type="button"
+                class="day-miss-toggle"
+                id="overallToggleBtn"
+              >
+                Show lost rewards
+              </button>
+            </div>
             <div class="season-grid" id="overallTotalsGrid"></div>
           </div>
           <div id="overallSub-bosses" style="display: none">
@@ -1018,15 +1036,19 @@
             </div>
             <div id="seasonSub-totals">
               <div class="bracket-note" style="margin-bottom: 12px">
-                % of ranks in each bracket this season, and missed rewards vs
-                maximum potential
+                Rank brackets for each mode
               </div>
               <div class="dist-grid" id="seasonDist"></div>
-              <h2
-                style="margin: 18px 0 10px; font-size: 14px; color: var(--gold)"
-              >
-                Missed vs maximum potential
-              </h2>
+              <div class="section-header-row">
+                <h2 id="seasonTotalsTitle">Earned vs maximum rewards</h2>
+                <button
+                  type="button"
+                  class="day-miss-toggle"
+                  id="seasonToggleBtn"
+                >
+                  Show lost rewards
+                </button>
+              </div>
               <div class="season-grid" id="seasonGrid"></div>
             </div>
             <div id="seasonSub-bosses" style="display: none">
@@ -1114,7 +1136,9 @@
     </div>
 
     <script>
-      // ---------- Reward tables ----------
+      let showOverallLost = false;
+      let showSeasonLost = false;
+
       const CURRENCIES = {
         dreamFragment: { name: 'Dream Fragment', icon: '💠' },
         tidalEssence: { name: 'Tidal Essence', icon: '🌊' },
@@ -1124,9 +1148,6 @@
         diamonds: { name: 'Diamonds', icon: '💎' },
       };
 
-      // Dream Realm daily boss rotation (8-day cycle).
-      // Anchor: Talking Root was the open boss on 2026-09-28 (from in-game timers).
-      // Order matches the in-game schedule list.
       const DREAM_BOSSES = [
         'Talking Root',
         'Snow Stomper',
@@ -1137,7 +1158,7 @@
         'Marshtoad',
         'Doomscourge',
       ];
-      const DREAM_BOSS_ANCHOR = '2026-09-28'; // index 0 = Talking Root
+      const DREAM_BOSS_ANCHOR = '2026-09-28';
 
       const daysBetween = (a, b) => {
         const da = new Date(a + 'T12:00:00');
@@ -1249,8 +1270,6 @@
       const STORAGE_KEY = 'afk_rank_tracker_days';
       const SEASONS_KEY = 'afk_rank_tracker_seasons';
       const ACTIVE_SEASON_KEY = 'afk_rank_tracker_active_season';
-      // Legacy single-start key (migrated on load)
-      const LEGACY_SEASON_KEY = 'afk_rank_tracker_season_start';
 
       const TIER_COLORS = [
         '#f8c244',
@@ -1279,22 +1298,21 @@
 
       const bestRewards = (modeKey) => MODES[modeKey].brackets[0].r;
 
-      const computeMissed = (modeKey, rank) => {
+      const computeLost = (modeKey, rank) => {
         const best = bestRewards(modeKey);
         const bracket = getBracket(modeKey, rank);
         const got = bracket ? bracket.r : {};
-        const missed = {};
+        const lost = {};
         Object.keys(best).forEach((c) => {
-          missed[c] = best[c] - (got[c] || 0);
+          lost[c] = best[c] - (got[c] || 0);
         });
-        return { bracket, got, missed, best };
+        return { bracket, got, lost, best };
       };
 
       const loadDays = () => {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           const days = raw ? JSON.parse(raw) : {};
-          // Migrate renamed bosses
           let dirty = false;
           Object.keys(days).forEach((date) => {
             if (days[date].boss === 'Unknown Nightmare') {
@@ -1326,7 +1344,6 @@
         return `${y}-${m}-${day}`;
       };
 
-      // Display-friendly date (storage stays YYYY-MM-DD)
       const MONTHS_SHORT = [
         'Jan',
         'Feb',
@@ -1347,9 +1364,6 @@
         return `${MONTHS_SHORT[m - 1]} ${d}, ${y}`;
       };
 
-      // ---------- Seasons (multi) ----------
-      // Official AFK Journey seasons (oldest → newest). start is inclusive;
-      // end is the next season's start (exclusive) when present.
       const OFFICIAL_SEASONS = [
         { id: 's1', name: 'Song of Strife', start: '2024-05-10' },
         { id: 's2', name: 'Waves of Intrigue', start: '2024-09-19' },
@@ -1367,7 +1381,6 @@
           if (raw) {
             let list = JSON.parse(raw);
             if (Array.isArray(list) && list.length) {
-              // Migrate generic "Season 8" / wrong start to official Veil of Memories
               let dirty = false;
               list = list.map((s) => {
                 if (
@@ -1385,7 +1398,6 @@
                 }
                 return s;
               });
-              // Ensure current official season exists
               if (
                 !list.find((s) => s.id === 's8' || s.start === '2026-09-23')
               ) {
@@ -1401,8 +1413,6 @@
             }
           }
         } catch (e) {}
-        // First load: seed current season (and keep list minimal — past seasons
-        // can be added via + New season if needed for old data)
         const initial = [
           {
             id: 's8',
@@ -1434,11 +1444,9 @@
       const getSeasonDateRange = (seasons, season) => {
         const idx = seasons.findIndex((s) => s.id === season.id);
         const start = season.start;
-        // End is day before next season starts, or open (null)
         let end = null;
         if (idx >= 0 && idx < seasons.length - 1) {
           const nextStart = seasons[idx + 1].start;
-          // end exclusive: day before next
           const d = new Date(nextStart + 'T12:00:00');
           d.setDate(d.getDate() - 1);
           end = d.toISOString().slice(0, 10);
@@ -1465,7 +1473,6 @@
         return null;
       };
 
-      // Prefer S9 / Season 9 in the name; only trust short ids like s8 (not timestamps)
       const seasonNumber = (season) => {
         if (!season) return null;
         if (season.number != null && season.number !== '') {
@@ -1496,20 +1503,20 @@
         return max + 1;
       };
 
-      // ---------- Bracket distribution ----------
-      // dateFilterFn: optional (date) => bool; if null, all days
-      const computeBracketDist = (days, dateFilterFn) => {
+      const computeBracketDist = (days, dateFilterFn, showLost = false) => {
         const result = {};
         Object.keys(MODES).forEach((modeKey) => {
           const brackets = MODES[modeKey].brackets;
           const counts = brackets.map(() => 0);
           let outside = 0;
           let total = 0;
-          const missed = {};
+          const lost = {};
+          const gained = {};
           const maxPossible = {};
           const best = bestRewards(modeKey);
           Object.keys(best).forEach((c) => {
-            missed[c] = 0;
+            lost[c] = 0;
+            gained[c] = 0;
             maxPossible[c] = 0;
           });
           Object.keys(days).forEach((date) => {
@@ -1520,9 +1527,10 @@
             const idx = getBracketIndex(modeKey, rank);
             if (idx === -1) outside++;
             else counts[idx]++;
-            const { missed: dayMissed } = computeMissed(modeKey, rank);
+            const { lost: dayLost, got: dayGot } = computeLost(modeKey, rank);
             Object.keys(best).forEach((c) => {
-              missed[c] += dayMissed[c] || 0;
+              lost[c] += dayLost[c] || 0;
+              gained[c] += dayGot[c] || 0;
               maxPossible[c] += best[c];
             });
           });
@@ -1531,14 +1539,15 @@
             outside,
             total,
             brackets,
-            missed,
+            lost,
+            gained,
             maxPossible,
           };
         });
         return result;
       };
 
-      const renderDist = (container, distData) => {
+      const renderDist = (container, distData, showLost = false) => {
         const modeKeys = Object.keys(MODES);
         let anyData = false;
         modeKeys.forEach((k) => {
@@ -1551,8 +1560,15 @@
         }
         container.innerHTML = modeKeys
           .map((modeKey) => {
-            const { counts, outside, total, brackets, missed, maxPossible } =
-              distData[modeKey];
+            const {
+              counts,
+              outside,
+              total,
+              brackets,
+              lost,
+              gained,
+              maxPossible,
+            } = distData[modeKey];
             if (total === 0) {
               return `<div class="dist-mode">
             <div class="dist-title">${MODES[modeKey].label}</div>
@@ -1589,23 +1605,35 @@
             </div>`
                 : '';
 
-            // Missed currencies under the bracket bars
-            const missRows = Object.keys(missed)
+            const curRows = Object.keys(showLost ? lost : gained)
               .map((c) => {
                 const cur = CURRENCIES[c];
-                const missVal = missed[c] || 0;
                 const maxVal = maxPossible[c] || 0;
-                const pct =
-                  maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
-                const zero = missVal === 0;
-                const amount = zero ? '0' : '−' + missVal.toLocaleString();
-                return `<div class="dist-miss-row">
-              <span class="dist-miss-name">${cur.icon} ${cur.name}</span>
-              <span class="dist-miss-nums ${zero ? 'zero' : ''}">
-                ${amount}
-                <span class="dist-miss-pct">(${pct}% of potential)</span>
-              </span>
-            </div>`;
+                if (showLost) {
+                  const lostVal = lost[c] || 0;
+                  const pct =
+                    maxVal > 0 ? Math.round((lostVal / maxVal) * 100) : 0;
+                  const zero = lostVal === 0;
+                  return `<div class="dist-miss-row">
+                <span class="dist-miss-name">${cur.icon} ${cur.name}</span>
+                <span class="dist-miss-nums lost-val ${zero ? 'zero' : ''}">
+                  ${lostVal.toLocaleString()}/${maxVal.toLocaleString()}
+                  <span class="dist-miss-pct">(${pct}%)</span>
+                </span>
+              </div>`;
+                } else {
+                  const gainVal = gained[c] || 0;
+                  const pct =
+                    maxVal > 0 ? Math.round((gainVal / maxVal) * 100) : 0;
+                  const zero = gainVal === 0;
+                  return `<div class="dist-miss-row">
+                <span class="dist-miss-name">${cur.icon} ${cur.name}</span>
+                <span class="dist-miss-nums ${zero ? 'zero' : ''}">
+                  ${gainVal.toLocaleString()}/${maxVal.toLocaleString()}
+                  <span class="dist-miss-pct" style="color:var(--green);">(${pct}%)</span>
+                </span>
+              </div>`;
+                }
               })
               .join('');
 
@@ -1613,16 +1641,14 @@
             <div class="dist-title">${MODES[modeKey].label}</div>
             ${rows}${outRow}
             <div class="dist-miss-block">
-              <div class="dist-miss-heading">Missed vs maximum potential</div>
-              ${missRows}
+              <div class="dist-miss-heading">${showLost ? 'Lost vs maximum rewards' : 'Gained rewards'}</div>
+              ${curRows}
             </div>
           </div>`;
           })
           .join('');
       };
 
-      // ---------- UI: tabs ----------
-      // activateSubTab is assigned later; called on click after full script load
       let activateSubTab = () => {};
       let selectCurrentSeason = () => {};
 
@@ -1651,7 +1677,6 @@
         };
       });
 
-      // ---------- UI: today inputs ----------
       const rankInputsEl = document.getElementById('rankInputs');
       Object.keys(MODES).forEach((key) => {
         const div = document.createElement('div');
@@ -1680,7 +1705,6 @@
         entryDateEl.click();
       });
 
-      // Boss dropdown
       const entryBossEl = document.getElementById('entryBoss');
       DREAM_BOSSES.forEach((name) => {
         const opt = document.createElement('option');
@@ -1720,8 +1744,7 @@
           .addEventListener('input', () => colorRankInput(key));
       });
 
-      // Today results: gains by default; toggle to reveal missed vs potential
-      let showMissedDetails = false;
+      let showTodayLost = false;
       let lastRenderedDayData = null;
 
       const renderResultsForDay = (dayData, container) => {
@@ -1738,12 +1761,12 @@
         const toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className =
-          'ghost day-miss-toggle' + (showMissedDetails ? ' active' : '');
-        toggleBtn.textContent = showMissedDetails
-          ? 'Hide missed rewards'
-          : 'Show missed rewards';
+          'day-miss-toggle' + (showTodayLost ? ' active' : '');
+        toggleBtn.textContent = showTodayLost
+          ? 'Show gained rewards'
+          : 'Show lost rewards';
         toggleBtn.onclick = () => {
-          showMissedDetails = !showMissedDetails;
+          showTodayLost = !showTodayLost;
           if (lastRenderedDayData) {
             renderResultsForDay(
               lastRenderedDayData,
@@ -1754,33 +1777,32 @@
         header.appendChild(toggleBtn);
         container.appendChild(header);
 
-        const dayMissed = {};
+        const dayLost = {};
         const dayGained = {};
+        const dayMax = {};
         Object.keys(CURRENCIES).forEach((c) => {
-          dayMissed[c] = 0;
+          dayLost[c] = 0;
           dayGained[c] = 0;
+          dayMax[c] = 0;
         });
         let anyRank = false;
 
         Object.keys(MODES).forEach((modeKey) => {
           const rank = dayData.ranks[modeKey];
-          const { bracket, got, missed, best } = computeMissed(modeKey, rank);
+          const { bracket, got, lost, best } = computeLost(modeKey, rank);
           const box = document.createElement('div');
           box.className = 'result-mode';
 
-          const totalBest = Object.values(best).reduce((a, b) => a + b, 0);
-          const totalMissed = Object.values(missed).reduce((a, b) => a + b, 0);
-          const pct = totalBest
-            ? Math.round((totalMissed / totalBest) * 100)
-            : 0;
-
           if (rank) {
             anyRank = true;
-            Object.keys(missed).forEach((c) => {
-              dayMissed[c] += missed[c] || 0;
+            Object.keys(lost).forEach((c) => {
+              dayLost[c] += lost[c] || 0;
             });
             Object.keys(got).forEach((c) => {
               dayGained[c] += got[c] || 0;
+            });
+            Object.keys(best).forEach((c) => {
+              dayMax[c] += best[c] || 0;
             });
           }
 
@@ -1789,40 +1811,33 @@
             html += `<div class="bracket-note">No rank entered</div>`;
           } else if (!bracket) {
             html += `<div class="bracket-note">Rank <strong style="color: var(--red);">#${rank}</strong> — outside reward brackets</div>`;
-            if (showMissedDetails) {
-              html += `<span class="pct-badge bad">100% missed</span>`;
-            }
           } else {
             const idx = getBracketIndex(modeKey, rank);
             const c = tierColorForIndex(idx);
-            html += `<div class="bracket-note">Rank <strong style="color: ${c};">#${rank}</strong> → bracket <strong style="color: ${c};">${bracket.min}-${bracket.max}</strong>`;
-            if (showMissedDetails) {
-              html += ` <span class="pct-badge ${pct === 0 ? 'ok' : 'bad'}">${pct}% missed</span>`;
-            }
-            html += `</div>`;
+            html += `<div class="bracket-note">Rank <strong style="color: ${c};">#${rank}</strong> → bracket <strong style="color: ${c};">${bracket.min}-${bracket.max}</strong></div>`;
           }
           Object.keys(best).forEach((c) => {
             const cur = CURRENCIES[c];
             const gotVal = got[c] || 0;
-            const missVal = missed[c] || 0;
-            if (showMissedDetails) {
-              const missHtml =
-                missVal > 0
-                  ? `<span class="reward-missed">(-${missVal.toLocaleString()})</span>`
-                  : '';
+            const lostVal = lost[c] || 0;
+            const maxVal = best[c] || 0;
+
+            if (showTodayLost) {
+              const itemPct =
+                maxVal > 0 ? Math.round((lostVal / maxVal) * 100) : 0;
               html += `<div class="reward-row">
           <span class="reward-name">${cur.icon} ${cur.name}</span>
           <span class="reward-nums">
-            <span class="reward-got">${gotVal.toLocaleString()}</span> / ${best[c].toLocaleString()}
-            ${missHtml}
+            <span class="reward-lost-val">${lostVal.toLocaleString()}</span>/${maxVal.toLocaleString()} <span class="reward-pct bad">(${itemPct}%)</span>
           </span>
         </div>`;
             } else {
-              // Gains only
+              const itemPct =
+                maxVal > 0 ? Math.round((gotVal / maxVal) * 100) : 0;
               html += `<div class="reward-row">
           <span class="reward-name">${cur.icon} ${cur.name}</span>
           <span class="reward-nums">
-            <span class="reward-got">${gotVal.toLocaleString()}</span>
+            <span class="reward-got">${gotVal.toLocaleString()}</span>/${maxVal.toLocaleString()} <span class="reward-pct ok">(${itemPct}%)</span>
           </span>
         </div>`;
             }
@@ -1831,43 +1846,62 @@
           container.appendChild(box);
         });
 
-        // Day summary — always gains; also missed when toggled
         const summary = document.createElement('div');
         summary.className = 'day-summary';
         if (!anyRank) {
           summary.innerHTML =
             '<div class="bracket-note" style="margin:0">No ranks entered for this day.</div>';
         } else {
-          const gainParts = Object.keys(dayGained)
-            .filter((c) => dayGained[c] > 0)
-            .map((c) => {
-              const cur = CURRENCIES[c];
-              return `<span class="day-sum-item"><span class="day-sum-icon">${cur.icon}</span> ${cur.name} <strong class="reward-got">+${dayGained[c].toLocaleString()}</strong></span>`;
-            });
-          let html = `<div class="day-summary-block">
-            <div class="day-summary-title">Gained rewards</div>
-            <div class="day-summary-items">${gainParts.join('') || '<span class="bracket-note">No rewards gained</span>'}</div>
-          </div>`;
-          if (showMissedDetails) {
-            const missParts = Object.keys(dayMissed)
-              .filter((c) => dayMissed[c] > 0)
+          if (!showTodayLost) {
+            const gainParts = Object.keys(dayGained)
+              .filter((c) => dayMax[c] > 0)
               .map((c) => {
                 const cur = CURRENCIES[c];
-                return `<span class="day-sum-item"><span class="day-sum-icon">${cur.icon}</span> ${cur.name} <strong class="reward-missed">−${dayMissed[c].toLocaleString()}</strong></span>`;
+                const gotVal = dayGained[c];
+                const maxVal = dayMax[c];
+                const pct =
+                  maxVal > 0 ? Math.round((gotVal / maxVal) * 100) : 0;
+                return `<div class="day-summary-row">
+                  <span class="day-sum-item">${cur.icon} ${cur.name}</span>
+                  <span class="day-sum-nums reward-got">${gotVal.toLocaleString()}/${maxVal.toLocaleString()} (${pct}%)</span>
+                </div>`;
               });
-            if (!missParts.length) {
-              html += `<div class="day-summary-block">
-                <div class="day-summary-title">Missed rewards</div>
-                <div class="day-summary-ok">Nothing missed — full potential rewards.</div>
+            summary.innerHTML = `<div class="day-summary-block">
+              <div class="day-summary-title">TODAY'S TOTAL GAINED REWARDS</div>
+              <div class="day-summary-items">${gainParts.join('') || '<span class="bracket-note">No rewards gained</span>'}</div>
+            </div>`;
+          } else {
+            const lostParts = Object.keys(dayLost)
+              .filter((c) => dayMax[c] > 0)
+              .map((c) => {
+                const cur = CURRENCIES[c];
+                const lostVal = dayLost[c];
+                const maxVal = dayMax[c];
+                const pct =
+                  maxVal > 0 ? Math.round((lostVal / maxVal) * 100) : 0;
+                return `<div class="day-summary-row">
+                  <span class="day-sum-item">${cur.icon} ${cur.name}</span>
+                  <span class="day-sum-nums reward-lost-val">${lostVal.toLocaleString()}/${maxVal.toLocaleString()} (${pct}%)</span>
+                </div>`;
+              });
+            let html = '';
+            const totalLostSum = Object.values(dayLost).reduce(
+              (a, b) => a + b,
+              0,
+            );
+            if (totalLostSum === 0) {
+              html = `<div class="day-summary-block">
+                <div class="day-summary-title">TODAY'S TOTAL LOST REWARDS</div>
+                <div class="day-summary-ok">Nothing lost — full maximum rewards!</div>
               </div>`;
             } else {
-              html += `<div class="day-summary-block">
-                <div class="day-summary-title">Missed rewards</div>
-                <div class="day-summary-items">${missParts.join('')}</div>
+              html = `<div class="day-summary-block">
+                <div class="day-summary-title">TODAY'S TOTAL LOST REWARDS</div>
+                <div class="day-summary-items">${lostParts.join('')}</div>
               </div>`;
             }
+            summary.innerHTML = html;
           }
-          summary.innerHTML = html;
         }
         container.appendChild(summary);
       };
@@ -1943,13 +1977,13 @@
       document.getElementById('entryDate').onchange = preloadToday;
       preloadToday();
 
-      // ---------- History ----------
-      // Returns { missed: {cur: n}, maxPossible: {cur: n} }
       const computeTotalsForDays = (days, dateFilterFn) => {
-        const missed = {};
+        const lost = {};
+        const gained = {};
         const maxPossible = {};
         Object.keys(CURRENCIES).forEach((c) => {
-          missed[c] = 0;
+          lost[c] = 0;
+          gained[c] = 0;
           maxPossible[c] = 0;
         });
         Object.keys(days).forEach((date) => {
@@ -1957,44 +1991,56 @@
           Object.keys(MODES).forEach((modeKey) => {
             const rank = days[date].ranks[modeKey];
             if (!rank) return;
-            const { missed: dayMissed, best } = computeMissed(modeKey, rank);
+            const {
+              lost: dayLost,
+              got: dayGot,
+              best,
+            } = computeLost(modeKey, rank);
             Object.keys(best).forEach((c) => {
-              missed[c] += dayMissed[c] || 0;
+              lost[c] += dayLost[c] || 0;
+              gained[c] += dayGot[c] || 0;
               maxPossible[c] += best[c];
             });
           });
         });
-        return { missed, maxPossible };
+        return { lost, gained, maxPossible };
       };
 
-      const renderTotalsGrid = (gridEl, totalsData) => {
-        const { missed, maxPossible } = totalsData;
+      const renderTotalsGrid = (gridEl, totalsData, showLost = false) => {
+        const { lost, gained, maxPossible } = totalsData;
         gridEl.innerHTML = Object.keys(CURRENCIES)
           .map((c) => {
-            const missVal = missed[c] || 0;
             const maxVal = maxPossible[c] || 0;
-            const pct = maxVal > 0 ? Math.round((missVal / maxVal) * 100) : 0;
-            const zero = missVal === 0;
-            const pctClass = zero ? 'ok' : 'bad';
-            const lostLabel = zero
-              ? '0 lost'
-              : `−${missVal.toLocaleString()} lost`;
-            return `
-      <div class="season-box">
-        <div class="cur-label">${CURRENCIES[c].icon} ${CURRENCIES[c].name}</div>
-        <div class="cur-val ${zero ? 'zero' : ''}">${lostLabel}</div>
-        <div class="cur-meta">of <strong>${maxVal.toLocaleString()}</strong> potential</div>
-        <span class="cur-pct ${pctClass}">${pct}% missed</span>
-      </div>`;
+            if (showLost) {
+              const lostVal = lost[c] || 0;
+              const pct = maxVal > 0 ? Math.round((lostVal / maxVal) * 100) : 0;
+              const zero = lostVal === 0;
+              return `
+        <div class="season-box">
+          <div class="cur-label">${CURRENCIES[c].icon} ${CURRENCIES[c].name}</div>
+          <div class="cur-val lost-val ${zero ? 'zero' : ''}">
+            ${lostVal.toLocaleString()}/${maxVal.toLocaleString()} (${pct}%)
+          </div>
+        </div>`;
+            } else {
+              const gainVal = gained[c] || 0;
+              const pct = maxVal > 0 ? Math.round((gainVal / maxVal) * 100) : 0;
+              const zero = gainVal === 0;
+              return `
+        <div class="season-box">
+          <div class="cur-label">${CURRENCIES[c].icon} ${CURRENCIES[c].name}</div>
+          <div class="cur-val ${zero ? 'zero' : ''}">
+            ${gainVal.toLocaleString()}/${maxVal.toLocaleString()} (${pct}%)
+          </div>
+        </div>`;
+            }
           })
           .join('');
       };
 
-      // Per-boss bracket distribution for Dream Realm modes
       const DR_MODE_KEYS = ['drServer', 'drDistrict'];
 
       const computeBossBracketDist = (days, dateFilterFn) => {
-        // stats[boss][modeKey] = { counts[], outside, total, brackets }
         const stats = {};
         const ensure = (boss) => {
           if (!stats[boss]) {
@@ -2107,17 +2153,38 @@
 
       const renderOverall = () => {
         const days = loadDays();
-        const dist = computeBracketDist(days, null);
-        renderDist(document.getElementById('overallDist'), dist);
+        const dist = computeBracketDist(days, null, showOverallLost);
+        renderDist(
+          document.getElementById('overallDist'),
+          dist,
+          showOverallLost,
+        );
         renderBossBracketDist(
           document.getElementById('overallBossWrap'),
           computeBossBracketDist(days, null),
         );
         const totals = computeTotalsForDays(days, null);
-        renderTotalsGrid(document.getElementById('overallTotalsGrid'), totals);
+        renderTotalsGrid(
+          document.getElementById('overallTotalsGrid'),
+          totals,
+          showOverallLost,
+        );
       };
 
-      // Subtabs: Overall & Season inner views
+      const overallToggleBtn = document.getElementById('overallToggleBtn');
+      if (overallToggleBtn) {
+        overallToggleBtn.onclick = () => {
+          showOverallLost = !showOverallLost;
+          overallToggleBtn.classList.toggle('active', showOverallLost);
+          overallToggleBtn.textContent = showOverallLost
+            ? 'Show gained rewards'
+            : 'Show lost rewards';
+          document.getElementById('overallTotalsTitle').textContent =
+            showOverallLost ? 'Total lost rewards' : 'Total gained rewards';
+          renderOverall();
+        };
+      }
+
       activateSubTab = (tabsId, prefix, attr, key) => {
         const tabsEl = document.getElementById(tabsId);
         if (!tabsEl) return;
@@ -2144,7 +2211,6 @@
       wirePanelSubTabs('overallSubTabs', 'overallSub-', 'osub');
       wirePanelSubTabs('seasonSubTabs', 'seasonSub-', 'ssub');
 
-      // History filter: 'all' or season id
       let historySeasonFilter = 'all';
 
       const renderHistorySeasonTabs = () => {
@@ -2238,13 +2304,13 @@
     </tr></thead><tbody>`;
         dates.forEach((date) => {
           const d = days[date];
-          let totalMissed = 0;
+          let totalLost = 0;
           const rankCells = Object.keys(MODES)
             .map((key) => {
               const rank = d.ranks[key];
               if (!rank) return '<td class="bracket-note">—</td>';
-              const { missed } = computeMissed(key, rank);
-              totalMissed += Object.values(missed).reduce((a, b) => a + b, 0);
+              const { lost } = computeLost(key, rank);
+              totalLost += Object.values(lost).reduce((a, b) => a + b, 0);
               const idx = getBracketIndex(key, rank);
               const c = idx === -1 ? 'var(--red)' : tierColorForIndex(idx);
               return `<td style="color: ${c}; font-weight: 700;">#${rank}</td>`;
@@ -2281,11 +2347,9 @@
         renderSeason();
       };
 
-      // ---------- Season ----------
       let activeSeasonId = null;
       let pendingDeleteSeasonId = null;
 
-      // Always jump to the latest season when opening the Seasons tab
       selectCurrentSeason = () => {
         const seasons = loadSeasons();
         if (!seasons.length) return;
@@ -2300,7 +2364,6 @@
           activeSeasonId = seasons[seasons.length - 1].id;
           setActiveSeasonId(activeSeasonId);
         }
-        // Newest first (left)
         const ordered = [...seasons].reverse();
         tabsEl.innerHTML = ordered
           .map((s) => {
@@ -2342,24 +2405,45 @@
         const range = getSeasonDateRange(seasons, season);
         const days = loadDays();
 
+        const sNum = seasonNumber(season);
+        const sLabel = sNum ? `season ${sNum}` : season.name || 'this season';
+        const seasonTitleEl = document.getElementById('seasonTotalsTitle');
+        if (seasonTitleEl) {
+          seasonTitleEl.textContent = showSeasonLost
+            ? `Total lost rewards in ${sLabel}`
+            : `Total gained rewards in ${sLabel}`;
+        }
+
         const inSeason = (date) => dayInSeason(date, range);
 
-        // Bracket distribution first (on top)
-        const dist = computeBracketDist(days, inSeason);
-        renderDist(document.getElementById('seasonDist'), dist);
+        const dist = computeBracketDist(days, inSeason, showSeasonLost);
+        renderDist(document.getElementById('seasonDist'), dist, showSeasonLost);
 
-        // Boss bracket dist this season
         renderBossBracketDist(
           document.getElementById('seasonBossWrap'),
           computeBossBracketDist(days, inSeason),
         );
 
-        // Season totals under distribution
         const totals = computeTotalsForDays(days, inSeason);
-        renderTotalsGrid(document.getElementById('seasonGrid'), totals);
+        renderTotalsGrid(
+          document.getElementById('seasonGrid'),
+          totals,
+          showSeasonLost,
+        );
       };
 
-      // ---------- New season modal ----------
+      const seasonToggleBtn = document.getElementById('seasonToggleBtn');
+      if (seasonToggleBtn) {
+        seasonToggleBtn.onclick = () => {
+          showSeasonLost = !showSeasonLost;
+          seasonToggleBtn.classList.toggle('active', showSeasonLost);
+          seasonToggleBtn.textContent = showSeasonLost
+            ? 'Show gained rewards'
+            : 'Show lost rewards';
+          renderSeason();
+        };
+      }
+
       const syncModalSeasonStartLabel = () => {
         const el = document.getElementById('modalSeasonStart');
         const lab = document.getElementById('modalSeasonStartLabel');
@@ -2423,13 +2507,11 @@
         const nameNum = name.match(/\bS(?:eason)?\s*(\d{1,2})\b/i);
         if (nameNum) num = parseInt(nameNum[1], 10);
         if (!num) num = nextSeasonNumber(seasons);
-        // Normalize bare names to "S9 — Name" without doubling
         if (!/^S\d{1,2}\s*[—–-]/.test(name)) {
           const bare = name.replace(/^S(?:eason)?\s*\d{1,2}\s*[—–-]?\s*/i, '');
           name = `S${num} — ${bare || 'New Season'}`;
         }
         const id = 's' + num;
-        // Avoid id collision
         let finalId = id;
         if (seasons.some((s) => s.id === finalId)) {
           finalId = id + '-' + Date.now().toString(36);
@@ -2442,7 +2524,6 @@
         renderSeason();
       };
 
-      // ---------- Delete season modal ----------
       const openDeleteSeasonModal = (seasonId) => {
         const seasons = loadSeasons();
         if (seasons.length <= 1) return;
@@ -2501,7 +2582,6 @@
         renderOverall();
       };
 
-      // Init seasons on first load (migrates legacy if needed)
       loadSeasons();
     </script>
   </body>
