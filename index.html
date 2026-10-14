@@ -7,10 +7,6 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>AFK Journey • Personal Reward Tracker</title>
-    <script>
-      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
     <style>
       :root {
         --bg: #0b1124;
@@ -64,7 +60,7 @@
         background: transparent;
       }
       .header-card {
-        max-width: 1280px;
+        max-width: 1390px;
         margin: 0 auto;
         display: flex;
         align-items: center;
@@ -154,7 +150,7 @@
         }
       }
       .container {
-        max-width: 1280px;
+        max-width: 1390px;
         margin: 0 auto;
         padding: 20px 16px 60px;
       }
@@ -210,8 +206,23 @@
       }
       .mode-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 14px;
+      }
+      @media (max-width: 1250px) {
+        .mode-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 760px) {
+        .mode-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 520px) {
+        .mode-grid {
+          grid-template-columns: 1fr;
+        }
       }
       .mode-input label {
         display: block;
@@ -240,7 +251,7 @@
           box-shadow 0.15s,
           color 0.15s;
       }
-      /* Disabled rank inputs (Supreme Arena off season / Dream Hunt non-reward
+      /* Disabled rank inputs (Supreme Arena / Dream Hunt / Supreme League non-reward
          day): explicit solid colours instead of UA/opacity blending, so both
          look identical in every browser. */
       .mode-input input.tiered:disabled {
@@ -257,6 +268,15 @@
       .mode-input input.tiered:disabled::placeholder {
         color: var(--muted);
         opacity: 1;
+      }
+      .mode-hint {
+        margin-top: 6px;
+        font-size: 12px;
+        line-height: 1.35;
+        color: var(--red);
+      }
+      .mode-hint[hidden] {
+        display: none;
       }
       .mode-off-row {
         display: flex;
@@ -335,6 +355,9 @@
         margin: 0;
       }
       .day-modes-wrap {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         background: var(--panel);
         border: 1px solid var(--panel-border);
         border-radius: 10px;
@@ -345,16 +368,22 @@
       }
       .day-modes-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        justify-content: stretch;
         align-items: stretch;
         gap: 10px;
       }
-      @media (max-width: 1100px) {
+      @media (max-width: 1250px) {
         .day-modes-grid {
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
       }
-      @media (max-width: 600px) {
+      @media (max-width: 900px) {
+        .day-modes-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 520px) {
         .day-modes-grid {
           grid-template-columns: 1fr;
         }
@@ -416,6 +445,49 @@
       }
       .section-box > .section-header-row {
         margin: 0 0 12px;
+      }
+      /* "Totals" windows (rewards gained/lost for the day, season, overall):
+         tinted panel with a coloured top edge so they stand apart from the
+         per-mode boxes. Turns red when showing lost rewards. */
+      .totals-window {
+        --tw-rgb: 52, 211, 153;
+      }
+      /* two classes so it wins over the later .day-summary rule */
+      .section-box.totals-window,
+      .day-summary.totals-window {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(var(--tw-rgb), 0.1) 0%,
+            rgba(var(--tw-rgb), 0) 60%
+          ),
+          var(--panel);
+        border: 1px solid rgba(var(--tw-rgb), 0.3);
+        border-top: 3px solid rgb(var(--tw-rgb));
+        box-shadow:
+          0 0 18px rgba(var(--tw-rgb), 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+      .totals-window.lost {
+        --tw-rgb: 251, 113, 133;
+      }
+      .totals-window h2::before,
+      .totals-window .day-summary-title::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 9px;
+        border-radius: 50%;
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
+        background: rgb(var(--tw-rgb));
+        box-shadow: 0 0 8px rgba(var(--tw-rgb), 0.8);
+      }
+      .totals-window .season-box {
+        background: rgba(8, 13, 30, 0.35);
+        border-color: rgba(var(--tw-rgb), 0.2);
       }
       .section-box > .section-header-row + .season-grid {
         margin-top: 0;
@@ -539,7 +611,7 @@
       .result-mode {
         border: 1px solid var(--panel-border);
         border-radius: 10px;
-        padding: 14px;
+        padding: 8px;
         margin-bottom: 0;
         background: var(--panel);
         min-width: 0;
@@ -561,10 +633,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 6px 0;
+        padding: 5px 0;
         border-top: 1px dashed var(--panel-border);
         font-size: 14px;
-        gap: 8px;
+        gap: 6px;
       }
       .reward-row:first-of-type {
         border-top: none;
@@ -573,8 +645,9 @@
         color: var(--text);
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 6px;
         font-weight: 600;
+        min-width: 0;
       }
       .reward-nums {
         text-align: right;
@@ -641,9 +714,9 @@
       /* Compact badges in mode cards & distribution panels */
       .result-mode .item-card-preview,
       .dist-miss-block .item-card-preview {
-        width: 34px;
-        height: 36px;
-        border-radius: 7px;
+        width: 30px;
+        height: 32px;
+        border-radius: 6px;
         border-width: 1.5px;
         box-shadow:
           0 2px 4px rgba(0, 0, 0, 0.35),
@@ -651,11 +724,11 @@
       }
       .result-mode .item-card-icon,
       .dist-miss-block .item-card-icon {
-        width: 26px;
-        height: 26px;
+        width: 23px;
+        height: 23px;
       }
       .result-mode .reward-name {
-        gap: 8px;
+        gap: 6px;
       }
       .dist-miss-name {
         gap: 6px;
@@ -721,6 +794,15 @@
           #0f172a 100%
         );
         --badge-border: #60a5fa;
+      }
+      .item-card-preview.stellar {
+        --badge-bg: radial-gradient(
+          circle at 50% 20%,
+          #3b4fb8 0%,
+          #1b2461 55%,
+          #0a0f2e 100%
+        );
+        --badge-border: #e0b04a;
       }
       .item-card-preview.slumber {
         --badge-bg: radial-gradient(
@@ -803,7 +885,7 @@
         gap: 14px;
       }
       .season-grid-row.misc {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
       .season-grid-row.essences {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1099,10 +1181,25 @@
       }
       .dist-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 12px;
         margin-top: 4px;
         align-items: stretch;
+      }
+      @media (max-width: 1250px) {
+        .dist-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 760px) {
+        .dist-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 520px) {
+        .dist-grid {
+          grid-template-columns: 1fr;
+        }
       }
       .dist-mode {
         background: var(--panel2);
@@ -1550,7 +1647,7 @@
               </div>
               <div class="dist-grid" id="overallDist"></div>
             </div>
-            <div class="section-box">
+            <div class="section-box totals-window" id="overallTotalsBox">
               <div class="section-header-row">
                 <h2 id="overallTotalsTitle" style="color: var(--green)">
                   Total gained rewards
@@ -1659,7 +1756,7 @@
               </div>
               <div class="dist-grid" id="seasonDist"></div>
             </div>
-            <div class="section-box">
+            <div class="section-box totals-window" id="seasonTotalsBox">
               <div class="section-header-row">
                 <h2 id="seasonTotalsTitle" style="color: var(--green)">
                   Rewards gained in season 8
@@ -1821,6 +1918,7 @@
         seasonToken: 'images/Item_Season_Token.webp',
         diamonds: 'images/Item_Diamond.webp',
         slumber: 'images/Item_Slumber_Essence.webp',
+        stellar: 'images/Item_Stellar_Crystal.webp',
       };
 
       // Display order: non-essences on the first row, essences on the second
@@ -1840,6 +1938,11 @@
           name: 'Diamonds',
           icon: REWARD_ICONS.diamonds,
           type: 'diamonds',
+        },
+        stellarCrystal: {
+          name: 'Stellar Crystal',
+          icon: REWARD_ICONS.stellar,
+          type: 'stellar',
         },
         tidalEssence: {
           name: 'Tidal Essence',
@@ -1862,7 +1965,12 @@
           type: 'slumber',
         },
       };
-      const MISC_CURRENCY_KEYS = ['dreamFragment', 'seasonToken', 'diamonds'];
+      const MISC_CURRENCY_KEYS = [
+        'dreamFragment',
+        'seasonToken',
+        'diamonds',
+        'stellarCrystal',
+      ];
       const ESSENCE_CURRENCY_KEYS = [
         'tidalEssence',
         'temporalEssence',
@@ -2063,6 +2171,67 @@
             },
           ],
         },
+        // Supreme League: rewarded roughly once a month, when you are knocked
+        // out of the group stage or out of a Swiss round. Group stage exits are
+        // stored as 1000 + group rank (or 81 if no group rank was typed), so
+        // they always land in the Group stage bracket and never clash with
+        // Swiss ranks.
+        supremeLeague: {
+          label: 'Supreme League',
+          brackets: [
+            {
+              min: 1,
+              max: 1,
+              r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 2000 },
+            },
+            {
+              min: 2,
+              max: 2,
+              r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 1800 },
+            },
+            {
+              min: 3,
+              max: 3,
+              r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 1600 },
+            },
+            {
+              min: 4,
+              max: 4,
+              r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 1500 },
+            },
+            {
+              min: 5,
+              max: 8,
+              r: { slumberEssence: 100, stellarCrystal: 8, seasonToken: 1200 },
+            },
+            {
+              min: 9,
+              max: 16,
+              r: { slumberEssence: 90, stellarCrystal: 6, seasonToken: 1000 },
+            },
+            {
+              min: 17,
+              max: 32,
+              r: { slumberEssence: 80, stellarCrystal: 6, seasonToken: 800 },
+            },
+            {
+              min: 33,
+              max: 48,
+              r: { slumberEssence: 60, stellarCrystal: 5, seasonToken: 800 },
+            },
+            {
+              min: 49,
+              max: 80,
+              r: { slumberEssence: 40, stellarCrystal: 4, seasonToken: 800 },
+            },
+            {
+              min: 81,
+              max: 99999,
+              label: 'Group stage',
+              r: { slumberEssence: 20, stellarCrystal: 3, seasonToken: 800 },
+            },
+          ],
+        },
       };
 
       const STORAGE_KEY = 'afk_rank_tracker_days';
@@ -2102,6 +2271,35 @@
       };
 
       const bestRewards = (modeKey) => MODES[modeKey].brackets[0].r;
+
+      const SL_GROUP_RANK = 81; // group stage exit with no rank typed
+      const SL_GROUP_OFFSET = 1000; // stored rank = 1000 + group stage rank
+      const bracketLabel = (modeKey, b) => {
+        if (b.label) return b.label;
+        if (b.min === b.max) return `#${b.min}`;
+        return b.min === 1 ? `Top ${b.max}` : `${b.min}-${b.max}`;
+      };
+      const rankText = (modeKey, rank) => {
+        if (modeKey === 'supremeLeague' && rank >= SL_GROUP_RANK) {
+          return rank > SL_GROUP_OFFSET
+            ? `Group stage #${rank - SL_GROUP_OFFSET}`
+            : 'Group stage';
+        }
+        return `#${rank}`;
+      };
+      // Rank number only (no "Group stage" wording); null when a Supreme
+      // League group stage exit was logged without a group rank.
+      const rankNumText = (modeKey, rank) => {
+        if (modeKey === 'supremeLeague' && rank >= SL_GROUP_RANK) {
+          return rank > SL_GROUP_OFFSET ? `#${rank - SL_GROUP_OFFSET}` : null;
+        }
+        return `#${rank}`;
+      };
+      // Modes that only count on some days (not a reward day)
+      const isModeInactive = (modeKey, dayData) =>
+        (modeKey === 'supremeArena' && !!dayData.saOff) ||
+        (modeKey === 'dreamHunt' && !dayData.dhRewardDay) ||
+        (modeKey === 'supremeLeague' && !dayData.slRewardDay);
 
       const computeLost = (modeKey, rank) => {
         const best = bestRewards(modeKey);
@@ -2318,10 +2516,10 @@
         }
         const dayNum =
           status === 'active' ? seasonDayNumber(today, range.start) : null;
-        const dayText =
-          dayNum != null
-            ? ` · Day <strong style="color:var(--text)">${dayNum}</strong>`
-            : '';
+        // Active season: show the current day in the right-hand slot.
+        // Otherwise (ended / upcoming): show the total length there.
+        const rightLabel = dayNum != null ? 'Day' : 'Length';
+        const rightValue = dayNum != null ? dayNum : durationText;
 
         bar.hidden = false;
         bar.innerHTML = `
@@ -2329,11 +2527,11 @@
           <span>
             <span class="season-info-value">${startLabel}</span>
             <span class="season-info-sep"> → </span>
-            <span class="season-info-value">${endLabel}</span>${dayText}
+            <span class="season-info-value">${endLabel}</span>
           </span>
           <span>
-            <span class="season-info-label">Length</span>
-            <span class="season-info-value"> ${durationText}</span>
+            <span class="season-info-label">${rightLabel}</span>
+            <span class="season-info-value"> ${rightValue}</span>
           </span>
         `;
       };
@@ -2408,9 +2606,8 @@
           });
           Object.keys(days).forEach((date) => {
             if (dateFilterFn && !dateFilterFn(date)) return;
-            // Dream Hunt is weekly - only count marked reward days
-            if (modeKey === 'dreamHunt' && !days[date].dhRewardDay) return;
-            if (modeKey === 'supremeArena' && days[date].saOff) return;
+            // Dream Hunt / Supreme League only count marked reward days
+            if (isModeInactive(modeKey, days[date])) return;
             const rank = days[date].ranks[modeKey];
             if (!rank) return;
             total++;
@@ -2474,8 +2671,7 @@
                 const n = counts[idx];
                 const pct = Math.round((n / total) * 100);
                 const c = tierColorForIndex(idx, brackets.length);
-                const label =
-                  b.min === 1 ? `Top ${b.max}` : `${b.min}-${b.max}`;
+                const label = bracketLabel(modeKey, b);
                 return `<div class="dist-row">
               <span class="dist-label" style="color:${c}">${label}</span>
               <div class="dist-bar-wrap">
@@ -2610,9 +2806,9 @@
         div.className = 'mode-input';
         let extra = '';
         if (key === 'supremeArena') {
-          extra = `<label class="mode-off-row" for="saOffToday">
-            <input type="checkbox" id="saOffToday" />
-            Off season
+          extra = `<label class="mode-off-row" for="saRewardDay">
+            <input type="checkbox" id="saRewardDay" />
+            Reward day
           </label>`;
         } else if (key === 'dreamHunt') {
           extra = `<label class="mode-off-row" for="dhRewardDay">
@@ -2620,7 +2816,19 @@
             Reward day
                       </label>`;
         }
+        if (key === 'supremeLeague') {
+          extra = `<label class="mode-off-row" for="slRewardDay">
+            <input type="checkbox" id="slRewardDay" />
+            Reward day
+          </label>
+          <label class="mode-off-row" for="slGroupExit">
+            <input type="checkbox" id="slGroupExit" />
+            Out in group stage
+          </label>
+          <div class="mode-hint" id="slHint" hidden></div>`;
+        }
         const placeholders = {
+          supremeLeague: 'Swiss rank 1-80',
           drServer: 'e.g. 12',
           drDistrict: 'e.g. 35',
           supremeArena: 'e.g. 8',
@@ -2630,15 +2838,15 @@
         rankInputsEl.appendChild(div);
       });
 
-      const saOffEl = document.getElementById('saOffToday');
+      const saRewardDayEl = document.getElementById('saRewardDay');
       const saRankEl = document.getElementById('rank_supremeArena');
       const dhRewardDayEl = document.getElementById('dhRewardDay');
       const dhRankEl = document.getElementById('rank_dreamHunt');
-      const syncSaOffState = () => {
-        if (!saOffEl || !saRankEl) return;
-        const off = saOffEl.checked;
-        saRankEl.disabled = off;
-        if (off) {
+      const syncSaRewardDayState = () => {
+        if (!saRewardDayEl || !saRankEl) return;
+        const on = saRewardDayEl.checked;
+        saRankEl.disabled = !on;
+        if (!on) {
           saRankEl.value = '';
           saRankEl.style.borderColor = 'var(--panel-border)';
           saRankEl.style.color = 'var(--muted)';
@@ -2647,9 +2855,11 @@
           colorRankInput('supremeArena');
         }
       };
-      if (saOffEl) {
-        saOffEl.addEventListener('change', syncSaOffState);
+      if (saRewardDayEl) {
+        saRewardDayEl.addEventListener('change', syncSaRewardDayState);
       }
+      // start disabled until Reward day is checked
+      syncSaRewardDayState();
       const syncDhRewardDayState = () => {
         if (!dhRewardDayEl || !dhRankEl) return;
         const on = dhRewardDayEl.checked;
@@ -2668,6 +2878,62 @@
       }
       // start disabled until Reward day is checked
       syncDhRewardDayState();
+
+      // Supreme League: rank only counts on a reward day; a group stage exit
+      // has no rank of its own, so it replaces the rank input.
+      const slRewardDayEl = document.getElementById('slRewardDay');
+      const slGroupExitEl = document.getElementById('slGroupExit');
+      const slRankEl = document.getElementById('rank_supremeLeague');
+      // Top 20 of the group stage advance to Swiss, so a group stage exit can
+      // only be rank 21-60; Swiss ranks run 1-80. Returns false when invalid.
+      const SL_GROUP_MIN = 21;
+      const SL_GROUP_MAX = 60;
+      const SL_SWISS_MAX = 80;
+      const validateSl = () => {
+        const hint = document.getElementById('slHint');
+        if (!hint || !slRankEl || !slGroupExitEl) return true;
+        let msg = '';
+        const raw = slRankEl.value;
+        const v = parseInt(raw, 10);
+        if (!slRankEl.disabled && raw !== '' && !isNaN(v)) {
+          if (slGroupExitEl.checked) {
+            if (v < SL_GROUP_MIN) {
+              msg = `Top 20 in the group stage advance to Swiss. For a group stage exit enter rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}, or untick "Out in group stage" and enter your Swiss rank.`;
+            } else if (v > SL_GROUP_MAX) {
+              msg = `Group stage exits are rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}.`;
+            }
+          } else if (v > SL_SWISS_MAX) {
+            msg = `Swiss ranks go up to ${SL_SWISS_MAX}. If you were knocked out in the group stage, tick "Out in group stage".`;
+          }
+        }
+        hint.textContent = msg;
+        hint.hidden = !msg;
+        return !msg;
+      };
+      const syncSlState = () => {
+        if (!slRewardDayEl || !slRankEl || !slGroupExitEl) return;
+        const on = slRewardDayEl.checked;
+        slGroupExitEl.disabled = !on;
+        if (!on) slGroupExitEl.checked = false;
+        const grp = slGroupExitEl.checked;
+        slRankEl.disabled = !on;
+        slRankEl.placeholder = grp
+          ? 'Group rank 21-60 (optional)'
+          : 'Swiss rank 1-80';
+        if (slRankEl.disabled) {
+          slRankEl.value = '';
+          slRankEl.style.borderColor = 'var(--panel-border)';
+          slRankEl.style.color = 'var(--muted)';
+          slRankEl.style.boxShadow = 'none';
+        } else {
+          colorRankInput('supremeLeague');
+        }
+        validateSl();
+      };
+      if (slRankEl) slRankEl.addEventListener('input', validateSl);
+      if (slRewardDayEl) slRewardDayEl.addEventListener('change', syncSlState);
+      if (slGroupExitEl) slGroupExitEl.addEventListener('change', syncSlState);
+      syncSlState();
       const entryDateEl = document.getElementById('entryDate');
       const entryDateLabel = document.getElementById('entryDateLabel');
       const syncEntryDateLabel = () => {
@@ -2717,7 +2983,15 @@
           }
           return;
         }
-        const rank = parseInt(input.value, 10);
+        let rank = parseInt(input.value, 10);
+        if (
+          key === 'supremeLeague' &&
+          slGroupExitEl &&
+          slGroupExitEl.checked &&
+          !isNaN(rank)
+        ) {
+          rank += SL_GROUP_OFFSET;
+        }
         const idx = getBracketIndex(key, rank);
         if (isNaN(rank) || idx === -1) {
           input.style.borderColor = 'var(--panel-border)';
@@ -2798,9 +3072,7 @@
           const box = document.createElement('div');
           box.className = 'result-mode';
 
-          const modeOff =
-            (modeKey === 'supremeArena' && !!dayData.saOff) ||
-            (modeKey === 'dreamHunt' && !dayData.dhRewardDay);
+          const modeOff = isModeInactive(modeKey, dayData);
           // Only add to day totals when the mode counts for this day
           if (rank && !modeOff) {
             anyRank = true;
@@ -2819,17 +3091,29 @@
 
           let html = `<div class="mode-title">${MODES[modeKey].label}</div>`;
           if (modeKey === 'supremeArena' && dayData.saOff) {
-            html += `<div class="bracket-note" style="color:var(--muted)">Off season</div>`;
-          } else if (modeKey === 'dreamHunt' && !dayData.dhRewardDay) {
+            html += `<div class="bracket-note" style="color:var(--muted)">Not a reward day</div>`;
+          } else if (
+            (modeKey === 'dreamHunt' || modeKey === 'supremeLeague') &&
+            modeOff
+          ) {
             html += `<div class="bracket-note" style="color:var(--muted)">Not a reward day</div>`;
           } else if (!rank) {
             html += `<div class="bracket-note">No rank entered</div>`;
           } else if (!bracket) {
-            html += `<div class="bracket-note">Rank <strong style="color: var(--red);">#${rank}</strong> - outside reward brackets</div>`;
+            html += `<div class="bracket-note">Rank <strong style="color: var(--red);">${rankText(modeKey, rank)}</strong> - outside reward brackets</div>`;
           } else {
             const idx = getBracketIndex(modeKey, rank);
             const c = tierColorForIndex(idx, MODES[modeKey].brackets.length);
-            html += `<div class="bracket-note">Rank <strong style="color: ${c};">#${rank}</strong> → bracket <strong style="color: ${c};">${bracket.min}-${bracket.max}</strong></div>`;
+            const bLabel =
+              modeKey === 'supremeLeague'
+                ? rank >= SL_GROUP_RANK
+                  ? '1-60 Group stage'
+                  : '1-80 Swiss stage'
+                : `${bracket.min}-${bracket.max}`;
+            const rNum = rankNumText(modeKey, rank);
+            html += rNum
+              ? `<div class="bracket-note">Rank <strong style="color: ${c};">${rNum}</strong> - bracket <strong style="color: ${c};">${bLabel}</strong></div>`
+              : `<div class="bracket-note">Bracket <strong style="color: ${c};">${bLabel}</strong></div>`;
           }
           if (!modeOff && rank)
             CURRENCY_KEYS.forEach((c) => {
@@ -2898,7 +3182,8 @@
         container.appendChild(modesWrap);
 
         const summary = document.createElement('div');
-        summary.className = 'day-summary';
+        summary.className =
+          'day-summary totals-window' + (showTodayLost ? ' lost' : '');
         if (!anyRank) {
           summary.innerHTML =
             '<div class="bracket-note" style="margin:0">No ranks entered for this day.</div>';
@@ -2962,19 +3247,19 @@
 
             if (isPerfectDay) {
               summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--green);">Rewards gained</div>
-                <div class="day-summary-ok" style="margin-bottom: 12px;">100% of the rewards gained, good job!</div>
+                <div class="day-summary-title" style="color: var(--green);">Rewards gained for the day</div>
+                <div class="day-summary-ok" style="margin-bottom: 12px;">100% of the rewards gained for the day, good job!</div>
                 <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
               </div>`;
             } else if (isTotalZeroDay) {
               summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--green);">Rewards gained</div>
-                <div class="day-summary-bad" style="margin-bottom: 12px;">100% of the rewards lost, better luck next time!</div>
+                <div class="day-summary-title" style="color: var(--green);">Rewards gained for the day</div>
+                <div class="day-summary-bad" style="margin-bottom: 12px;">100% of the rewards lost for the day, better luck next time!</div>
                 <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
               </div>`;
             } else {
               summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--green);">Rewards gained</div>
+                <div class="day-summary-title" style="color: var(--green);">Rewards gained for the day</div>
                 <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
               </div>`;
             }
@@ -3019,18 +3304,18 @@
             );
             if (totalLostSum === 0) {
               html = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">Rewards lost today</div>
+                <div class="day-summary-title" style="color: var(--red);">Rewards lost for the day</div>
                 <div class="day-summary-ok">✨ PERFECT! NOTHING LOST (0%) - MAXIMUM REWARDS ACHIEVED! ✨</div>
               </div>`;
             } else if (totalLostSum === totalMaxSum && totalMaxSum > 0) {
               html = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">Rewards lost today</div>
+                <div class="day-summary-title" style="color: var(--red);">Rewards lost for the day</div>
                 <div class="day-summary-bad" style="margin-bottom: 12px;">💥 100% REWARDS LOST (ALL REWARDS MISSED) 💥</div>
                 <div class="day-summary-items horizontal-grid">${lostGrouped}</div>
               </div>`;
             } else {
               html = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">Rewards lost today</div>
+                <div class="day-summary-title" style="color: var(--red);">Rewards lost for the day</div>
                 <div class="day-summary-items horizontal-grid">${lostGrouped}</div>
               </div>`;
             }
@@ -3041,14 +3326,24 @@
       };
 
       const saveDay = () => {
+        if (!validateSl()) return;
         const date = document.getElementById('entryDate').value || todayStr();
-        const saOffChecked = !!(saOffEl && saOffEl.checked);
+        const saRewardChecked = !!(saRewardDayEl && saRewardDayEl.checked);
         const days = loadDays();
         const existing = days[date] || null;
         const ranks = {};
         Object.keys(MODES).forEach((key) => {
-          if (key === 'supremeArena' && saOffChecked) {
-            ranks[key] = null;
+          if (
+            key === 'supremeLeague' &&
+            slGroupExitEl &&
+            slGroupExitEl.checked
+          ) {
+            const g = parseInt(
+              document.getElementById('rank_supremeLeague').value,
+              10,
+            );
+            ranks[key] =
+              !isNaN(g) && g >= 1 ? SL_GROUP_OFFSET + g : SL_GROUP_RANK;
             return;
           }
           const raw = document.getElementById('rank_' + key).value;
@@ -3066,10 +3361,10 @@
             ranks[key] = null;
           }
         });
-        let saOff = false;
-        if (saOffChecked) {
-          saOff = true;
-        } else if (document.getElementById('rank_supremeArena').value !== '') {
+        // Supreme Arena: ticking Reward day makes the day count (saOff = false);
+        // otherwise keep what was saved before, and new days default to off.
+        let saOff = true;
+        if (saRewardChecked) {
           saOff = false;
         } else if (existing) {
           saOff = !!existing.saOff;
@@ -3085,8 +3380,18 @@
         } else if (existing) {
           dhRewardDay = !!existing.dhRewardDay;
         }
+        // Supreme League: same idea as Dream Hunt (monthly reward day)
+        let slRewardDay = false;
+        const slChecked = !!(slRewardDayEl && slRewardDayEl.checked);
+        if (slChecked) {
+          slRewardDay = true;
+        } else if (document.getElementById('rank_supremeLeague').value !== '') {
+          slRewardDay = false;
+        } else if (existing) {
+          slRewardDay = !!existing.slRewardDay;
+        }
         const boss = entryBossEl.value || bossForDate(date);
-        days[date] = { date, ranks, boss, saOff, dhRewardDay };
+        days[date] = { date, ranks, boss, saOff, dhRewardDay, slRewardDay };
         saveDays(days);
         document.getElementById('saveStatus').textContent =
           `Saved ${formatDate(date)} ✓`;
@@ -3094,14 +3399,17 @@
           document.getElementById('saveStatus').textContent = '';
         }, 2500);
         // clear inputs after save - results stay visible
-        if (saOffEl) saOffEl.checked = false;
+        if (saRewardDayEl) saRewardDayEl.checked = false;
         if (dhRewardDayEl) dhRewardDayEl.checked = false;
+        if (slRewardDayEl) slRewardDayEl.checked = false;
+        if (slGroupExitEl) slGroupExitEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
           colorRankInput(key);
         });
-        syncSaOffState();
+        syncSaRewardDayState();
         syncDhRewardDayState();
+        syncSlState();
         renderResultsForDay(
           days[date],
           document.getElementById('todayResults'),
@@ -3132,7 +3440,7 @@
         const dayNum = seasonDayNumber(date, season.start);
         return `<div class="bracket-note" style="font-size:16px">
           <strong style="color:var(--gold)">${seasonLabel(season)}</strong>
-          <span style="color:#ffffff">· Day <strong>${dayNum}</strong> · ${formatDate(date)}</span>
+          <strong style="color:#ffffff">· ${formatDate(date)} · <span style="color:var(--muted)">Day</span> ${dayNum}</strong>
         </div>`;
       };
 
@@ -3141,14 +3449,17 @@
         const date = document.getElementById('entryDate').value;
         bossManualOverride = false;
         // always start with empty inputs; only show saved output below
-        if (saOffEl) saOffEl.checked = false;
+        if (saRewardDayEl) saRewardDayEl.checked = false;
         if (dhRewardDayEl) dhRewardDayEl.checked = false;
+        if (slRewardDayEl) slRewardDayEl.checked = false;
+        if (slGroupExitEl) slGroupExitEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
           colorRankInput(key);
         });
-        syncSaOffState();
+        syncSaRewardDayState();
         syncDhRewardDayState();
+        syncSlState();
         syncBossFromDate();
         if (days[date]) {
           renderResultsForDay(
@@ -3174,8 +3485,7 @@
         Object.keys(days).forEach((date) => {
           if (dateFilterFn && !dateFilterFn(date)) return;
           Object.keys(MODES).forEach((modeKey) => {
-            if (modeKey === 'dreamHunt' && !days[date].dhRewardDay) return;
-            if (modeKey === 'supremeArena' && days[date].saOff) return;
+            if (isModeInactive(modeKey, days[date])) return;
             const rank = days[date].ranks[modeKey];
             if (!rank) return;
             const {
@@ -3401,6 +3711,8 @@
           overallToggleBtn.innerHTML = showOverallLost
             ? 'Show <span style="color: var(--green);">gained</span> rewards'
             : 'Show <span style="color: var(--red);">lost</span> rewards';
+          const overallBox = document.getElementById('overallTotalsBox');
+          if (overallBox) overallBox.classList.toggle('lost', showOverallLost);
           const titleEl = document.getElementById('overallTotalsTitle');
           if (titleEl) {
             titleEl.style.color = showOverallLost
@@ -3537,9 +3849,12 @@
           const rankCells = Object.keys(MODES)
             .map((key) => {
               if (key === 'supremeArena' && d.saOff) {
-                return '<td class="bracket-note" style="color:var(--muted)">Off season</td>';
+                return '<td class="bracket-note" style="color:var(--muted)">Not a reward day</td>';
               }
-              if (key === 'dreamHunt' && !d.dhRewardDay) {
+              if (
+                (key === 'dreamHunt' && !d.dhRewardDay) ||
+                (key === 'supremeLeague' && !d.slRewardDay)
+              ) {
                 return '<td class="bracket-note" style="color:var(--muted)">Not a reward day</td>';
               }
               const rank = d.ranks[key];
@@ -3551,7 +3866,7 @@
                 idx === -1
                   ? 'var(--red)'
                   : tierColorForIndex(idx, MODES[key].brackets.length);
-              return `<td style="color: ${c}; font-weight: 700;">#${rank}</td>`;
+              return `<td style="color: ${c}; font-weight: 700;">${rankText(key, rank)}</td>`;
             })
             .join('');
           const bossName = d.boss || bossForDate(date);
@@ -3656,6 +3971,8 @@
         const n = seasonNumber(season);
         const seasonPart = n ? ` season ${n}` : ' season';
         titleEl.style.color = showSeasonLost ? 'var(--red)' : 'var(--green)';
+        const seasonBox = document.getElementById('seasonTotalsBox');
+        if (seasonBox) seasonBox.classList.toggle('lost', showSeasonLost);
         titleEl.textContent = showSeasonLost
           ? `Rewards lost in${seasonPart}`
           : `Rewards gained in${seasonPart}`;
