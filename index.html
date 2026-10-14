@@ -53,11 +53,21 @@
         color: var(--text);
         font-family: 'Segoe UI', system-ui, sans-serif;
         min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       header {
-        padding: 16px 20px 18px;
-        border-bottom: 1px solid var(--panel-border);
+        padding: 16px 20px 0;
         background: transparent;
+      }
+      /* divider under the header: only as wide as the page content */
+      header::after {
+        content: '';
+        display: block;
+        width: 100%;
+        max-width: 1358px;
+        margin: 18px auto 0;
+        border-bottom: 1px solid var(--panel-border);
       }
       .header-card {
         max-width: 1390px;
@@ -150,9 +160,11 @@
         }
       }
       .container {
+        width: 100%;
+        flex: 1 0 auto;
         max-width: 1390px;
         margin: 0 auto;
-        padding: 20px 16px 60px;
+        padding: 20px 16px 30px;
       }
       .tabs {
         display: flex;
@@ -288,6 +300,11 @@
         font-weight: 600;
         cursor: pointer;
         user-select: none;
+      }
+      .mode-check-row {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 16px;
       }
       .mode-off-row input {
         accent-color: var(--gold);
@@ -867,6 +884,34 @@
       }
       tr:hover td {
         background: rgba(255, 255, 255, 0.02);
+      }
+      /* History: ~14 rows (two weeks) visible, then the list scrolls */
+      .history-scroll {
+        max-height: 540px;
+        overflow: auto;
+      }
+      .history-scroll th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--panel);
+      }
+      .site-footer {
+        width: calc(100% - 32px);
+        max-width: 1358px;
+        margin: auto auto 0;
+        border-top: 1px solid var(--panel-border);
+        text-align: center;
+        color: #b6c6e6;
+        font-size: 14px;
+        padding: 20px 16px 28px;
+      }
+      .site-footer strong {
+        color: var(--cyan);
+        font-weight: 700;
+      }
+      .site-footer .footer-dim {
+        color: var(--muted);
       }
       .empty {
         color: var(--muted);
@@ -1905,6 +1950,11 @@
       </div>
     </div>
 
+    <footer class="site-footer">
+      Made by <strong>Dracias</strong>
+      <span class="footer-dim">• AFK Journey F2P Community</span>
+    </footer>
+
     <script>
       let showOverallLost = false;
       let showSeasonLost = false;
@@ -2274,22 +2324,30 @@
 
       const SL_GROUP_RANK = 81; // group stage exit with no rank typed
       const SL_GROUP_OFFSET = 1000; // stored rank = 1000 + group stage rank
+      // "Did not qualify": stored as a rank outside every bracket, so it
+      // counts as a played day with no rewards (everything possible is lost).
+      const SL_NOQUAL_RANK = 9999999;
       const bracketLabel = (modeKey, b) => {
         if (b.label) return b.label;
         if (b.min === b.max) return `#${b.min}`;
         return b.min === 1 ? `Top ${b.max}` : `${b.min}-${b.max}`;
       };
       const rankText = (modeKey, rank) => {
+        if (modeKey === 'supremeLeague' && rank >= SL_NOQUAL_RANK) {
+          return 'Did not qualify';
+        }
         if (modeKey === 'supremeLeague' && rank >= SL_GROUP_RANK) {
           return rank > SL_GROUP_OFFSET
             ? `Group stage #${rank - SL_GROUP_OFFSET}`
             : 'Group stage';
         }
+        if (modeKey === 'supremeLeague') return `Swiss stage #${rank}`;
         return `#${rank}`;
       };
       // Rank number only (no "Group stage" wording); null when a Supreme
       // League group stage exit was logged without a group rank.
       const rankNumText = (modeKey, rank) => {
+        if (modeKey === 'supremeLeague' && rank >= SL_NOQUAL_RANK) return null;
         if (modeKey === 'supremeLeague' && rank >= SL_GROUP_RANK) {
           return rank > SL_GROUP_OFFSET ? `#${rank - SL_GROUP_OFFSET}` : null;
         }
@@ -2320,6 +2378,15 @@
           Object.keys(days).forEach((date) => {
             if (days[date].boss === 'Unknown Nightmare') {
               days[date].boss = 'Snow Stomper';
+              dirty = true;
+            }
+            if (
+              days[date].slNoQual &&
+              days[date].ranks &&
+              !days[date].ranks.supremeLeague
+            ) {
+              days[date].ranks.supremeLeague = SL_NOQUAL_RANK;
+              days[date].slRewardDay = true;
               dirty = true;
             }
           });
@@ -2686,7 +2753,7 @@
             const outRow =
               outside > 0
                 ? `<div class="dist-row">
-              <span class="dist-label" style="color:var(--red)">Outside</span>
+              <span class="dist-label" style="color:var(--red)">${modeKey === 'supremeLeague' ? 'DNQ' : 'Outside'}</span>
               <div class="dist-bar-wrap">
                 <div class="dist-bar" style="width:${outPct}%;background:var(--red)"></div>
               </div>
@@ -2817,10 +2884,16 @@
                       </label>`;
         }
         if (key === 'supremeLeague') {
-          extra = `<label class="mode-off-row" for="slRewardDay">
-            <input type="checkbox" id="slRewardDay" />
-            Reward day
-          </label>
+          extra = `<div class="mode-check-row">
+            <label class="mode-off-row" for="slRewardDay">
+              <input type="checkbox" id="slRewardDay" />
+              Reward day
+            </label>
+            <label class="mode-off-row" for="slNoQual">
+              <input type="checkbox" id="slNoQual" />
+              Did not qualify
+            </label>
+          </div>
           <label class="mode-off-row" for="slGroupExit">
             <input type="checkbox" id="slGroupExit" />
             Out in group stage
@@ -2883,6 +2956,7 @@
       // has no rank of its own, so it replaces the rank input.
       const slRewardDayEl = document.getElementById('slRewardDay');
       const slGroupExitEl = document.getElementById('slGroupExit');
+      const slNoQualEl = document.getElementById('slNoQual');
       const slRankEl = document.getElementById('rank_supremeLeague');
       // Top 20 of the group stage advance to Swiss, so a group stage exit can
       // only be rank 21-60; Swiss ranks run 1-80. Returns false when invalid.
@@ -2931,7 +3005,18 @@
         validateSl();
       };
       if (slRankEl) slRankEl.addEventListener('input', validateSl);
-      if (slRewardDayEl) slRewardDayEl.addEventListener('change', syncSlState);
+      // "Did not qualify" and "Reward day" exclude each other
+      if (slNoQualEl)
+        slNoQualEl.addEventListener('change', () => {
+          if (slNoQualEl.checked && slRewardDayEl)
+            slRewardDayEl.checked = false;
+          syncSlState();
+        });
+      if (slRewardDayEl)
+        slRewardDayEl.addEventListener('change', () => {
+          if (slRewardDayEl.checked && slNoQualEl) slNoQualEl.checked = false;
+          syncSlState();
+        });
       if (slGroupExitEl) slGroupExitEl.addEventListener('change', syncSlState);
       syncSlState();
       const entryDateEl = document.getElementById('entryDate');
@@ -3096,11 +3181,18 @@
             (modeKey === 'dreamHunt' || modeKey === 'supremeLeague') &&
             modeOff
           ) {
-            html += `<div class="bracket-note" style="color:var(--muted)">Not a reward day</div>`;
+            const offText =
+              modeKey === 'supremeLeague' && dayData.slNoQual
+                ? 'Did not qualify'
+                : 'Not a reward day';
+            html += `<div class="bracket-note" style="color:var(--muted)">${offText}</div>`;
           } else if (!rank) {
             html += `<div class="bracket-note">No rank entered</div>`;
           } else if (!bracket) {
-            html += `<div class="bracket-note">Rank <strong style="color: var(--red);">${rankText(modeKey, rank)}</strong> - outside reward brackets</div>`;
+            html +=
+              modeKey === 'supremeLeague' && rank >= SL_NOQUAL_RANK
+                ? `<div class="bracket-note"><strong style="color: var(--red);">Did not qualify</strong> - no rewards</div>`
+                : `<div class="bracket-note">Rank <strong style="color: var(--red);">${rankText(modeKey, rank)}</strong> - outside reward brackets</div>`;
           } else {
             const idx = getBracketIndex(modeKey, rank);
             const c = tierColorForIndex(idx, MODES[modeKey].brackets.length);
@@ -3382,16 +3474,33 @@
         }
         // Supreme League: same idea as Dream Hunt (monthly reward day)
         let slRewardDay = false;
+        let slNoQual = false;
         const slChecked = !!(slRewardDayEl && slRewardDayEl.checked);
-        if (slChecked) {
+        const slNoQualChecked = !!(slNoQualEl && slNoQualEl.checked);
+        if (slNoQualChecked) {
+          // didn't qualify: a played day with no rewards, so all the possible
+          // rewards count as lost
+          slNoQual = true;
+          slRewardDay = true;
+          ranks.supremeLeague = SL_NOQUAL_RANK;
+        } else if (slChecked) {
           slRewardDay = true;
         } else if (document.getElementById('rank_supremeLeague').value !== '') {
           slRewardDay = false;
         } else if (existing) {
           slRewardDay = !!existing.slRewardDay;
+          slNoQual = !!existing.slNoQual;
         }
         const boss = entryBossEl.value || bossForDate(date);
-        days[date] = { date, ranks, boss, saOff, dhRewardDay, slRewardDay };
+        days[date] = {
+          date,
+          ranks,
+          boss,
+          saOff,
+          dhRewardDay,
+          slRewardDay,
+          slNoQual,
+        };
         saveDays(days);
         document.getElementById('saveStatus').textContent =
           `Saved ${formatDate(date)} ✓`;
@@ -3403,6 +3512,7 @@
         if (dhRewardDayEl) dhRewardDayEl.checked = false;
         if (slRewardDayEl) slRewardDayEl.checked = false;
         if (slGroupExitEl) slGroupExitEl.checked = false;
+        if (slNoQualEl) slNoQualEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
           colorRankInput(key);
@@ -3453,6 +3563,7 @@
         if (dhRewardDayEl) dhRewardDayEl.checked = false;
         if (slRewardDayEl) slRewardDayEl.checked = false;
         if (slGroupExitEl) slGroupExitEl.checked = false;
+        if (slNoQualEl) slNoQualEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
           colorRankInput(key);
@@ -3835,7 +3946,7 @@
           wrap.innerHTML = `<div class="empty">No days match “${q}”.</div>`;
           return;
         }
-        let html = `<div style="overflow-x:auto;"><table><thead><tr>
+        let html = `<div class="history-scroll"><table><thead><tr>
       <th>Season day</th>
       <th>Date</th>
       <th>Dream Realm Boss</th>
@@ -3855,7 +3966,11 @@
                 (key === 'dreamHunt' && !d.dhRewardDay) ||
                 (key === 'supremeLeague' && !d.slRewardDay)
               ) {
-                return '<td class="bracket-note" style="color:var(--muted)">Not a reward day</td>';
+                const off =
+                  key === 'supremeLeague' && d.slNoQual
+                    ? 'Did not qualify'
+                    : 'Not a reward day';
+                return `<td class="bracket-note" style="color:var(--muted)">${off}</td>`;
               }
               const rank = d.ranks[key];
               if (!rank) return '<td class="bracket-note">-</td>';
