@@ -885,10 +885,29 @@
       tr:hover td {
         background: rgba(255, 255, 255, 0.02);
       }
-      /* History: ~21 rows (three weeks) visible, then the list scrolls */
+      /* History: the list scrolls after as many rows as fit the screen:
+         ~14 rows on a 1080p monitor, ~21 on 1440p (capped), fewer on phones */
       .history-scroll {
-        max-height: 790px;
+        max-height: clamp(320px, calc(100vh - 380px), 790px);
         overflow: auto;
+      }
+      @supports (height: 100dvh) {
+        .history-scroll {
+          max-height: clamp(320px, calc(100dvh - 380px), 790px);
+        }
+      }
+      @media (max-width: 600px) {
+        .history-scroll th,
+        .history-scroll td {
+          padding: 7px 7px;
+          font-size: 12px;
+        }
+        .history-scroll th {
+          font-size: 10px;
+        }
+        .hist-season {
+          display: none;
+        }
       }
       .history-scroll th {
         position: sticky;
@@ -3008,8 +3027,7 @@
       // "Did not qualify" and "Reward day" exclude each other
       if (slNoQualEl)
         slNoQualEl.addEventListener('change', () => {
-          if (slNoQualEl.checked && slRewardDayEl)
-            slRewardDayEl.checked = false;
+          if (slNoQualEl.checked && slRewardDayEl) slRewardDayEl.checked = false;
           syncSlState();
         });
       if (slRewardDayEl)
@@ -3988,7 +4006,7 @@
           const season = findSeasonForDate(date, seasons);
           const dayNum = season ? seasonDayNumber(date, season.start) : null;
           const dayLabel = dayNum
-            ? `Day ${dayNum}${season ? ` · ${seasonLabel(season)}` : ''}`
+            ? `Day ${dayNum}${season ? `<span class="hist-season"> · ${seasonLabel(season)}</span>` : ''}`
             : '-';
           html += `<tr>
         <td style="color:var(--muted);font-size:12px;white-space:nowrap">${dayLabel}</td>
