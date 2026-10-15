@@ -3070,11 +3070,11 @@
         } else if (!slRankEl.disabled && raw !== '' && !isNaN(v)) {
           if (slGroupExitEl.checked) {
             if (v < SL_GROUP_MIN || v > SL_GROUP_MAX) {
-              msg = `Top 20 in the Group Stage advance to Swiss Stage, Group Stage exit is rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}.`;
+              msg = `Top 20 in the Group Stage advance to Swiss Stage, Group Stage exit rank is ${SL_GROUP_MIN}-${SL_GROUP_MAX}.`;
             }
           } else if (slSwissExitEl.checked) {
             if (v < SL_SWISS_MIN || v > SL_SWISS_MAX) {
-              msg = `Top 48 in the Swiss Stage advance to Knockout Stage, Swiss Stage exit is rank ${SL_SWISS_MIN}-${SL_SWISS_MAX}.`;
+              msg = `Top 48 in the Swiss Stage advance to Knockout Stage, Swiss Stage exit rank is ${SL_SWISS_MIN}-${SL_SWISS_MAX}.`;
             }
           } else if (v > SL_KO_MAX) {
             msg = `Knockout Stage is rank 1-${SL_KO_MAX}. If you were knocked out earlier, tick Swiss or Group Stage.`;
