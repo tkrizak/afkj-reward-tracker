@@ -306,6 +306,30 @@
         flex-wrap: wrap;
         column-gap: 16px;
       }
+      /* Keep Supreme League stage choices tucked away until Reward day is selected. */
+      .mode-check-row.sl-stage-hidden {
+        display: none;
+      }
+      .mode-check-row.sl-stage-active {
+        margin-top: 8px;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.025);
+      }
+      .mode-check-row.sl-stage-required::before {
+        content: 'Choose the stage you were out in';
+        display: block;
+        flex-basis: 100%;
+        margin-bottom: 3px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .mode-check-row.sl-stage-required .mode-off-row {
+        color: var(--text);
+        font-weight: 650;
+      }
       .mode-off-row input {
         accent-color: var(--gold);
         width: 15px;
@@ -2964,6 +2988,10 @@
             </label>
           </div>
           <div class="mode-check-row">
+            <label class="mode-off-row" for="slKnockoutExit">
+              <input type="checkbox" id="slKnockoutExit" />
+              Out in Knockout Stage
+            </label>
             <label class="mode-off-row" for="slSwissExit">
               <input type="checkbox" id="slSwissExit" />
               Out in Swiss Stage
@@ -3035,8 +3063,10 @@
       // behind the scenes (the rank is required to save a swiss/group exit).
       const slRewardDayEl = document.getElementById('slRewardDay');
       const slNoQualEl = document.getElementById('slNoQual');
+      const slKnockoutExitEl = document.getElementById('slKnockoutExit');
       const slSwissExitEl = document.getElementById('slSwissExit');
       const slGroupExitEl = document.getElementById('slGroupExit');
+      const slStageRowEl = slGroupExitEl ? slGroupExitEl.closest('.mode-check-row') : null;
       const slRankEl = document.getElementById('rank_supremeLeague');
       // Top 20 of the group stage advance to Swiss, so a group stage exit can
       // only be rank 21-60; swiss stage exits are rank 49-80.
@@ -3054,7 +3084,7 @@
       // forSave: also require the rank for a swiss/group stage exit
       const validateSl = (forSave = false) => {
         const hint = document.getElementById('slHint');
-        if (!hint || !slRankEl || !slGroupExitEl || !slSwissExitEl) return true;
+        if (!hint || !slRankEl || !slGroupExitEl || !slSwissExitEl || !slKnockoutExitEl) return true;
         let msg = '';
         const raw = slRankEl.value;
         const v = parseInt(raw, 10);
@@ -3062,11 +3092,13 @@
           forSave &&
           !slRankEl.disabled &&
           (raw === '' || isNaN(v)) &&
-          (slGroupExitEl.checked || slSwissExitEl.checked)
+          (slGroupExitEl.checked || slSwissExitEl.checked || slKnockoutExitEl.checked)
         ) {
           msg = slGroupExitEl.checked
             ? `Enter your Group Stage rank (${SL_GROUP_MIN}-${SL_GROUP_MAX}) to save.`
-            : `Enter your Swiss Stage rank (${SL_SWISS_MIN}-${SL_SWISS_MAX}) to save.`;
+            : slSwissExitEl.checked
+              ? `Enter your Swiss Stage rank (${SL_SWISS_MIN}-${SL_SWISS_MAX}) to save.`
+              : `Enter your Knockout Stage rank (1-${SL_KO_MAX}) to save.`;
         } else if (!slRankEl.disabled && raw !== '' && !isNaN(v)) {
           if (slGroupExitEl.checked) {
             if (v < SL_GROUP_MIN || v > SL_GROUP_MAX) {
@@ -3076,7 +3108,9 @@
             if (v < SL_SWISS_MIN || v > SL_SWISS_MAX) {
               msg = `Top 48 in the Swiss Stage advance to Knockout Stage, Swiss Stage exit rank is ${SL_SWISS_MIN}-${SL_SWISS_MAX}.`;
             }
-          } else if (v > SL_KO_MAX) {
+          } else if (slKnockoutExitEl.checked && (v < 1 || v > SL_KO_MAX)) {
+            msg = `Knockout Stage rank must be 1-${SL_KO_MAX}.`;
+          } else if (!slKnockoutExitEl.checked && v > SL_KO_MAX) {
             msg = `Knockout Stage is rank 1-${SL_KO_MAX}. If you were knocked out earlier, tick Swiss or Group Stage.`;
           }
         }
@@ -3085,23 +3119,31 @@
         return !msg;
       };
       const syncSlState = () => {
-        if (!slRewardDayEl || !slRankEl || !slGroupExitEl || !slSwissExitEl)
+        if (!slRewardDayEl || !slRankEl || !slGroupExitEl || !slSwissExitEl || !slKnockoutExitEl)
           return;
         const on = slRewardDayEl.checked;
-        slGroupExitEl.disabled = !on;
-        slSwissExitEl.disabled = !on;
+        const stageChosen = slKnockoutExitEl.checked || slSwissExitEl.checked || slGroupExitEl.checked;
+        if (slStageRowEl) {
+          slStageRowEl.classList.toggle('sl-stage-hidden', !on);
+          slStageRowEl.classList.toggle('sl-stage-active', on);
+          slStageRowEl.classList.toggle('sl-stage-required', on);
+        }
+        [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach((el) => { el.disabled = !on; });
         if (!on) {
+          slKnockoutExitEl.checked = false;
           slGroupExitEl.checked = false;
           slSwissExitEl.checked = false;
         }
-        slRankEl.disabled = !on;
+        slRankEl.disabled = !on || !(slKnockoutExitEl.checked || slSwissExitEl.checked || slGroupExitEl.checked);
         // the hint shows which ranks are valid for the current choice
         slRankEl.placeholder = on
           ? slGroupExitEl.checked
             ? `Rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}`
             : slSwissExitEl.checked
               ? `Rank ${SL_SWISS_MIN}-${SL_SWISS_MAX}`
-              : `Rank 1-${SL_KO_MAX}`
+              : slKnockoutExitEl.checked
+                ? `Rank 1-${SL_KO_MAX}`
+                : 'Choose stage first' 
           : slNoQualEl && slNoQualEl.checked
             ? 'Did not qualify'
             : 'Not a reward day';
@@ -3128,19 +3170,18 @@
           if (slRewardDayEl.checked && slNoQualEl) slNoQualEl.checked = false;
           syncSlState();
         });
-      // swiss / group stage exits exclude each other too
-      if (slSwissExitEl)
-        slSwissExitEl.addEventListener('change', () => {
-          if (slSwissExitEl.checked && slGroupExitEl)
-            slGroupExitEl.checked = false;
+      // Stage choices are mutually exclusive; select one before entering a rank.
+      [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach((chosen) => {
+        if (!chosen) return;
+        chosen.addEventListener('change', () => {
+          if (chosen.checked) {
+            [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach((other) => {
+              if (other && other !== chosen) other.checked = false;
+            });
+          }
           syncSlState();
         });
-      if (slGroupExitEl)
-        slGroupExitEl.addEventListener('change', () => {
-          if (slGroupExitEl.checked && slSwissExitEl)
-            slSwissExitEl.checked = false;
-          syncSlState();
-        });
+      });
       syncSlState();
       const entryDateEl = document.getElementById('entryDate');
       const entryDateLabel = document.getElementById('entryDateLabel');
@@ -3627,6 +3668,7 @@
         if (slRewardDayEl) slRewardDayEl.checked = false;
         if (slGroupExitEl) slGroupExitEl.checked = false;
         if (slSwissExitEl) slSwissExitEl.checked = false;
+        if (slKnockoutExitEl) slKnockoutExitEl.checked = false;
         if (slNoQualEl) slNoQualEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
@@ -3679,6 +3721,7 @@
         if (slRewardDayEl) slRewardDayEl.checked = false;
         if (slGroupExitEl) slGroupExitEl.checked = false;
         if (slSwissExitEl) slSwissExitEl.checked = false;
+        if (slKnockoutExitEl) slKnockoutExitEl.checked = false;
         if (slNoQualEl) slNoQualEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
@@ -4230,7 +4273,7 @@
         const seasonSuffix = ` in ${goldName(seasonName)}`;
         const distNote = document.getElementById('seasonDistNote');
         if (distNote) {
-          distNote.innerHTML = `${goldName(seasonName)} rank distribution &amp; rewards ${showSeasonLost ? 'lost' : 'gained'} per mode`;
+          distNote.innerHTML = `Rank distribution &amp; rewards ${showSeasonLost ? 'lost' : 'gained'} per mode in ${goldName(seasonName)}`;
           distNote.style.color = showSeasonLost ? 'var(--red)' : 'var(--green)';
         }
         const bossNote = document.getElementById('seasonBossNote');
