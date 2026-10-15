@@ -352,8 +352,13 @@
         font-weight: 600;
       }
       button.ghost:hover {
-        border-color: var(--red);
-        color: var(--red);
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+      button.ghost:active {
+        border-color: var(--gold);
+        color: var(--gold);
+        box-shadow: 0 0 8px var(--gold-glow);
       }
       #todayResults {
         display: flex;
@@ -1699,7 +1704,7 @@
                   id="overallDistNote"
                   style="color: var(--green)"
                 >
-                  Overall rank distribution &amp; gained rewards per mode
+                  Overall rank distribution &amp; rewards gained per mode
                 </div>
                 <button
                   type="button"
@@ -1714,7 +1719,7 @@
             <div class="section-box totals-window" id="overallTotalsBox">
               <div class="section-header-row">
                 <h2 id="overallTotalsTitle" style="color: var(--green)">
-                  Total gained rewards
+                  Total rewards gained
                 </h2>
               </div>
               <div class="season-grid" id="overallTotalsGrid"></div>
@@ -1808,7 +1813,7 @@
                   id="seasonDistNote"
                   style="color: var(--green)"
                 >
-                  Rank distribution &amp; gained rewards per mode in season
+                  Rank distribution &amp; rewards gained per mode in season
                 </div>
                 <button
                   type="button"
@@ -1853,20 +1858,12 @@
           Previous seasons stay available. Days from the start date onward count
           toward the new season.
         </p>
-        <div
-          class="mode-input"
-          id="modalSeasonPickWrap"
-          style="margin-bottom: 12px"
-        >
-          <label for="modalSeasonPick">Choose a season</label>
-          <select id="modalSeasonPick" class="pretty-select"></select>
-        </div>
         <div class="mode-input" style="margin-bottom: 12px">
           <label for="modalSeasonName">Season name</label>
           <input
             type="text"
             id="modalSeasonName"
-            placeholder="e.g. S1 - Song of Strife"
+            placeholder="e.g. S8 - Veil of Memories"
             value=""
           />
         </div>
@@ -1971,7 +1968,7 @@
 
     <footer class="site-footer">
       Made by <strong>Dracias</strong>
-      <span class="footer-dim">• AFK Journey F2P Community</span>
+      <span class="footer-dim">• AFK Journey</span>
     </footer>
 
     <script>
@@ -2245,58 +2242,71 @@
         // stored as 1000 + group rank (or 81 if no group rank was typed), so
         // they always land in the Group stage bracket and never clash with
         // Swiss ranks.
+        // Supreme League. Ranks 1-48 are the knockout stage. "Out in swiss
+        // stage" is stored as 2000 + rank (rank required) and "Out in group
+        // stage" as 1000 + rank (rank required), so the stage never clashes
+        // with a knockout rank. (81-999 = group stage exits from older saves.)
         supremeLeague: {
           label: 'Supreme League',
           brackets: [
             {
               min: 1,
               max: 1,
+              label: 'Champion',
               r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 2000 },
             },
             {
               min: 2,
               max: 2,
+              label: 'Runner-Up',
               r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 1800 },
             },
             {
               min: 3,
               max: 3,
+              label: '3rd Place',
               r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 1600 },
             },
             {
               min: 4,
               max: 4,
+              label: '4th Place',
               r: { slumberEssence: 120, stellarCrystal: 10, seasonToken: 1500 },
             },
             {
               min: 5,
               max: 8,
+              label: 'Top 8',
               r: { slumberEssence: 100, stellarCrystal: 8, seasonToken: 1200 },
             },
             {
               min: 9,
               max: 16,
+              label: 'Top 16',
               r: { slumberEssence: 90, stellarCrystal: 6, seasonToken: 1000 },
             },
             {
               min: 17,
               max: 32,
+              label: 'Top 32',
               r: { slumberEssence: 80, stellarCrystal: 6, seasonToken: 800 },
             },
             {
               min: 33,
               max: 48,
+              label: 'Top 48',
               r: { slumberEssence: 60, stellarCrystal: 5, seasonToken: 800 },
             },
             {
-              min: 49,
-              max: 80,
+              min: 2000,
+              max: 2999,
+              label: 'Swiss Stage',
               r: { slumberEssence: 40, stellarCrystal: 4, seasonToken: 800 },
             },
             {
               min: 81,
-              max: 99999,
-              label: 'Group stage',
+              max: 1999,
+              label: 'Group Stage',
               r: { slumberEssence: 20, stellarCrystal: 3, seasonToken: 800 },
             },
           ],
@@ -2341,33 +2351,52 @@
 
       const bestRewards = (modeKey) => MODES[modeKey].brackets[0].r;
 
-      const SL_GROUP_RANK = 81; // group stage exit with no rank typed
       const SL_GROUP_OFFSET = 1000; // stored rank = 1000 + group stage rank
+      const SL_SWISS_OFFSET = 2000; // stored rank = 2000 + swiss stage rank
       // "Did not qualify": stored as a rank outside every bracket, so it
       // counts as a played day with no rewards (everything possible is lost).
       const SL_NOQUAL_RANK = 9999999;
+      // 'ko' (knockout 1-48) | 'swiss' | 'group' | 'dnq'
+      const slStage = (rank) =>
+        rank >= SL_NOQUAL_RANK
+          ? 'dnq'
+          : rank >= SL_SWISS_OFFSET
+            ? 'swiss'
+            : rank > 48
+              ? 'group'
+              : 'ko';
       const bracketLabel = (modeKey, b) => {
         if (b.label) return b.label;
         if (b.min === b.max) return `#${b.min}`;
         return b.min === 1 ? `Top ${b.max}` : `${b.min}-${b.max}`;
       };
+      // Text for the history table
       const rankText = (modeKey, rank) => {
-        if (modeKey === 'supremeLeague' && rank >= SL_NOQUAL_RANK) {
-          return 'Did not qualify';
+        if (modeKey !== 'supremeLeague') return `#${rank}`;
+        const st = slStage(rank);
+        if (st === 'dnq') return 'Did not qualify';
+        if (st === 'swiss') {
+          return rank > SL_SWISS_OFFSET
+            ? `Swiss Stage #${rank - SL_SWISS_OFFSET}`
+            : 'Swiss Stage';
         }
-        if (modeKey === 'supremeLeague' && rank >= SL_GROUP_RANK) {
+        if (st === 'group') {
           return rank > SL_GROUP_OFFSET
-            ? `Group stage #${rank - SL_GROUP_OFFSET}`
-            : 'Group stage';
+            ? `Group Stage #${rank - SL_GROUP_OFFSET}`
+            : 'Group Stage';
         }
-        if (modeKey === 'supremeLeague') return `Swiss stage #${rank}`;
         return `#${rank}`;
       };
-      // Rank number only (no "Group stage" wording); null when a Supreme
-      // League group stage exit was logged without a group rank.
+      // The rank number only; null when there is none (a Supreme League
+      // swiss/group exit logged without a rank, or did not qualify).
       const rankNumText = (modeKey, rank) => {
-        if (modeKey === 'supremeLeague' && rank >= SL_NOQUAL_RANK) return null;
-        if (modeKey === 'supremeLeague' && rank >= SL_GROUP_RANK) {
+        if (modeKey !== 'supremeLeague') return `#${rank}`;
+        const st = slStage(rank);
+        if (st === 'dnq') return null;
+        if (st === 'swiss') {
+          return rank > SL_SWISS_OFFSET ? `#${rank - SL_SWISS_OFFSET}` : null;
+        }
+        if (st === 'group') {
           return rank > SL_GROUP_OFFSET ? `#${rank - SL_GROUP_OFFSET}` : null;
         }
         return `#${rank}`;
@@ -2397,6 +2426,12 @@
           Object.keys(days).forEach((date) => {
             if (days[date].boss === 'Unknown Nightmare') {
               days[date].boss = 'Snow Stomper';
+              dirty = true;
+            }
+            // older saves kept swiss ranks 49-80 as plain numbers
+            const oldSl = days[date].ranks && days[date].ranks.supremeLeague;
+            if (oldSl >= 49 && oldSl <= 80) {
+              days[date].ranks.supremeLeague = SL_SWISS_OFFSET + oldSl;
               dirty = true;
             }
             if (
@@ -2657,6 +2692,21 @@
       // Display name is exactly what the person typed. The season number
       // (used for "season N" captions and picking the next number) is tracked
       // separately and never injected into the name.
+      const escapeHtml = (str) =>
+        String(str).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+            })[c],
+        );
+      // season name exactly as typed, in the gold accent colour
+      const goldName = (name) =>
+        `<span style="color: var(--gold)">${escapeHtml(name)}</span>`;
       const seasonLabel = (season) => {
         if (!season) return '';
         return String(season.name || '').trim();
@@ -2850,7 +2900,7 @@
             <div class="dist-title">${MODES[modeKey].label}</div>
             <div class="dist-brackets">${rows}${outRow}</div>
             <div class="dist-miss-block">
-              <div class="dist-miss-heading" style="color: ${showLost ? 'var(--red)' : 'var(--green)'};">${showLost ? 'Lost rewards' : 'Gained rewards'}</div>
+              <div class="dist-miss-heading" style="color: ${showLost ? 'var(--red)' : 'var(--green)'};">${showLost ? 'Rewards lost' : 'Rewards gained'}</div>
               ${curRows}
             </div>
           </div>`;
@@ -2913,20 +2963,26 @@
               Did not qualify
             </label>
           </div>
-          <label class="mode-off-row" for="slGroupExit">
-            <input type="checkbox" id="slGroupExit" />
-            Out in group stage
-          </label>
+          <div class="mode-check-row">
+            <label class="mode-off-row" for="slSwissExit">
+              <input type="checkbox" id="slSwissExit" />
+              Out in Swiss Stage
+            </label>
+            <label class="mode-off-row" for="slGroupExit">
+              <input type="checkbox" id="slGroupExit" />
+              Out in Group Stage
+            </label>
+          </div>
           <div class="mode-hint" id="slHint" hidden></div>`;
         }
         const placeholders = {
-          supremeLeague: 'Swiss rank 1-80',
+          supremeLeague: 'e.g. 12',
           drServer: 'e.g. 12',
           drDistrict: 'e.g. 35',
           supremeArena: 'e.g. 8',
           dreamHunt: 'e.g. 42',
         };
-        div.innerHTML = `<label>${MODES[key].label}</label><input type="number" min="1" class="tiered" id="rank_${key}" placeholder="${placeholders[key] || 'e.g. 20'}" />${extra}`;
+        div.innerHTML = `<label>${MODES[key].label}</label><input type="number" min="1" class="tiered" id="rank_${key}" placeholder="${placeholders[key] || 'e.g. 20'}" data-ph="${placeholders[key] || 'e.g. 20'}" />${extra}`;
         rankInputsEl.appendChild(div);
       });
 
@@ -2938,6 +2994,7 @@
         if (!saRewardDayEl || !saRankEl) return;
         const on = saRewardDayEl.checked;
         saRankEl.disabled = !on;
+        saRankEl.placeholder = on ? saRankEl.dataset.ph : 'Not a reward day';
         if (!on) {
           saRankEl.value = '';
           saRankEl.style.borderColor = 'var(--panel-border)';
@@ -2956,6 +3013,7 @@
         if (!dhRewardDayEl || !dhRankEl) return;
         const on = dhRewardDayEl.checked;
         dhRankEl.disabled = !on;
+        dhRankEl.placeholder = on ? dhRankEl.dataset.ph : 'Not a reward day';
         if (!on) {
           dhRankEl.value = '';
           dhRankEl.style.borderColor = 'var(--panel-border)';
@@ -2971,32 +3029,55 @@
       // start disabled until Reward day is checked
       syncDhRewardDayState();
 
-      // Supreme League: rank only counts on a reward day; a group stage exit
-      // has no rank of its own, so it replaces the rank input.
+      // Supreme League: only counts on a reward day. Without a stage ticked the
+      // rank is the knockout rank (1-48). "Out in swiss/group stage" put you in
+      // that bracket; the rank is required and only worked out
+      // behind the scenes (the rank is required to save a swiss/group exit).
       const slRewardDayEl = document.getElementById('slRewardDay');
-      const slGroupExitEl = document.getElementById('slGroupExit');
       const slNoQualEl = document.getElementById('slNoQual');
+      const slSwissExitEl = document.getElementById('slSwissExit');
+      const slGroupExitEl = document.getElementById('slGroupExit');
       const slRankEl = document.getElementById('rank_supremeLeague');
       // Top 20 of the group stage advance to Swiss, so a group stage exit can
-      // only be rank 21-60; Swiss ranks run 1-80. Returns false when invalid.
+      // only be rank 21-60; swiss stage exits are rank 49-80.
+      const SL_KO_MAX = 48;
+      const SL_SWISS_MIN = 49;
+      const SL_SWISS_MAX = 80;
       const SL_GROUP_MIN = 21;
       const SL_GROUP_MAX = 60;
-      const SL_SWISS_MAX = 80;
-      const validateSl = () => {
+      const slStageOffset = () =>
+        slGroupExitEl && slGroupExitEl.checked
+          ? SL_GROUP_OFFSET
+          : slSwissExitEl && slSwissExitEl.checked
+            ? SL_SWISS_OFFSET
+            : 0;
+      // forSave: also require the rank for a swiss/group stage exit
+      const validateSl = (forSave = false) => {
         const hint = document.getElementById('slHint');
-        if (!hint || !slRankEl || !slGroupExitEl) return true;
+        if (!hint || !slRankEl || !slGroupExitEl || !slSwissExitEl) return true;
         let msg = '';
         const raw = slRankEl.value;
         const v = parseInt(raw, 10);
-        if (!slRankEl.disabled && raw !== '' && !isNaN(v)) {
+        if (
+          forSave &&
+          !slRankEl.disabled &&
+          (raw === '' || isNaN(v)) &&
+          (slGroupExitEl.checked || slSwissExitEl.checked)
+        ) {
+          msg = slGroupExitEl.checked
+            ? `Enter your Group Stage rank (${SL_GROUP_MIN}-${SL_GROUP_MAX}) to save.`
+            : `Enter your Swiss Stage rank (${SL_SWISS_MIN}-${SL_SWISS_MAX}) to save.`;
+        } else if (!slRankEl.disabled && raw !== '' && !isNaN(v)) {
           if (slGroupExitEl.checked) {
-            if (v < SL_GROUP_MIN) {
-              msg = `Top 20 in the group stage advance to Swiss. For a group stage exit enter rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}, or untick "Out in group stage" and enter your Swiss rank.`;
-            } else if (v > SL_GROUP_MAX) {
-              msg = `Group stage exits are rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}.`;
+            if (v < SL_GROUP_MIN || v > SL_GROUP_MAX) {
+              msg = `Top 20 in the Group Stage advance to Swiss Stage, Group Stage exit is rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}.`;
             }
-          } else if (v > SL_SWISS_MAX) {
-            msg = `Swiss ranks go up to ${SL_SWISS_MAX}. If you were knocked out in the group stage, tick "Out in group stage".`;
+          } else if (slSwissExitEl.checked) {
+            if (v < SL_SWISS_MIN || v > SL_SWISS_MAX) {
+              msg = `Top 48 in the Swiss Stage advance to Knockout Stage, Swiss Stage exit is rank ${SL_SWISS_MIN}-${SL_SWISS_MAX}.`;
+            }
+          } else if (v > SL_KO_MAX) {
+            msg = `Knockout Stage is rank 1-${SL_KO_MAX}. If you were knocked out earlier, tick Swiss or Group Stage.`;
           }
         }
         hint.textContent = msg;
@@ -3004,15 +3085,26 @@
         return !msg;
       };
       const syncSlState = () => {
-        if (!slRewardDayEl || !slRankEl || !slGroupExitEl) return;
+        if (!slRewardDayEl || !slRankEl || !slGroupExitEl || !slSwissExitEl)
+          return;
         const on = slRewardDayEl.checked;
         slGroupExitEl.disabled = !on;
-        if (!on) slGroupExitEl.checked = false;
-        const grp = slGroupExitEl.checked;
+        slSwissExitEl.disabled = !on;
+        if (!on) {
+          slGroupExitEl.checked = false;
+          slSwissExitEl.checked = false;
+        }
         slRankEl.disabled = !on;
-        slRankEl.placeholder = grp
-          ? 'Group rank 21-60 (optional)'
-          : 'Swiss rank 1-80';
+        // the hint shows which ranks are valid for the current choice
+        slRankEl.placeholder = on
+          ? slGroupExitEl.checked
+            ? `Rank ${SL_GROUP_MIN}-${SL_GROUP_MAX}`
+            : slSwissExitEl.checked
+              ? `Rank ${SL_SWISS_MIN}-${SL_SWISS_MAX}`
+              : `Rank 1-${SL_KO_MAX}`
+          : slNoQualEl && slNoQualEl.checked
+            ? 'Did not qualify'
+            : 'Not a reward day';
         if (slRankEl.disabled) {
           slRankEl.value = '';
           slRankEl.style.borderColor = 'var(--panel-border)';
@@ -3027,7 +3119,8 @@
       // "Did not qualify" and "Reward day" exclude each other
       if (slNoQualEl)
         slNoQualEl.addEventListener('change', () => {
-          if (slNoQualEl.checked && slRewardDayEl) slRewardDayEl.checked = false;
+          if (slNoQualEl.checked && slRewardDayEl)
+            slRewardDayEl.checked = false;
           syncSlState();
         });
       if (slRewardDayEl)
@@ -3035,7 +3128,19 @@
           if (slRewardDayEl.checked && slNoQualEl) slNoQualEl.checked = false;
           syncSlState();
         });
-      if (slGroupExitEl) slGroupExitEl.addEventListener('change', syncSlState);
+      // swiss / group stage exits exclude each other too
+      if (slSwissExitEl)
+        slSwissExitEl.addEventListener('change', () => {
+          if (slSwissExitEl.checked && slGroupExitEl)
+            slGroupExitEl.checked = false;
+          syncSlState();
+        });
+      if (slGroupExitEl)
+        slGroupExitEl.addEventListener('change', () => {
+          if (slGroupExitEl.checked && slSwissExitEl)
+            slSwissExitEl.checked = false;
+          syncSlState();
+        });
       syncSlState();
       const entryDateEl = document.getElementById('entryDate');
       const entryDateLabel = document.getElementById('entryDateLabel');
@@ -3087,13 +3192,9 @@
           return;
         }
         let rank = parseInt(input.value, 10);
-        if (
-          key === 'supremeLeague' &&
-          slGroupExitEl &&
-          slGroupExitEl.checked &&
-          !isNaN(rank)
-        ) {
-          rank += SL_GROUP_OFFSET;
+        if (key === 'supremeLeague') {
+          if (!isNaN(rank)) rank += slStageOffset();
+          else if (slStageOffset()) rank = slStageOffset(); // stage, no rank
         }
         const idx = getBracketIndex(key, rank);
         if (isNaN(rank) || idx === -1) {
@@ -3152,8 +3253,8 @@
         modesTitle.className = 'day-summary-title';
         modesTitle.style.color = showTodayLost ? 'var(--red)' : 'var(--green)';
         modesTitle.textContent = showTodayLost
-          ? 'Rank & lost rewards per mode'
-          : 'Rank & gained rewards per mode';
+          ? 'Rankings & rewards lost per mode'
+          : 'Rankings & rewards gained per mode';
         modesWrap.appendChild(modesTitle);
         const modesGrid = document.createElement('div');
         modesGrid.className = 'day-modes-grid';
@@ -3216,9 +3317,7 @@
             const c = tierColorForIndex(idx, MODES[modeKey].brackets.length);
             const bLabel =
               modeKey === 'supremeLeague'
-                ? rank >= SL_GROUP_RANK
-                  ? '1-60 Group stage'
-                  : '1-80 Swiss stage'
+                ? bracketLabel(modeKey, bracket)
                 : `${bracket.min}-${bracket.max}`;
             const rNum = rankNumText(modeKey, rank);
             html += rNum
@@ -3436,24 +3535,21 @@
       };
 
       const saveDay = () => {
-        if (!validateSl()) return;
+        if (!validateSl(true)) return;
         const date = document.getElementById('entryDate').value || todayStr();
         const saRewardChecked = !!(saRewardDayEl && saRewardDayEl.checked);
         const days = loadDays();
         const existing = days[date] || null;
         const ranks = {};
         Object.keys(MODES).forEach((key) => {
-          if (
-            key === 'supremeLeague' &&
-            slGroupExitEl &&
-            slGroupExitEl.checked
-          ) {
+          if (key === 'supremeLeague' && slStageOffset()) {
+            // swiss/group exit: the rank is required, the stage decides the
+            // bracket
             const g = parseInt(
               document.getElementById('rank_supremeLeague').value,
               10,
             );
-            ranks[key] =
-              !isNaN(g) && g >= 1 ? SL_GROUP_OFFSET + g : SL_GROUP_RANK;
+            ranks[key] = slStageOffset() + (!isNaN(g) && g >= 1 ? g : 0);
             return;
           }
           const raw = document.getElementById('rank_' + key).value;
@@ -3530,6 +3626,7 @@
         if (dhRewardDayEl) dhRewardDayEl.checked = false;
         if (slRewardDayEl) slRewardDayEl.checked = false;
         if (slGroupExitEl) slGroupExitEl.checked = false;
+        if (slSwissExitEl) slSwissExitEl.checked = false;
         if (slNoQualEl) slNoQualEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
@@ -3581,6 +3678,7 @@
         if (dhRewardDayEl) dhRewardDayEl.checked = false;
         if (slRewardDayEl) slRewardDayEl.checked = false;
         if (slGroupExitEl) slGroupExitEl.checked = false;
+        if (slSwissExitEl) slSwissExitEl.checked = false;
         if (slNoQualEl) slNoQualEl.checked = false;
         Object.keys(MODES).forEach((key) => {
           document.getElementById('rank_' + key).value = '';
@@ -3806,7 +3904,7 @@
       const renderOverall = () => {
         const overallDistNote = document.getElementById('overallDistNote');
         if (overallDistNote) {
-          overallDistNote.textContent = `Overall rank distribution & ${showOverallLost ? 'lost' : 'gained'} rewards per mode`;
+          overallDistNote.textContent = `Overall rank distribution & rewards ${showOverallLost ? 'lost' : 'gained'} per mode`;
           overallDistNote.style.color = showOverallLost
             ? 'var(--red)'
             : 'var(--green)';
@@ -3848,8 +3946,8 @@
               ? 'var(--red)'
               : 'var(--green)';
             titleEl.textContent = showOverallLost
-              ? 'Total lost rewards'
-              : 'Total gained rewards';
+              ? 'Total rewards lost'
+              : 'Total rewards gained';
           }
           renderOverall();
         };
@@ -4101,14 +4199,10 @@
       const updateSeasonTotalsTitle = (season) => {
         const titleEl = document.getElementById('seasonTotalsTitle');
         if (!titleEl) return;
-        const n = seasonNumber(season);
-        const seasonPart = n ? ` season ${n}` : ' season';
         titleEl.style.color = showSeasonLost ? 'var(--red)' : 'var(--green)';
         const seasonBox = document.getElementById('seasonTotalsBox');
         if (seasonBox) seasonBox.classList.toggle('lost', showSeasonLost);
-        titleEl.textContent = showSeasonLost
-          ? `Rewards lost in${seasonPart}`
-          : `Rewards gained in${seasonPart}`;
+        titleEl.innerHTML = `Rewards ${showSeasonLost ? 'lost' : 'gained'} in ${goldName(seasonLabel(season) || 'this season')}`;
       };
 
       const renderSeason = () => {
@@ -4132,16 +4226,16 @@
 
         updateSeasonTotalsTitle(season);
 
-        const n = seasonNumber(season);
-        const seasonSuffix = n ? ` in season ${n}` : ' in season';
+        const seasonName = seasonLabel(season) || 'this season';
+        const seasonSuffix = ` in ${goldName(seasonName)}`;
         const distNote = document.getElementById('seasonDistNote');
         if (distNote) {
-          distNote.textContent = `Rank distribution & ${showSeasonLost ? 'lost' : 'gained'} rewards per mode${seasonSuffix}`;
+          distNote.innerHTML = `${goldName(seasonName)} rank distribution &amp; rewards ${showSeasonLost ? 'lost' : 'gained'} per mode`;
           distNote.style.color = showSeasonLost ? 'var(--red)' : 'var(--green)';
         }
         const bossNote = document.getElementById('seasonBossNote');
         if (bossNote) {
-          bossNote.textContent = `Rankings for each Dream Realm boss${seasonSuffix}`;
+          bossNote.innerHTML = `Rankings for each Dream Realm boss${seasonSuffix}`;
         }
 
         const dist = computeBracketDist(days, filterFn, showSeasonLost);
@@ -4194,69 +4288,31 @@
       // once the season has been created.
       let pendingSaveAfterSeason = false;
 
-      // Known game seasons (start dates). Each season ends the day before the
-      // next one starts, so only starts are needed. Picking one just fills in
-      // the name + start date; "Custom" keeps the fully manual flow, so future
-      // seasons that aren't listed here still work.
-      const KNOWN_SEASONS = [
-        { number: 1, title: 'Song of Strife', start: '2024-05-10' },
-        { number: 2, title: 'Waves of Intrigue', start: '2024-09-19' },
-        { number: 3, title: 'Chains of Eternity', start: '2025-01-17' },
-        { number: 4, title: 'Echoes of Dissent', start: '2025-05-23' },
-        { number: 5, title: 'Thorns of Devotion', start: '2025-09-26' },
-        { number: 6, title: 'Tower of Memory', start: '2026-01-30' },
-        { number: 7, title: 'Crown of Ashes', start: '2026-05-29' },
-        { number: 8, title: 'Veil of Memories', start: '2026-09-23' },
-      ];
-      const modalSeasonPick = document.getElementById('modalSeasonPick');
-      const fillSeasonPick = (seasons) => {
-        const taken = new Set(seasons.map((x) => x.start));
-        const takenNums = new Set(
-          seasons.map((x) => seasonNumber(x)).filter(Boolean),
-        );
-        const options = [...KNOWN_SEASONS]
-          .reverse()
-          .filter(
-            (k) => !taken.has(k.start) && !takenNums.has(String(k.number)),
-          )
-          .map(
-            (k) =>
-              `<option value="${k.number}">S${k.number} - ${k.title} · ${formatDate(k.start)}</option>`,
-          );
-        modalSeasonPick.innerHTML =
-          '<option value="">Custom (type your own)</option>' + options.join('');
-        modalSeasonPick.value = '';
-      };
-      modalSeasonPick.onchange = () => {
-        const k = KNOWN_SEASONS.find(
-          (x) => String(x.number) === modalSeasonPick.value,
-        );
-        if (!k) return; // Custom: leave fields as they are
-        modalSeasonName.value = `S${k.number} - ${k.title}`;
-        modalSeasonStart.value = k.start;
-        syncModalStartLabel();
-      };
+      // Defaults shown in the season popup (first-ever day, or "+ New season").
+      // The name is only a placeholder hint; the start date is pre-filled.
+      // Update both when a new season starts.
+      const DEFAULT_SEASON_NAME_HINT = 'e.g. S8 - Veil of Memories';
+      const DEFAULT_SEASON_START = '2026-09-23';
 
       const openNewSeasonModal = (startDate) => {
         const seasons = loadSeasons();
         const isFirst = seasons.length === 0;
         if (isFirst) {
-          // empty field so the "e.g. S1 - Song of Strife" placeholder shows
+          // empty field so the placeholder hint shows
           modalSeasonName.value = '';
-          modalSeasonName.placeholder = 'e.g. S1 - Song of Strife';
+          modalSeasonName.placeholder = DEFAULT_SEASON_NAME_HINT;
           modalSeasonTitle.textContent = 'Add your first season';
           modalSeasonDesc.textContent =
-            'Pick the season you want to track and the date it started. Days from the start date onward count toward it. You can add the next season when it begins.';
+            'Enter the season you want to track and the date it started. Days from the start date onward count toward it. You can add the next season when it begins.';
         } else {
           modalSeasonName.value = '';
-          modalSeasonName.placeholder = `e.g. S${nextSeasonNumber(seasons)} - Season Name`;
+          modalSeasonName.placeholder = DEFAULT_SEASON_NAME_HINT;
           modalSeasonTitle.textContent = 'Start a new season';
           modalSeasonDesc.textContent =
             'Previous seasons stay available. Days from the start date onward count toward the new season.';
         }
-        modalSeasonStart.value = startDate || todayStr();
+        modalSeasonStart.value = DEFAULT_SEASON_START;
         syncModalStartLabel();
-        fillSeasonPick(seasons);
         newSeasonModal.hidden = false;
         if (isFirst) modalSeasonName.focus();
       };
