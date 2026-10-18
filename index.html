@@ -342,6 +342,54 @@
         font-weight: 500;
         font-size: 11px;
       }
+      .setup-banner {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px 14px;
+        flex-wrap: wrap;
+        margin: 0 0 16px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(140, 162, 204, 0.22);
+        background: rgba(140, 162, 204, 0.06);
+      }
+      .setup-banner[hidden] {
+        display: none;
+      }
+      .setup-banner-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted);
+        line-height: 1.4;
+        flex: 0 1 auto;
+      }
+      #setupBannerBtn {
+        white-space: nowrap;
+        flex: 0 0 auto;
+      }
+      .setup-banner-text strong {
+        color: var(--gold);
+        font-weight: 700;
+      }
+      /* reminder next to the boss field */
+      .boss-hint {
+        align-self: flex-end;
+        max-width: 260px;
+        margin-bottom: 3px;
+        padding: 2px 0 2px 10px;
+        border-left: 2px solid rgba(248, 194, 68, 0.35);
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .boss-hint strong {
+        color: var(--gold);
+        font-weight: 700;
+      }
+      .boss-hint[hidden] {
+        display: none;
+      }
       .date-row {
         display: flex;
         gap: 14px;
@@ -1262,16 +1310,6 @@
         color: var(--gold);
         font-weight: 700;
       }
-      .del-btn {
-        background: none;
-        border: none;
-        color: var(--muted);
-        cursor: pointer;
-        font-size: 15px;
-      }
-      .del-btn:hover {
-        color: var(--red);
-      }
       .dist-grid {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1438,12 +1476,6 @@
           min-height: 198px;
         }
       }
-      .dist-miss-heading {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--gold);
-        margin-bottom: 8px;
-      }
       .dist-miss-row {
         display: flex;
         justify-content: space-between;
@@ -1553,23 +1585,154 @@
         gap: 2px;
       }
       .season-del,
+      .del-btn,
+      .edit-btn,
       .season-edit {
         background: none;
         border: none;
-        color: var(--muted);
+        color: #b6c6e6;
         cursor: pointer;
-        font-size: 13px;
-        padding: 4px 6px;
+        font-size: 18px;
+        padding: 5px 7px;
         border-radius: 6px;
         line-height: 1;
+        transition:
+          color 0.15s,
+          background 0.15s;
       }
-      .season-del:hover {
+      .season-del:hover,
+      .del-btn:hover {
         color: var(--red);
         background: rgba(251, 113, 133, 0.12);
       }
+      .edit-btn:hover,
       .season-edit:hover {
         color: var(--cyan);
         background: rgba(110, 219, 248, 0.12);
+      }
+      .boss-row {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+      }
+      /* looks like the old dropdown, but the boss comes from the rotation */
+      .boss-field {
+        flex: 1;
+        min-width: 0;
+        padding: 9px 11px;
+        border-radius: 8px;
+        border: 1px solid var(--panel-border);
+        background-color: #0b1124;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: default;
+      }
+      .boss-field.unset {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .step-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .step-label[hidden],
+      #modalSeasonSave[hidden],
+      #brBack[hidden] {
+        display: none;
+      }
+      .br-list {
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 10px;
+        max-height: 280px;
+        overflow-y: auto;
+      }
+      .br-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+      .br-row + .br-row {
+        border-top: 1px solid var(--panel-border);
+      }
+      .br-row .br-day {
+        width: 44px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .br-row .br-name {
+        flex: 1;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .br-row button {
+        background: none;
+        border: 1px solid var(--panel-border);
+        color: var(--muted);
+        border-radius: 6px;
+        padding: 2px 7px;
+        cursor: pointer;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+      .br-row button:hover {
+        color: var(--cyan);
+        border-color: var(--cyan);
+      }
+      .br-row button.br-remove:hover {
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .br-add {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .br-add {
+        align-items: stretch;
+      }
+      #brHint {
+        margin: 0 0 10px;
+      }
+      .br-preview {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .br-preview div {
+        background: var(--panel2);
+        border-radius: 8px;
+        padding: 6px 8px;
+        min-width: 0;
+      }
+      .br-preview small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .br-preview b {
+        display: block;
+        font-size: 12px;
+        line-height: 1.3;
+        color: var(--text);
+        overflow-wrap: anywhere;
+      }
+      @media (max-width: 520px) {
+        .br-preview {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
       }
       .modal-overlay {
         position: fixed;
@@ -1631,6 +1794,10 @@
         .date-row .mode-input {
           max-width: none;
         }
+        .boss-hint {
+          align-self: stretch;
+          max-width: none;
+        }
       }
     </style>
   </head>
@@ -1667,13 +1834,19 @@
         <button class="tab active" data-view="today">Daily log</button>
         <button class="tab" data-view="season">Seasons</button>
         <button class="tab" data-view="overall">Overall</button>
-        <button class="tab tab-end" data-view="history">History</button>
+        <button class="tab tab-end" data-view="history">Log history</button>
       </div>
 
       <!-- TODAY -->
       <div class="view active" id="view-today">
         <div class="card">
           <h2>Enter daily rankings</h2>
+          <div id="setupBanner" class="setup-banner" hidden>
+            <div class="setup-banner-text" id="setupBannerText"></div>
+            <button type="button" class="ghost" id="setupBannerBtn">
+              + Add a season
+            </button>
+          </div>
           <div class="date-row">
             <div class="mode-input">
               <label>Date</label>
@@ -1697,13 +1870,18 @@
             </div>
             <div class="mode-input" style="max-width: 240px">
               <label>Dream Realm boss</label>
-              <select id="entryBoss" class="pretty-select"></select>
+              <div class="boss-row">
+                <div class="boss-field" id="bossCurrent">-</div>
+              </div>
+              <select id="entryBoss" hidden aria-hidden="true"></select>
+            </div>
+            <div class="boss-hint" id="bossHint" hidden>
+              Add a boss rotation to be able to save your day.
             </div>
           </div>
           <div class="mode-grid" id="rankInputs"></div>
           <div style="margin-top: 16px; display: flex; gap: 10px">
             <button class="primary" id="saveDayBtn">Save Day</button>
-            <span class="bracket-note" id="saveStatus"></span>
           </div>
         </div>
         <div id="todayResults"></div>
@@ -1735,7 +1913,7 @@
                   class="day-miss-toggle"
                   id="overallToggleBtn"
                 >
-                  Show <span style="color: var(--red)">lost</span> rewards
+                  Show lost rewards
                 </button>
               </div>
               <div class="dist-grid" id="overallDist"></div>
@@ -1777,7 +1955,7 @@
             <input
               type="search"
               id="historySearch"
-              placeholder="Search date or boss"
+              placeholder="Search date, month, boss, season, day…"
               autocomplete="off"
             />
             <span class="search-hint" id="historySearchHint"></span>
@@ -1844,7 +2022,7 @@
                   class="day-miss-toggle"
                   id="seasonToggleBtn"
                 >
-                  Show <span style="color: var(--red)">lost</span> rewards
+                  Show lost rewards
                 </button>
               </div>
               <div class="dist-grid" id="seasonDist"></div>
@@ -1874,90 +2052,111 @@
       </div>
     </div>
 
-    <!-- New season modal -->
+    <!-- Season + boss rotation modal (one window, two steps) -->
     <div class="modal-overlay" id="newSeasonModal" hidden>
-      <div class="modal">
-        <h3 id="modalSeasonTitle">Start a new season</h3>
-        <p class="modal-desc" id="modalSeasonDesc">
-          Previous seasons stay available. Days from the start date onward count
-          toward the new season.
-        </p>
-        <div class="mode-input" style="margin-bottom: 12px">
-          <label for="modalSeasonName">Season name</label>
-          <input
-            type="text"
-            id="modalSeasonName"
-            placeholder="e.g. S8 - Veil of Memories"
-            value=""
-          />
-        </div>
-        <div class="mode-input" style="margin-bottom: 18px">
-          <label for="modalSeasonStart">Start date</label>
-          <div class="pretty-date-wrap" style="max-width: none">
-            <button
-              type="button"
-              class="pretty-date-btn"
-              id="modalSeasonStartBtn"
-              title="Pick a date"
-            >
-              <span id="modalSeasonStartLabel">-</span>
-              <span class="pretty-date-icon" aria-hidden="true">📅</span>
-            </button>
+      <div
+        class="modal"
+        style="max-width: 520px; max-height: 92vh; overflow-y: auto"
+      >
+        <!-- Step 1: season name + start date -->
+        <div id="seasonPane1">
+          <div class="step-label" id="seasonStep1Label">Step 1 of 2</div>
+          <h3 id="modalSeasonTitle">Start a new season</h3>
+          <p class="modal-desc" id="modalSeasonDesc">
+            Previous seasons stay available. Days from the start date onward
+            count toward the new season.
+          </p>
+          <div class="mode-input" style="margin-bottom: 12px">
+            <label for="modalSeasonName">Season name</label>
             <input
-              type="date"
-              id="modalSeasonStart"
-              class="pretty-date-native"
-              tabindex="-1"
+              type="text"
+              id="modalSeasonName"
+              placeholder="e.g. S8 - Veil of Memories"
+              value=""
             />
           </div>
+          <div class="mode-input" style="margin-bottom: 18px">
+            <label for="modalSeasonStart">Start date</label>
+            <div class="pretty-date-wrap" style="max-width: none">
+              <button
+                type="button"
+                class="pretty-date-btn"
+                id="modalSeasonStartBtn"
+                title="Pick a date"
+              >
+                <span id="modalSeasonStartLabel">-</span>
+                <span class="pretty-date-icon" aria-hidden="true">📅</span>
+              </button>
+              <input
+                type="date"
+                id="modalSeasonStart"
+                class="pretty-date-native"
+                tabindex="-1"
+              />
+            </div>
+          </div>
+          <div class="mode-hint" id="modalSeasonHint" hidden></div>
+          <p
+            class="modal-desc"
+            id="modalSeasonNextHint"
+            hidden
+            style="margin: 0 0 10px; font-size: 12px"
+          >
+            Press <strong>Next</strong> to edit the
+            <strong>Dream Realm boss rotation</strong>.
+          </p>
+          <div class="modal-actions">
+            <button class="ghost" id="modalSeasonCancel">Cancel</button>
+            <button class="primary" id="modalSeasonSave" hidden>Save</button>
+            <button class="primary" id="modalSeasonConfirm">Next</button>
+          </div>
         </div>
-        <div class="modal-actions">
-          <button class="ghost" id="modalSeasonCancel">Cancel</button>
-          <button class="primary" id="modalSeasonConfirm">Create season</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Rename season modal -->
-    <div class="modal-overlay" id="renameSeasonModal" hidden>
-      <div class="modal">
-        <h3>Edit season</h3>
-        <p class="modal-desc">
-          Change the season name or start date. Days are assigned by start date
-          ranges.
-        </p>
-        <div class="mode-input" style="margin-bottom: 12px">
-          <label for="modalRenameName">Season name</label>
-          <input
-            type="text"
-            id="modalRenameName"
-            placeholder="e.g. Season 8"
-            value=""
-          />
-        </div>
-        <div class="mode-input" style="margin-bottom: 18px">
-          <label for="modalRenameStart">Start date</label>
-          <div class="pretty-date-wrap" style="max-width: none">
-            <button
-              type="button"
-              class="pretty-date-btn"
-              id="modalRenameStartBtn"
-              title="Pick a date"
-            >
-              <span id="modalRenameStartLabel">-</span>
-              <span class="pretty-date-icon" aria-hidden="true">📅</span>
-            </button>
-            <input
-              type="date"
-              id="modalRenameStart"
-              class="pretty-date-native"
-              tabindex="-1"
-            />
+        <!-- Step 2 (or the only step when editing a season's rotation) -->
+        <div id="seasonPane2" hidden>
+          <div class="step-label" id="seasonStep2Label">Step 2 of 2</div>
+          <h3 id="brTitle" style="margin: 0 0 8px">Boss rotation</h3>
+          <p class="modal-desc" id="brDesc">
+            Bosses repeat in this order. The first boss in the list is the boss
+            on the cycle start date.
+          </p>
+          <div class="mode-input" style="margin-bottom: 12px">
+            <label for="brAnchor">Cycle starts on</label>
+            <input type="date" id="brAnchor" style="color-scheme: dark" />
           </div>
-        </div>
-        <div class="modal-actions">
-          <button class="ghost" id="modalRenameCancel">Cancel</button>
-          <button class="primary" id="modalRenameConfirm">Save changes</button>
+          <div class="br-list" id="brList"></div>
+          <div class="br-add">
+            <div class="mode-input" style="flex: 1; margin: 0">
+              <input
+                type="text"
+                id="brAddName"
+                placeholder="New boss name"
+                maxlength="40"
+              />
+            </div>
+            <button class="ghost" id="brAddBtn" type="button">Add boss</button>
+          </div>
+          <div class="mode-hint" id="brHint" hidden></div>
+          <div style="font-size: 12px; color: var(--muted); margin: 0 0 6px">
+            First days of this season
+          </div>
+          <div class="br-preview" id="brPreview"></div>
+          <p
+            class="modal-desc"
+            id="brNote"
+            style="margin: 0 0 14px; font-size: 12px"
+          >
+            Saving also updates the boss on days you already logged this season.
+          </p>
+          <div class="modal-actions" style="justify-content: space-between">
+            <button class="ghost" id="brBack" type="button">Back</button>
+            <div style="display: flex; gap: 10px">
+              <button class="ghost" id="brCancel" type="button">Cancel</button>
+              <button class="primary" id="brSave" type="button">
+                Save rotation
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2079,30 +2278,146 @@
         </div>`;
       };
 
-      const DREAM_BOSSES = [
-        'Talking Root',
-        'Snow Stomper',
-        'Midnight Harvester',
-        'King Croaker',
-        'Novik',
-        'Mirage Frostspike',
-        'Marshtoad',
-        'Doomscourge',
+      // ONE BLOCK PER SEASON - the only place to edit when a new season starts.
+      // Add a block at the end (oldest first). Everything else is derived:
+      //  - number/name: the "add season" window suggests the newest block
+      //  - start: the date that season starts; a date is in the season whose
+      //    block has the latest start on or before it (so any date before the
+      //    first block is the season before it, e.g. S7 for dates before S8)
+      //  - cycleStart + bosses: the default boss rotation (the first boss in
+      //    the list is the boss on cycleStart; players can still edit it)
+      //  - end (optional): last day of the season. Only needed on the newest
+      //    block - without it that season is treated as running on until you
+      //    add the next block. Dates after `end` count as the next season.
+      // New bosses just go into that season's `bosses` list.
+      const SEASON_BLOCKS = [
+        {
+          number: 8,
+          name: 'Veil of Memories',
+          start: '2026-09-23',
+          cycleStart: '2026-09-23',
+          bosses: [
+            'King Croaker',
+            'Novik',
+            'Mirage Frostspike',
+            'Marshtoad',
+            'Doomscourge',
+            'Talking Root',
+            'Snow Stomper',
+            'Midnight Harvester',
+          ],
+        },
       ];
-      const DREAM_BOSS_ANCHOR = '2026-09-28';
+      const LATEST_SEASON_BLOCK = SEASON_BLOCKS[SEASON_BLOCKS.length - 1];
+      // Every boss in any season (the "known" bosses), without duplicates
+      const DREAM_BOSSES = (() => {
+        const seen = new Set();
+        const out = [];
+        SEASON_BLOCKS.forEach((blk) =>
+          blk.bosses.forEach((name) => {
+            const k = name.trim().replace(/\s+/g, ' ').toLowerCase();
+            if (!seen.has(k)) {
+              seen.add(k);
+              out.push(name);
+            }
+          }),
+        );
+        return out;
+      })();
+      // Which game season a date is in, from the block start dates
+      const seasonNumberForDate = (dateStr) => {
+        const first = SEASON_BLOCKS[0];
+        if (!dateStr || dateStr < first.start) return first.number - 1;
+        let blk = first;
+        SEASON_BLOCKS.forEach((b) => {
+          if (b.start <= dateStr) blk = b;
+        });
+        if (blk === LATEST_SEASON_BLOCK && blk.end && dateStr > blk.end) {
+          return blk.number + 1;
+        }
+        return blk.number;
+      };
+      const BOSS_ROTATIONS_KEY = 'afk_rank_tracker_boss_rotations';
 
       const daysBetween = (a, b) => {
         const da = new Date(a + 'T12:00:00');
         const db = new Date(b + 'T12:00:00');
         return Math.round((db - da) / 86400000);
       };
+      // Boss names are compared ignoring capitals and extra spaces, so
+      // "king  croaker" and "King Croaker" are the same boss.
+      const cleanBoss = (str) =>
+        String(str || '')
+          .trim()
+          .replace(/\s+/g, ' ');
+      const normBoss = (str) => cleanBoss(str).toLowerCase();
+
+      const loadCustomRotations = () => {
+        try {
+          const raw = JSON.parse(localStorage.getItem(BOSS_ROTATIONS_KEY));
+          return raw && typeof raw === 'object' ? raw : {};
+        } catch (e) {
+          return {};
+        }
+      };
+      const saveCustomRotations = (obj) => {
+        try {
+          localStorage.setItem(BOSS_ROTATIONS_KEY, JSON.stringify(obj));
+        } catch (e) {}
+      };
+      // A season uses the default of the block with its number: the number
+      // typed in its name ("S8", "Season 8"), else the one its start date is in.
+      const defaultRotationFor = (season) => {
+        if (!season) return null;
+        const n =
+          numberFromName(season.name) ?? seasonNumberForDate(season.start);
+        const blk = SEASON_BLOCKS.find((b) => b.number === n);
+        return blk ? { anchor: blk.cycleStart, order: [...blk.bosses] } : null;
+      };
+      // The player's own rotation wins over the site default; null = not set.
+      const rotationFor = (season) => {
+        if (!season) return null;
+        const custom = loadCustomRotations()[season.id];
+        if (
+          custom &&
+          custom.anchor &&
+          Array.isArray(custom.order) &&
+          custom.order.length
+        ) {
+          return {
+            anchor: custom.anchor,
+            order: [...custom.order],
+            source: 'custom',
+          };
+        }
+        const def = defaultRotationFor(season);
+        return def ? { ...def, source: 'default' } : null;
+      };
+      const bossFromRotation = (rot, dateStr) => {
+        const n = rot.order.length;
+        const delta = daysBetween(rot.anchor, dateStr);
+        return rot.order[((delta % n) + n) % n];
+      };
+      // Boss for a date from that date's season rotation ('' = not set)
       const bossForDate = (dateStr) => {
-        if (!dateStr) return DREAM_BOSSES[0];
-        const delta = daysBetween(DREAM_BOSS_ANCHOR, dateStr);
-        const idx =
-          ((delta % DREAM_BOSSES.length) + DREAM_BOSSES.length) %
-          DREAM_BOSSES.length;
-        return DREAM_BOSSES[idx];
+        if (!dateStr) return '';
+        const season = findSeasonForDate(dateStr, loadSeasons());
+        const rot = rotationFor(season);
+        return rot ? bossFromRotation(rot, dateStr) : '';
+      };
+      // Every boss name we know of, so a typed name reuses the spelling
+      const knownBossNames = () => {
+        const names = [...DREAM_BOSSES];
+        Object.values(loadCustomRotations()).forEach((r) => {
+          if (r && Array.isArray(r.order)) names.push(...r.order);
+        });
+        try {
+          const days = loadDays();
+          Object.keys(days).forEach((d) => {
+            if (days[d].boss) names.push(days[d].boss);
+          });
+        } catch (e) {}
+        return names;
       };
 
       const MODES = {
@@ -2375,6 +2690,8 @@
 
       const bestRewards = (modeKey) => MODES[modeKey].brackets[0].r;
 
+      // highest rank that can be typed (a rank is a whole number, 1 or more)
+      const MAX_RANK_INPUT = 5000;
       const SL_GROUP_OFFSET = 1000; // stored rank = 1000 + group stage rank
       const SL_SWISS_OFFSET = 2000; // stored rank = 2000 + swiss stage rank
       // "Did not qualify": stored as a rank outside every bracket, so it
@@ -2452,6 +2769,25 @@
               days[date].boss = 'Snow Stomper';
               dirty = true;
             }
+            // drop saved ranks that can't be real (negative, 0, decimals, huge):
+            // a negative rank would otherwise count as a top rank
+            if (days[date].ranks) {
+              Object.keys(days[date].ranks).forEach((k) => {
+                const r = days[date].ranks[k];
+                if (r == null) return;
+                const valid =
+                  Number.isInteger(r) &&
+                  (k === 'supremeLeague'
+                    ? (r >= 1 && r <= 48) ||
+                      (r >= 81 && r <= 2999) ||
+                      r === SL_NOQUAL_RANK
+                    : r >= 1 && r <= MAX_RANK_INPUT);
+                if (!valid) {
+                  days[date].ranks[k] = null;
+                  dirty = true;
+                }
+              });
+            }
             // older saves kept swiss ranks 49-80 as plain numbers
             const oldSl = days[date].ranks && days[date].ranks.supremeLeague;
             if (oldSl >= 49 && oldSl <= 80) {
@@ -2506,10 +2842,83 @@
         'Nov',
         'Dec',
       ];
+      const MONTHS_FULL = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
       const formatDate = (iso) => {
         if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
         const [y, m, d] = iso.split('-').map(Number);
         return `${MONTHS_SHORT[m - 1]} ${d}, ${y}`;
+      };
+
+      // Build a rich lowercase search blob for a logged day so history search
+      // matches natural date forms, month names, season labels, day numbers,
+      // and boss names — while still matching the real date under the hood.
+      const historySearchBlob = (dateStr, dayData, seasons) => {
+        const parts = [];
+        if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          return '';
+        }
+        const [y, m, d] = dateStr.split('-');
+        const monthIdx = parseInt(m, 10) - 1;
+        const dayNum = parseInt(d, 10);
+        const shortM = MONTHS_SHORT[monthIdx] || '';
+        const fullM = MONTHS_FULL[monthIdx] || '';
+
+        // Canonical + common written forms of the date
+        parts.push(dateStr); // 2026-10-18
+        parts.push(formatDate(dateStr)); // Oct 18, 2026
+        parts.push(`${y}-${m}`); // 2026-10
+        parts.push(`${m}-${d}`); // 10-18
+        parts.push(`${d}-${m}-${y}`); // 18-10-2026
+        parts.push(`${d}.${m}.${y}`); // 18.10.2026
+        parts.push(`${d}/${m}/${y}`); // 18/10/2026
+        parts.push(`${m}/${d}/${y}`); // 10/18/2026 (US)
+        parts.push(`${d} ${shortM}`); // 18 Oct
+        parts.push(`${shortM} ${dayNum}`); // Oct 18
+        parts.push(`${d} ${fullM}`); // 18 October
+        parts.push(`${fullM} ${dayNum}`); // October 18
+        parts.push(`${shortM} ${dayNum} ${y}`); // Oct 18 2026
+        parts.push(`${fullM} ${dayNum} ${y}`); // October 18 2026
+        parts.push(`${fullM} ${y}`); // October 2026
+        parts.push(`${shortM} ${y}`); // Oct 2026
+        parts.push(shortM, fullM, y, m, d, String(dayNum));
+
+        // Boss
+        const boss = (dayData && dayData.boss) || bossForDate(dateStr) || '';
+        if (boss) parts.push(boss);
+
+        // Season name + season-day number ("Day 25", "day 25", just "25")
+        const season = findSeasonForDate(dateStr, seasons);
+        if (season) {
+          const sName = seasonLabel(season);
+          if (sName) parts.push(sName);
+          const sDay = seasonDayNumber(dateStr, season.start);
+          if (sDay != null) {
+            parts.push(`day ${sDay}`, `day${sDay}`, String(sDay));
+          }
+        }
+
+        return parts.join(' ').toLowerCase();
+      };
+
+      const historyMatchesQuery = (dateStr, dayData, seasons, q) => {
+        if (!q) return true;
+        const blob = historySearchBlob(dateStr, dayData, seasons);
+        // Require every whitespace-separated token to appear (order-independent)
+        const tokens = q.split(/\s+/).filter(Boolean);
+        return tokens.every((t) => blob.includes(t));
       };
 
       const loadSeasons = () => {
@@ -2739,15 +3148,6 @@
         const m = String(name || '').match(/\bS(?:eason)?\s*(\d{1,2})\b/i);
         return m ? parseInt(m[1], 10) : null;
       };
-      const nextSeasonNumber = (seasons) => {
-        let max = 0;
-        seasons.forEach((s) => {
-          const n = parseInt(seasonNumber(s) || '0', 10);
-          if (n > max) max = n;
-        });
-        return max + 1;
-      };
-
       const computeBracketDist = (days, dateFilterFn, showLost = false) => {
         const result = {};
         Object.keys(MODES).forEach((modeKey) => {
@@ -2924,7 +3324,6 @@
             <div class="dist-title">${MODES[modeKey].label}</div>
             <div class="dist-brackets">${rows}${outRow}</div>
             <div class="dist-miss-block">
-              <div class="dist-miss-heading" style="color: ${showLost ? 'var(--red)' : 'var(--green)'};">${showLost ? 'Rewards lost' : 'Rewards gained'}</div>
               ${curRows}
             </div>
           </div>`;
@@ -3010,7 +3409,15 @@
           supremeArena: 'e.g. 8',
           dreamHunt: 'e.g. 42',
         };
-        div.innerHTML = `<label>${MODES[key].label}</label><input type="number" min="1" class="tiered" id="rank_${key}" placeholder="${placeholders[key] || 'e.g. 20'}" data-ph="${placeholders[key] || 'e.g. 20'}" />${extra}`;
+        div.innerHTML = `<label>${MODES[key].label}</label><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" class="tiered" id="rank_${key}" placeholder="${placeholders[key] || 'e.g. 20'}" data-ph="${placeholders[key] || 'e.g. 20'}" />${extra}`;
+        // ranks are whole numbers from 1 up: drop minus signs, decimals,
+        // letters and leading zeros, and cap very large numbers
+        div.querySelector('input.tiered').addEventListener('input', (e) => {
+          const el = e.target;
+          let v = el.value.replace(/\D/g, '').replace(/^0+/, '');
+          if (v && parseInt(v, 10) > MAX_RANK_INPUT) v = String(MAX_RANK_INPUT);
+          if (v !== el.value) el.value = v;
+        });
         rankInputsEl.appendChild(div);
       });
 
@@ -3066,7 +3473,9 @@
       const slKnockoutExitEl = document.getElementById('slKnockoutExit');
       const slSwissExitEl = document.getElementById('slSwissExit');
       const slGroupExitEl = document.getElementById('slGroupExit');
-      const slStageRowEl = slGroupExitEl ? slGroupExitEl.closest('.mode-check-row') : null;
+      const slStageRowEl = slGroupExitEl
+        ? slGroupExitEl.closest('.mode-check-row')
+        : null;
       const slRankEl = document.getElementById('rank_supremeLeague');
       // Top 20 of the group stage advance to Swiss, so a group stage exit can
       // only be rank 21-60; swiss stage exits are rank 49-80.
@@ -3084,7 +3493,14 @@
       // forSave: also require the rank for a swiss/group stage exit
       const validateSl = (forSave = false) => {
         const hint = document.getElementById('slHint');
-        if (!hint || !slRankEl || !slGroupExitEl || !slSwissExitEl || !slKnockoutExitEl) return true;
+        if (
+          !hint ||
+          !slRankEl ||
+          !slGroupExitEl ||
+          !slSwissExitEl ||
+          !slKnockoutExitEl
+        )
+          return true;
         let msg = '';
         const raw = slRankEl.value;
         const v = parseInt(raw, 10);
@@ -3092,7 +3508,9 @@
           forSave &&
           !slRankEl.disabled &&
           (raw === '' || isNaN(v)) &&
-          (slGroupExitEl.checked || slSwissExitEl.checked || slKnockoutExitEl.checked)
+          (slGroupExitEl.checked ||
+            slSwissExitEl.checked ||
+            slKnockoutExitEl.checked)
         ) {
           msg = slGroupExitEl.checked
             ? `Enter your Group Stage rank (${SL_GROUP_MIN}-${SL_GROUP_MAX}) to save.`
@@ -3119,22 +3537,39 @@
         return !msg;
       };
       const syncSlState = () => {
-        if (!slRewardDayEl || !slRankEl || !slGroupExitEl || !slSwissExitEl || !slKnockoutExitEl)
+        if (
+          !slRewardDayEl ||
+          !slRankEl ||
+          !slGroupExitEl ||
+          !slSwissExitEl ||
+          !slKnockoutExitEl
+        )
           return;
         const on = slRewardDayEl.checked;
-        const stageChosen = slKnockoutExitEl.checked || slSwissExitEl.checked || slGroupExitEl.checked;
+        const stageChosen =
+          slKnockoutExitEl.checked ||
+          slSwissExitEl.checked ||
+          slGroupExitEl.checked;
         if (slStageRowEl) {
           slStageRowEl.classList.toggle('sl-stage-hidden', !on);
           slStageRowEl.classList.toggle('sl-stage-active', on);
           slStageRowEl.classList.toggle('sl-stage-required', on);
         }
-        [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach((el) => { el.disabled = !on; });
+        [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach((el) => {
+          el.disabled = !on;
+        });
         if (!on) {
           slKnockoutExitEl.checked = false;
           slGroupExitEl.checked = false;
           slSwissExitEl.checked = false;
         }
-        slRankEl.disabled = !on || !(slKnockoutExitEl.checked || slSwissExitEl.checked || slGroupExitEl.checked);
+        slRankEl.disabled =
+          !on ||
+          !(
+            slKnockoutExitEl.checked ||
+            slSwissExitEl.checked ||
+            slGroupExitEl.checked
+          );
         // the hint shows which ranks are valid for the current choice
         slRankEl.placeholder = on
           ? slGroupExitEl.checked
@@ -3143,7 +3578,7 @@
               ? `Rank ${SL_SWISS_MIN}-${SL_SWISS_MAX}`
               : slKnockoutExitEl.checked
                 ? `Rank 1-${SL_KO_MAX}`
-                : 'Choose stage first' 
+                : 'Choose stage first'
           : slNoQualEl && slNoQualEl.checked
             ? 'Did not qualify'
             : 'Not a reward day';
@@ -3175,9 +3610,11 @@
         if (!chosen) return;
         chosen.addEventListener('change', () => {
           if (chosen.checked) {
-            [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach((other) => {
-              if (other && other !== chosen) other.checked = false;
-            });
+            [slKnockoutExitEl, slSwissExitEl, slGroupExitEl].forEach(
+              (other) => {
+                if (other && other !== chosen) other.checked = false;
+              },
+            );
           }
           syncSlState();
         });
@@ -3205,21 +3642,105 @@
       });
 
       const entryBossEl = document.getElementById('entryBoss');
-      DREAM_BOSSES.forEach((name) => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        entryBossEl.appendChild(opt);
-      });
+      const bossCurrentEl = document.getElementById('bossCurrent');
       let bossManualOverride = false;
-      const syncBossFromDate = () => {
-        if (bossManualOverride) return;
-        const date = document.getElementById('entryDate').value || todayStr();
-        entryBossEl.value = bossForDate(date);
+      const entrySeason = () =>
+        findSeasonForDate(
+          document.getElementById('entryDate').value || todayStr(),
+          loadSeasons(),
+        );
+      // Select options: this season's rotation first, then every known boss
+      const fillBossOptions = (extra) => {
+        const current = entryBossEl.value;
+        const rot = rotationFor(entrySeason());
+        const seen = new Set();
+        const names = [];
+        [...(rot ? rot.order : []), ...DREAM_BOSSES, current, extra].forEach(
+          (n) => {
+            const k = normBoss(n);
+            if (!k || seen.has(k)) return;
+            seen.add(k);
+            names.push(n);
+          },
+        );
+        entryBossEl.innerHTML = '';
+        const blank = document.createElement('option');
+        blank.value = '';
+        blank.textContent = 'Choose boss';
+        entryBossEl.appendChild(blank);
+        names.forEach((name) => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          entryBossEl.appendChild(opt);
+        });
+        entryBossEl.value = current || '';
       };
-      entryBossEl.addEventListener('change', () => {
-        bossManualOverride = true;
-      });
+      // First-time setup reminders. Top banner: add a season. Next to the boss
+      // field: add a boss rotation (only once a season exists).
+      const rotationReady = (season) => {
+        const rot = season ? rotationFor(season) : null;
+        return !!rot && rot.source === 'custom';
+      };
+      const updateSetupBanner = () => {
+        const banner = document.getElementById('setupBanner');
+        const textEl = document.getElementById('setupBannerText');
+        const btn = document.getElementById('setupBannerBtn');
+        const hint = document.getElementById('bossHint');
+        if (!banner || !textEl || !btn) return;
+        const seasons = loadSeasons();
+        const season = entrySeason();
+        if (!season) {
+          banner.hidden = false;
+          textEl.innerHTML = seasons.length
+            ? 'No season covers this date. Add a season that includes it.'
+            : 'Add the season you want to track before logging ranks.';
+          btn.textContent = '+ Add a season';
+          btn.onclick = () =>
+            openNewSeasonModal(
+              document.getElementById('entryDate').value || todayStr(),
+            );
+        } else {
+          banner.hidden = true;
+        }
+        if (hint) hint.hidden = !season || rotationReady(season);
+        // the button says what pressing it will do
+        const saveBtn = document.getElementById('saveDayBtn');
+        if (saveBtn) {
+          saveBtn.textContent = !season
+            ? 'Create season & save day'
+            : !rotationReady(season)
+              ? 'Set rotation & save day'
+              : 'Save Day';
+        }
+      };
+
+      // The boss comes from the season's rotation; the rotation is set up when
+      // a day is saved, and edited with the boss button on the Seasons tab.
+      const renderBossField = () => {
+        fillBossOptions();
+        const val = entryBossEl.value;
+        const season = entrySeason();
+        if (val && rotationReady(season)) {
+          bossCurrentEl.textContent = val;
+          bossCurrentEl.classList.remove('unset');
+        } else if (season) {
+          bossCurrentEl.textContent = 'Create a boss rotation';
+          bossCurrentEl.classList.add('unset');
+        } else {
+          bossCurrentEl.textContent = 'Add a season first';
+          bossCurrentEl.classList.add('unset');
+        }
+        updateSetupBanner();
+      };
+      const syncBossFromDate = () => {
+        if (!bossManualOverride) {
+          const date = document.getElementById('entryDate').value || todayStr();
+          fillBossOptions();
+          entryBossEl.value = bossForDate(date);
+        }
+        renderBossField();
+      };
       syncBossFromDate();
 
       const colorRankInput = (key) => {
@@ -3273,9 +3794,9 @@
         toggleBtn.type = 'button';
         toggleBtn.className =
           'day-miss-toggle' + (showTodayLost ? ' active' : '');
-        toggleBtn.innerHTML = showTodayLost
-          ? 'Show <span style="color: var(--green);">gained</span> rewards'
-          : 'Show <span style="color: var(--red);">lost</span> rewards';
+        toggleBtn.textContent = showTodayLost
+          ? 'Show gained rewards'
+          : 'Show lost rewards';
         toggleBtn.onclick = () => {
           showTodayLost = !showTodayLost;
           if (lastRenderedDayData) {
@@ -3578,6 +4099,23 @@
       const saveDay = () => {
         if (!validateSl(true)) return;
         const date = document.getElementById('entryDate').value || todayStr();
+        // A day can only be saved once a season exists and its boss rotation
+        // is set. Missing pieces are asked for in order (season first, then
+        // rotation) and the day is saved when the last one is done.
+        const seasons = loadSeasons();
+        const season = findSeasonForDate(date, seasons);
+        if (!season) {
+          pendingSaveAfterSeason = true;
+          openNewSeasonModal(date);
+          updateSetupBanner();
+          return;
+        }
+        if (!rotationReady(season)) {
+          pendingSaveAfterRotation = true;
+          openBossRotationModal(season.id);
+          updateSetupBanner();
+          return;
+        }
         const saRewardChecked = !!(saRewardDayEl && saRewardDayEl.checked);
         const days = loadDays();
         const existing = days[date] || null;
@@ -3597,54 +4135,23 @@
           const val = parseInt(raw, 10);
           if (raw !== '' && !isNaN(val)) {
             ranks[key] = val;
-          } else if (
-            existing &&
-            existing.ranks &&
-            existing.ranks[key] != null
-          ) {
-            // keep previous value when input left empty
-            ranks[key] = existing.ranks[key];
           } else {
+            // the inputs always show the saved day, so empty = no rank
             ranks[key] = null;
           }
         });
-        // Supreme Arena: ticking Reward day makes the day count (saOff = false);
-        // otherwise keep what was saved before, and new days default to off.
-        let saOff = true;
-        if (saRewardChecked) {
-          saOff = false;
-        } else if (existing) {
-          saOff = !!existing.saOff;
-        }
-        // Dream Hunt: checkbox sets reward day; empty+no check keeps previous
-        let dhRewardDay = false;
-        const dhChecked = !!(dhRewardDayEl && dhRewardDayEl.checked);
-        if (dhChecked) {
-          dhRewardDay = true;
-        } else if (document.getElementById('rank_dreamHunt').value !== '') {
-          // rank entered without checking → treat as not a reward day
-          dhRewardDay = false;
-        } else if (existing) {
-          dhRewardDay = !!existing.dhRewardDay;
-        }
-        // Supreme League: same idea as Dream Hunt (monthly reward day)
-        let slRewardDay = false;
-        let slNoQual = false;
+        // The checkboxes mirror the saved day too, so they decide the flags.
+        // Supreme Arena / Dream Hunt: Reward day ticked = the day counts.
+        const saOff = !saRewardChecked;
+        const dhRewardDay = !!(dhRewardDayEl && dhRewardDayEl.checked);
+        // Supreme League: Reward day or Did not qualify
         const slChecked = !!(slRewardDayEl && slRewardDayEl.checked);
-        const slNoQualChecked = !!(slNoQualEl && slNoQualEl.checked);
-        if (slNoQualChecked) {
+        const slNoQual = !!(slNoQualEl && slNoQualEl.checked);
+        const slRewardDay = slChecked || slNoQual;
+        if (slNoQual) {
           // didn't qualify: a played day with no rewards, so all the possible
           // rewards count as lost
-          slNoQual = true;
-          slRewardDay = true;
           ranks.supremeLeague = SL_NOQUAL_RANK;
-        } else if (slChecked) {
-          slRewardDay = true;
-        } else if (document.getElementById('rank_supremeLeague').value !== '') {
-          slRewardDay = false;
-        } else if (existing) {
-          slRewardDay = !!existing.slRewardDay;
-          slNoQual = !!existing.slNoQual;
         }
         const boss = entryBossEl.value || bossForDate(date);
         days[date] = {
@@ -3657,26 +4164,14 @@
           slNoQual,
         };
         saveDays(days);
-        document.getElementById('saveStatus').textContent =
-          `Saved ${formatDate(date)} ✓`;
-        setTimeout(() => {
-          document.getElementById('saveStatus').textContent = '';
-        }, 2500);
-        // clear inputs after save - results stay visible
-        if (saRewardDayEl) saRewardDayEl.checked = false;
-        if (dhRewardDayEl) dhRewardDayEl.checked = false;
-        if (slRewardDayEl) slRewardDayEl.checked = false;
-        if (slGroupExitEl) slGroupExitEl.checked = false;
-        if (slSwissExitEl) slSwissExitEl.checked = false;
-        if (slKnockoutExitEl) slKnockoutExitEl.checked = false;
-        if (slNoQualEl) slNoQualEl.checked = false;
-        Object.keys(MODES).forEach((key) => {
-          document.getElementById('rank_' + key).value = '';
-          colorRankInput(key);
-        });
-        syncSaRewardDayState();
-        syncDhRewardDayState();
-        syncSlState();
+        // first save creates the season, so the boss field was still "not
+        // set" - show the boss the day was actually saved with
+        if (boss && !entryBossEl.value) {
+          fillBossOptions(boss);
+          entryBossEl.value = boss;
+        }
+        renderBossField();
+        // inputs stay as entered so the day can be edited further
         renderResultsForDay(
           days[date],
           document.getElementById('todayResults'),
@@ -3687,14 +4182,6 @@
       };
 
       document.getElementById('saveDayBtn').onclick = () => {
-        // First save with no season yet → ask for one first, then save.
-        if (!loadSeasons().length) {
-          pendingSaveAfterSeason = true;
-          openNewSeasonModal(
-            document.getElementById('entryDate').value || todayStr(),
-          );
-          return;
-        }
         saveDay();
       };
 
@@ -3711,26 +4198,71 @@
         </div>`;
       };
 
+      // Show the saved day (if any) in the inputs, so an old day can be opened
+      // and filled out further. A date with nothing saved gets empty inputs.
+      const fillInputsFromDay = (day) => {
+        const setRank = (key, v) => {
+          document.getElementById('rank_' + key).value = v == null ? '' : v;
+        };
+        const r = (day && day.ranks) || {};
+        if (saRewardDayEl) saRewardDayEl.checked = !!day && !day.saOff;
+        if (dhRewardDayEl) dhRewardDayEl.checked = !!(day && day.dhRewardDay);
+        const slNo = !!(day && day.slNoQual);
+        if (slNoQualEl) slNoQualEl.checked = slNo;
+        if (slRewardDayEl)
+          slRewardDayEl.checked = !!(day && day.slRewardDay) && !slNo;
+        const slr = r.supremeLeague;
+        const slSt = slr ? slStage(slr) : null;
+        if (slKnockoutExitEl) slKnockoutExitEl.checked = !slNo && slSt === 'ko';
+        if (slSwissExitEl) slSwissExitEl.checked = !slNo && slSt === 'swiss';
+        if (slGroupExitEl) slGroupExitEl.checked = !slNo && slSt === 'group';
+        // enable/disable first (this also empties disabled inputs) ...
+        syncSaRewardDayState();
+        syncDhRewardDayState();
+        syncSlState();
+        // ... then fill in the saved ranks
+        Object.keys(MODES).forEach((key) => {
+          if (key === 'supremeLeague') {
+            if (slNo || !slr) return setRank(key, null);
+            if (slSt === 'swiss') {
+              return setRank(
+                key,
+                slr > SL_SWISS_OFFSET ? slr - SL_SWISS_OFFSET : null,
+              );
+            }
+            if (slSt === 'group') {
+              return setRank(
+                key,
+                slr > SL_GROUP_OFFSET ? slr - SL_GROUP_OFFSET : null,
+              );
+            }
+            return setRank(key, slr);
+          }
+          if (
+            key === 'supremeArena' &&
+            !(saRewardDayEl && saRewardDayEl.checked)
+          )
+            return;
+          if (key === 'dreamHunt' && !(dhRewardDayEl && dhRewardDayEl.checked))
+            return;
+          setRank(key, r[key]);
+        });
+        Object.keys(MODES).forEach((key) => colorRankInput(key));
+        validateSl();
+      };
+
       const preloadToday = () => {
         const days = loadDays();
         const date = document.getElementById('entryDate').value;
         bossManualOverride = false;
-        // always start with empty inputs; only show saved output below
-        if (saRewardDayEl) saRewardDayEl.checked = false;
-        if (dhRewardDayEl) dhRewardDayEl.checked = false;
-        if (slRewardDayEl) slRewardDayEl.checked = false;
-        if (slGroupExitEl) slGroupExitEl.checked = false;
-        if (slSwissExitEl) slSwissExitEl.checked = false;
-        if (slKnockoutExitEl) slKnockoutExitEl.checked = false;
-        if (slNoQualEl) slNoQualEl.checked = false;
-        Object.keys(MODES).forEach((key) => {
-          document.getElementById('rank_' + key).value = '';
-          colorRankInput(key);
-        });
-        syncSaRewardDayState();
-        syncDhRewardDayState();
-        syncSlState();
+        fillInputsFromDay(days[date] || null);
         syncBossFromDate();
+        // a saved day keeps the boss it was saved with
+        if (days[date] && days[date].boss) {
+          fillBossOptions();
+          entryBossEl.value = days[date].boss;
+          renderBossField();
+        }
         if (days[date]) {
           renderResultsForDay(
             days[date],
@@ -3855,6 +4387,7 @@
           if (dateFilterFn && !dateFilterFn(date)) return;
           const d = days[date];
           const boss = d.boss || bossForDate(date);
+          if (!boss) return;
           const entry = ensure(boss);
           DR_MODE_KEYS.forEach((mk) => {
             const rank = d.ranks[mk];
@@ -3978,9 +4511,9 @@
         overallToggleBtn.onclick = () => {
           showOverallLost = !showOverallLost;
           overallToggleBtn.classList.toggle('active', showOverallLost);
-          overallToggleBtn.innerHTML = showOverallLost
-            ? 'Show <span style="color: var(--green);">gained</span> rewards'
-            : 'Show <span style="color: var(--red);">lost</span> rewards';
+          overallToggleBtn.textContent = showOverallLost
+            ? 'Show gained rewards'
+            : 'Show lost rewards';
           const overallBox = document.getElementById('overallTotalsBox');
           if (overallBox) overallBox.classList.toggle('lost', showOverallLost);
           const titleEl = document.getElementById('overallTotalsTitle');
@@ -4076,10 +4609,9 @@
         const q = (searchEl?.value || '').trim().toLowerCase();
 
         const dates = q
-          ? allDates.filter((d) => {
-              const boss = (days[d].boss || bossForDate(d)).toLowerCase();
-              return d.toLowerCase().includes(q) || boss.includes(q);
-            })
+          ? allDates.filter((d) =>
+              historyMatchesQuery(d, days[d], seasons, q),
+            )
           : allDates;
 
         if (hintEl) {
@@ -4143,7 +4675,7 @@
               return `<td style="color: ${c}; font-weight: 700;">${rankText(key, rank)}</td>`;
             })
             .join('');
-          const bossName = d.boss || bossForDate(date);
+          const bossName = escapeHtml(d.boss || bossForDate(date) || '—');
           const season = findSeasonForDate(date, seasons);
           const dayNum = season ? seasonDayNumber(date, season.start) : null;
           const dayLabel = dayNum
@@ -4154,7 +4686,10 @@
         <td style="white-space:nowrap">${formatDate(date)}</td>
         <td style="color: var(--cyan); font-weight: 600;">${bossName}</td>
         ${rankCells}
-        <td><button class="del-btn" onclick="deleteDay('${date}')" title="Delete">🗑</button></td>
+        <td style="white-space:nowrap">
+          <button class="edit-btn" onclick="editDay('${date}')" title="Edit this day">✎</button>
+          <button class="del-btn" onclick="deleteDay('${date}')" title="Delete">🗑</button>
+        </td>
       </tr>`;
         });
         html += '</tbody></table></div>';
@@ -4165,6 +4700,35 @@
         renderHistory();
       });
 
+      // Open a logged day on the Daily log tab for editing
+      window.editDay = (date) => {
+        document
+          .querySelectorAll('.tab')
+          .forEach((t) => t.classList.remove('active'));
+        document
+          .querySelectorAll('.view')
+          .forEach((v) => v.classList.remove('active'));
+        const todayTab = document.querySelector('.tab[data-view="today"]');
+        if (todayTab) todayTab.classList.add('active');
+        const view = document.getElementById('view-today');
+        if (view) view.classList.add('active');
+
+        const entryDateEl = document.getElementById('entryDate');
+        if (entryDateEl) {
+          entryDateEl.value = date;
+          const label = document.getElementById('entryDateLabel');
+          if (label) label.textContent = formatDate(date);
+          preloadToday();
+        }
+        // Bring the daily form into view
+        const formCard = document.querySelector('#view-today .card');
+        if (formCard) {
+          formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      };
+
       window.deleteDay = (date) => {
         const days = loadDays();
         delete days[date];
@@ -4172,6 +4736,11 @@
         renderHistory();
         renderOverall();
         renderSeason();
+        // if that date is open in the Daily log, empty it too (inputs and
+        // results); other dates are left alone
+        if (document.getElementById('entryDate').value === date) {
+          preloadToday();
+        }
       };
 
       let activeSeasonId = null;
@@ -4228,7 +4797,7 @@
         tabsEl.querySelectorAll('.season-edit').forEach((btn) => {
           btn.onclick = (e) => {
             e.stopPropagation();
-            openRenameSeasonModal(btn.dataset.editSid);
+            openSeasonEditor(btn.dataset.editSid);
           };
         });
         tabsEl.querySelectorAll('.season-del').forEach((btn) => {
@@ -4306,9 +4875,9 @@
         seasonToggleBtn.onclick = () => {
           showSeasonLost = !showSeasonLost;
           seasonToggleBtn.classList.toggle('active', showSeasonLost);
-          seasonToggleBtn.innerHTML = showSeasonLost
-            ? 'Show <span style="color: var(--green);">gained</span> rewards'
-            : 'Show <span style="color: var(--red);">lost</span> rewards';
+          seasonToggleBtn.textContent = showSeasonLost
+            ? 'Show gained rewards'
+            : 'Show lost rewards';
           renderSeason();
         };
       }
@@ -4330,14 +4899,28 @@
       // When the first-ever "Save day" opens the modal, the save finishes
       // once the season has been created.
       let pendingSaveAfterSeason = false;
+      let pendingSaveAfterRotation = false;
 
-      // Defaults shown in the season popup (first-ever day, or "+ New season").
-      // The name is only a placeholder hint; the start date is pre-filled.
-      // Update both when a new season starts.
-      const DEFAULT_SEASON_NAME_HINT = 'e.g. S8 - Veil of Memories';
-      const DEFAULT_SEASON_START = '2026-09-23';
+      // Defaults shown in the season popup (first-ever day, or "+ New season"):
+      // they come from the newest block in SEASON_BLOCKS. The name is only a
+      // placeholder hint; the start date is pre-filled.
+      const DEFAULT_SEASON_NAME_HINT = `e.g. S${LATEST_SEASON_BLOCK.number} - ${LATEST_SEASON_BLOCK.name}`;
+      const DEFAULT_SEASON_START = LATEST_SEASON_BLOCK.start;
 
       const openNewSeasonModal = (startDate) => {
+        // one window: step 1 (season) now, step 2 (boss rotation) after Next
+        brMode = 'create';
+        brSeasonId = null;
+        brDraft = null;
+        brTouched = false;
+        brAnchorTouched = false;
+        document.getElementById('modalSeasonHint').hidden = true;
+        document.getElementById('seasonStep1Label').hidden = false;
+        document.getElementById('modalSeasonSave').hidden = true;
+        document.getElementById('modalSeasonConfirm').className = 'primary';
+        const nextHint = document.getElementById('modalSeasonNextHint');
+        if (nextHint) nextHint.hidden = true;
+        openSeasonPane(1);
         const seasons = loadSeasons();
         const isFirst = seasons.length === 0;
         if (isFirst) {
@@ -4354,10 +4937,17 @@
           modalSeasonDesc.textContent =
             'Previous seasons stay available. Days from the start date onward count toward the new season.';
         }
-        modalSeasonStart.value = DEFAULT_SEASON_START;
+        // From the Daily log the picked date is the start date. From the
+        // Seasons tab it is the newest block's start, unless a season already
+        // starts that day (then today).
+        modalSeasonStart.value =
+          startDate ||
+          (seasons.some((x) => x.start === DEFAULT_SEASON_START)
+            ? todayStr()
+            : DEFAULT_SEASON_START);
         syncModalStartLabel();
         newSeasonModal.hidden = false;
-        if (isFirst) modalSeasonName.focus();
+        modalSeasonName.focus();
       };
       document.getElementById('newSeasonBtn').onclick = () =>
         openNewSeasonModal();
@@ -4379,108 +4969,517 @@
           modalSeasonStart.click();
         });
 
-      document.getElementById('modalSeasonCancel').onclick = () => {
-        newSeasonModal.hidden = true;
-        if (pendingSaveAfterSeason) {
-          pendingSaveAfterSeason = false;
-          const st = document.getElementById('saveStatus');
-          st.textContent = 'Add a season to save your first day.';
-          setTimeout(() => {
-            st.textContent = '';
-          }, 3500);
+      // ---- Season + boss rotation popup (one window, two steps) ----
+      // 'create': step 1 = name and start date, step 2 = boss rotation. Nothing
+      //   is saved until the last button, so cancelling leaves nothing behind.
+      // 'edit': only the rotation pane, for a season that already exists.
+      const seasonPane1 = document.getElementById('seasonPane1');
+      const seasonPane2 = document.getElementById('seasonPane2');
+      const brListEl = document.getElementById('brList');
+      const brAnchorEl = document.getElementById('brAnchor');
+      const brAddNameEl = document.getElementById('brAddName');
+      const brBackBtn = document.getElementById('brBack');
+      const brSaveBtn = document.getElementById('brSave');
+      // 'create': new season (name/date, then rotation)
+      // 'season': edit an existing season (name/date, optionally the rotation)
+      // 'rotation': only the rotation pane (asked for when saving a day)
+      let brMode = 'rotation';
+      let brSeasonId = null; // edit mode: the season being edited
+      let brDraft = null; // create mode: { name, start, number }
+      let brTouched = false; // the player changed the list or the date
+      let brAnchorTouched = false; // the player picked the cycle date themselves
+      let brStart = ''; // start date of the season being set up
+      let brOrder = [];
+      const openSeasonPane = (n) => {
+        seasonPane1.hidden = n !== 1;
+        seasonPane2.hidden = n !== 2;
+      };
+      // another season that already starts on this date (exceptId = ignore one)
+      const seasonStartConflict = (start, exceptId) =>
+        loadSeasons().find((x) => x.start === start && x.id !== exceptId);
+      const startConflictText = (start, other) =>
+        seasonLabel(other) +
+        ' already starts on ' +
+        formatDate(start) +
+        '. Pick a different start date.';
+      const brSetHint = (msg) => {
+        const el = document.getElementById('brHint');
+        el.textContent = msg || '';
+        el.hidden = !msg;
+      };
+      const renderBossRotationModal = () => {
+        brListEl.innerHTML = '';
+        if (!brOrder.length) {
+          brListEl.innerHTML =
+            '<div class="br-row" style="color:var(--muted)">No bosses yet. Add the bosses in the order they appear.</div>';
         }
-      };
-      document.getElementById('modalSeasonConfirm').onclick = () => {
-        const name = modalSeasonName.value.trim() || 'New Season';
-        const start = modalSeasonStart.value || todayStr();
-        const seasons = loadSeasons();
-        const id = 's_' + Date.now();
-        // number: from the typed name if it has one, else the next in line
-        const number = numberFromName(name) ?? nextSeasonNumber(seasons);
-        seasons.push({ id, name, start, number });
-        seasons.sort((a, b) => a.start.localeCompare(b.start));
-        saveSeasons(seasons);
-        activeSeasonId = id;
-        setActiveSeasonId(id);
-        newSeasonModal.hidden = true;
-        if (pendingSaveAfterSeason) {
-          pendingSaveAfterSeason = false;
-          saveDay(); // finishes the save and re-renders everything
-        } else {
-          renderSeason();
-          renderHistory();
-        }
-      };
-
-      let pendingRenameSeasonId = null;
-      const renameSeasonModal = document.getElementById('renameSeasonModal');
-      const modalRenameName = document.getElementById('modalRenameName');
-      const modalRenameStart = document.getElementById('modalRenameStart');
-      const modalRenameStartLabel = document.getElementById(
-        'modalRenameStartLabel',
-      );
-      const syncRenameStartLabel = () => {
-        modalRenameStartLabel.textContent = formatDate(
-          modalRenameStart.value || todayStr(),
-        );
-      };
-
-      const openRenameSeasonModal = (sid) => {
-        const seasons = loadSeasons();
-        const s = seasons.find((x) => x.id === sid);
-        if (!s) return;
-        pendingRenameSeasonId = sid;
-        modalRenameName.value = s.name || '';
-        modalRenameStart.value = s.start || todayStr();
-        syncRenameStartLabel();
-        renameSeasonModal.hidden = false;
-      };
-
-      document.getElementById('modalRenameStart').onchange =
-        syncRenameStartLabel;
-      document.getElementById('modalRenameStart').oninput =
-        syncRenameStartLabel;
-      document
-        .getElementById('modalRenameStartBtn')
-        .addEventListener('click', () => {
-          if (typeof modalRenameStart.showPicker === 'function') {
-            try {
-              modalRenameStart.showPicker();
-              return;
-            } catch (e) {}
-          }
-          modalRenameStart.focus();
-          modalRenameStart.click();
+        brOrder.forEach((name, i) => {
+          const row = document.createElement('div');
+          row.className = 'br-row';
+          const day = document.createElement('span');
+          day.className = 'br-day';
+          day.textContent = 'Day ' + (i + 1);
+          const nm = document.createElement('span');
+          nm.className = 'br-name';
+          nm.textContent = name;
+          row.append(day, nm);
+          const mk = (label, aria, cls, fn, disabled) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = label;
+            b.setAttribute('aria-label', aria);
+            if (cls) b.className = cls;
+            b.disabled = !!disabled;
+            if (disabled) b.style.opacity = '0.35';
+            b.onclick = () => {
+              brTouched = true;
+              fn();
+            };
+            return b;
+          };
+          row.append(
+            mk(
+              '↑',
+              'Move up',
+              '',
+              () => {
+                [brOrder[i - 1], brOrder[i]] = [brOrder[i], brOrder[i - 1]];
+                renderBossRotationModal();
+              },
+              i === 0,
+            ),
+            mk(
+              '↓',
+              'Move down',
+              '',
+              () => {
+                [brOrder[i + 1], brOrder[i]] = [brOrder[i], brOrder[i + 1]];
+                renderBossRotationModal();
+              },
+              i === brOrder.length - 1,
+            ),
+            mk(
+              '✕',
+              'Remove boss',
+              'br-remove',
+              () => {
+                brOrder.splice(i, 1);
+                renderBossRotationModal();
+              },
+              false,
+            ),
+          );
+          brListEl.appendChild(row);
         });
-
-      document.getElementById('modalRenameCancel').onclick = () => {
-        renameSeasonModal.hidden = true;
-        pendingRenameSeasonId = null;
+        // preview: the first 5 days of the season, so a cycle date that
+        // doesn't fit the season shows up straight away
+        const prev = document.getElementById('brPreview');
+        prev.innerHTML = '';
+        if (brOrder.length && brAnchorEl.value) {
+          for (let i = 0; i < 5; i++) {
+            const d = new Date((brStart || brAnchorEl.value) + 'T12:00:00Z');
+            d.setUTCDate(d.getUTCDate() + i);
+            const ds = d.toISOString().slice(0, 10);
+            const cell = document.createElement('div');
+            const sm = document.createElement('small');
+            sm.textContent = formatDate(ds).replace(/, \d{4}$/, '');
+            const bb = document.createElement('b');
+            bb.textContent = bossFromRotation(
+              { anchor: brAnchorEl.value, order: brOrder },
+              ds,
+            );
+            cell.append(sm, bb);
+            prev.appendChild(cell);
+          }
+        }
       };
-      document.getElementById('modalRenameConfirm').onclick = () => {
-        if (!pendingRenameSeasonId) return;
-        const name = modalRenameName.value.trim() || 'Season';
-        const start = modalRenameStart.value || todayStr();
+      // The same rotation, but with the cycle starting on the season's first
+      // day: the list is rotated so the boss of that day comes first. Every
+      // date keeps the same boss; only the cycle date no longer lies before
+      // the season (e.g. a default that began before this season started).
+      const rotationAtStart = (rot, start) => {
+        if (!rot || !start || rot.anchor >= start) return rot;
+        const n = rot.order.length;
+        const idx = ((daysBetween(rot.anchor, start) % n) + n) % n;
+        return {
+          ...rot,
+          anchor: start,
+          order: [...rot.order.slice(idx), ...rot.order.slice(0, idx)],
+        };
+      };
+      // Fill the editor for a season (a real one, or the create-mode draft):
+      // its saved/default rotation, else the known bosses from the season start.
+      const brPrefill = (season) => {
+        const rot = rotationAtStart(rotationFor(season), season.start);
+        brOrder = rot ? [...rot.order] : [...LATEST_SEASON_BLOCK.bosses];
+        // Cycle start: the player's own date, else the site default's date for
+        // this season, else the day the season starts.
+        brStart = season.start;
+        brAnchorEl.min = brStart;
+        brAnchorEl.value = rot ? rot.anchor : season.start;
+        brAnchorTouched = false;
+        let desc = rot
+          ? 'Bosses repeat in this order. The first boss in the list is the boss on the cycle start date.'
+          : "This season's rotation isn't set yet. Put the bosses in the order they appear, and pick the cycle start date: the first boss in the list is the boss on that date.";
+        if (brMode === 'rotation' && pendingSaveAfterRotation) {
+          desc =
+            'Last step: set the boss order for this season. The first boss in the list is the boss on the cycle start date. Your day is saved when you press Save.';
+        } else if (brMode === 'create' && pendingSaveAfterSeason) {
+          desc += ' Your day is saved when you finish.';
+        }
+        document.getElementById('brDesc').textContent = desc;
+        brAddNameEl.value = '';
+        brSetHint('');
+        renderBossRotationModal();
+      };
+      // Edit the rotation of a season that already exists (only pane 2)
+      const openBossRotationModal = (seasonId) => {
+        const season = loadSeasons().find((x) => x.id === seasonId);
+        if (!season) return;
+        brMode = 'rotation';
+        brSeasonId = seasonId;
+        brDraft = null;
+        brTouched = false;
+        brPrefill(season);
+        document.getElementById('brTitle').textContent =
+          'Boss rotation · ' + seasonLabel(season);
+        document.getElementById('seasonStep2Label').hidden = true;
+        brBackBtn.hidden = true;
+        document.getElementById('brNote').hidden = false;
+        brSaveBtn.textContent = pendingSaveAfterRotation
+          ? 'Save rotation & day'
+          : 'Save rotation';
+        openSeasonPane(2);
+        newSeasonModal.hidden = false;
+      };
+      // Step 1 -> step 2 of creating a season (nothing is saved yet)
+      document.getElementById('modalSeasonConfirm').onclick = () => {
+        const editing = brMode === 'season';
+        const name =
+          modalSeasonName.value.trim() || (editing ? 'Season' : 'New Season');
+        const start = modalSeasonStart.value || todayStr();
+        const clash = seasonStartConflict(start, editing ? brSeasonId : null);
+        const startHint = document.getElementById('modalSeasonHint');
+        if (clash) {
+          startHint.textContent = startConflictText(start, clash);
+          startHint.hidden = false;
+          return;
+        }
+        startHint.hidden = true;
+        const number = numberFromName(name) ?? seasonNumberForDate(start);
+        // (when editing, the id lets the draft find the season's own rotation)
+        brDraft = { id: editing ? brSeasonId : undefined, name, start, number };
+        brStart = start;
+        brAnchorEl.min = start;
+        // coming back from "Back" keeps edits; otherwise refresh the
+        // suggestion, because the season number picks the site default
+        if (!brTouched) {
+          brPrefill(brDraft);
+        } else {
+          if (!brAnchorTouched) {
+            // list was edited but the date is still the suggested one: let it
+            // follow the (possibly changed) season start
+            const rot = rotationFor(brDraft);
+            brAnchorEl.value = rot && rot.anchor >= start ? rot.anchor : start;
+          }
+          renderBossRotationModal();
+        }
+        document.getElementById('brTitle').textContent =
+          'Boss rotation · ' + name;
+        document.getElementById('seasonStep2Label').hidden = editing;
+        brBackBtn.hidden = false;
+        document.getElementById('brNote').hidden = !editing;
+        brSaveBtn.textContent = editing
+          ? 'Save'
+          : pendingSaveAfterSeason
+            ? 'Create season & save day'
+            : 'Create season';
+        openSeasonPane(2);
+      };
+      modalSeasonName.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          // editing: Enter = the quick Save; creating: Enter = Next
+          document
+            .getElementById(
+              brMode === 'season' ? 'modalSeasonSave' : 'modalSeasonConfirm',
+            )
+            .click();
+        }
+      });
+      brBackBtn.onclick = () => openSeasonPane(1);
+      brAnchorEl.addEventListener('change', () => {
+        brTouched = true;
+        brAnchorTouched = true;
+        brSetHint('');
+        // the cycle can't start before the season does
+        if (brStart && brAnchorEl.value && brAnchorEl.value < brStart) {
+          brAnchorEl.value = brStart;
+          brSetHint(
+            "The cycle can't start before the season (" +
+              formatDate(brStart) +
+              ').',
+          );
+        }
+        renderBossRotationModal();
+      });
+      const brAddBoss = () => {
+        const typed = cleanBoss(brAddNameEl.value);
+        if (!typed) {
+          brSetHint('Type a boss name first.');
+          return;
+        }
+        // same name ignoring capitals / extra spaces -> reuse known spelling
+        const known = knownBossNames().find(
+          (n) => normBoss(n) === normBoss(typed),
+        );
+        const name = known || typed;
+        const dup = brOrder.find((b) => normBoss(b) === normBoss(name));
+        if (dup) {
+          brSetHint(dup + ' is already in this rotation.');
+          return;
+        }
+        brTouched = true;
+        brOrder.push(name);
+        brAddNameEl.value = '';
+        brSetHint('');
+        renderBossRotationModal();
+      };
+      document.getElementById('brAddBtn').onclick = brAddBoss;
+      brAddNameEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          brAddBoss();
+        }
+      });
+      // Close the window. When it is cancelled, a day that was waiting for
+      // the season / rotation is not saved.
+      const closeSeasonModal = (cancelled) => {
+        newSeasonModal.hidden = true;
+        brSeasonId = null;
+        brDraft = null;
+        brTouched = false;
+        brAnchorTouched = false;
+        if (!cancelled) return;
+        pendingSaveAfterSeason = false;
+        pendingSaveAfterRotation = false;
+      };
+      document.getElementById('modalSeasonCancel').onclick = () =>
+        closeSeasonModal(true);
+      document.getElementById('brCancel').onclick = () =>
+        closeSeasonModal(true);
+      newSeasonModal.addEventListener('click', (e) => {
+        if (e.target === newSeasonModal) closeSeasonModal(true);
+      });
+      // days already logged in a season follow its rotation
+      const brApplyToLoggedDays = (seasons, season) => {
+        const range = getSeasonDateRange(seasons, season);
+        const rot = rotationFor(season);
+        const days = loadDays();
+        let changed = false;
+        Object.keys(days).forEach((date) => {
+          if (!dayInSeason(date, range) || !rot) return;
+          const b = bossFromRotation(rot, date);
+          if (days[date].boss !== b) {
+            days[date].boss = b;
+            changed = true;
+          }
+        });
+        if (changed) saveDays(days);
+      };
+      // After a start date moves, some days belong to another season: give
+      // them the boss of their new season's rotation (only seasons whose
+      // rotation was set by the player; others keep the boss they were saved
+      // with).
+      const reapplyBossesForMovedDays = (oldSeasons, newSeasons) => {
+        const days = loadDays();
+        let changed = false;
+        Object.keys(days).forEach((date) => {
+          const before = findSeasonForDate(date, oldSeasons);
+          const after = findSeasonForDate(date, newSeasons);
+          if (!after || (before && before.id === after.id)) return;
+          const rot = rotationFor(after);
+          if (!rot || rot.source !== 'custom') return;
+          const b = bossFromRotation(rot, date);
+          if (days[date].boss !== b) {
+            days[date].boss = b;
+            changed = true;
+          }
+        });
+        if (changed) saveDays(days);
+      };
+      // Edit an existing season: step 1 = name/date (Save is enough for a
+      // quick change), Next goes on to its boss rotation.
+      const openSeasonEditor = (seasonId) => {
+        const season = loadSeasons().find((x) => x.id === seasonId);
+        if (!season) return;
+        brMode = 'season';
+        brSeasonId = seasonId;
+        brDraft = null;
+        brTouched = false;
+        brAnchorTouched = false;
+        document.getElementById('modalSeasonHint').hidden = true;
+        modalSeasonName.value = season.name || '';
+        modalSeasonName.placeholder = DEFAULT_SEASON_NAME_HINT;
+        modalSeasonTitle.textContent = 'Edit season';
+        modalSeasonDesc.textContent =
+          'Change the season name or start date.';
+        modalSeasonStart.value = season.start || todayStr();
+        syncModalStartLabel();
+        document.getElementById('seasonStep1Label').hidden = true;
+        document.getElementById('modalSeasonSave').hidden = false;
+        document.getElementById('modalSeasonConfirm').className = 'ghost';
+        const nextHint = document.getElementById('modalSeasonNextHint');
+        if (nextHint) nextHint.hidden = false;
+        openSeasonPane(1);
+        newSeasonModal.hidden = false;
+        modalSeasonName.focus();
+      };
+      // Save on step 1 while editing: name and start date only
+      document.getElementById('modalSeasonSave').onclick = () => {
+        if (brMode !== 'season' || !brSeasonId) return;
+        const name = modalSeasonName.value.trim() || 'Season';
+        const start = modalSeasonStart.value || todayStr();
+        const clash = seasonStartConflict(start, brSeasonId);
+        const startHint = document.getElementById('modalSeasonHint');
+        if (clash) {
+          startHint.textContent = startConflictText(start, clash);
+          startHint.hidden = false;
+          return;
+        }
         const seasons = loadSeasons();
-        const idx = seasons.findIndex((x) => x.id === pendingRenameSeasonId);
+        const before = JSON.parse(JSON.stringify(seasons));
+        const idx = seasons.findIndex((x) => x.id === brSeasonId);
         if (idx === -1) {
-          renameSeasonModal.hidden = true;
-          pendingRenameSeasonId = null;
+          closeSeasonModal(false);
           return;
         }
         seasons[idx] = {
           ...seasons[idx],
           name,
           start,
-          number: numberFromName(name) ?? seasons[idx].number ?? null,
+          number: numberFromName(name) ?? seasonNumberForDate(start),
         };
         seasons.sort((a, b) => a.start.localeCompare(b.start));
         saveSeasons(seasons);
-        renameSeasonModal.hidden = true;
-        pendingRenameSeasonId = null;
-        renderSeason();
+        reapplyBossesForMovedDays(before, seasons);
+        closeSeasonModal(false);
+        brRefreshAfterSave();
+      };
+      const brRefreshAfterSave = () => {
+        bossManualOverride = false;
+        syncBossFromDate();
         renderHistory();
         renderOverall();
+        renderSeason();
+        updateSetupBanner();
+      };
+      // true when the editor holds something that can be saved
+      const brValid = () => {
+        if (!brOrder.length) {
+          brSetHint('Add at least one boss.');
+          return false;
+        }
+        if (!brAnchorEl.value) {
+          brSetHint('Pick the date the cycle starts on.');
+          return false;
+        }
+        if (brStart && brAnchorEl.value < brStart) {
+          brSetHint(
+            "The cycle can't start before the season (" +
+              formatDate(brStart) +
+              ').',
+          );
+          return false;
+        }
+        return true;
+      };
+      brSaveBtn.onclick = () => {
+        if (!brValid()) return;
+        if (brMode === 'create') {
+          if (!brDraft) return;
+          const clash = seasonStartConflict(brDraft.start, null);
+          if (clash) {
+            brSetHint(startConflictText(brDraft.start, clash));
+            return;
+          }
+          // create the season and its rotation together
+          const seasons = loadSeasons();
+          const id = 's_' + Date.now();
+          const season = {
+            id,
+            name: brDraft.name,
+            start: brDraft.start,
+            number: brDraft.number,
+          };
+          seasons.push(season);
+          seasons.sort((a, b) => a.start.localeCompare(b.start));
+          saveSeasons(seasons);
+          activeSeasonId = id;
+          setActiveSeasonId(id);
+          const custom = loadCustomRotations();
+          custom[id] = { anchor: brAnchorEl.value, order: [...brOrder] };
+          saveCustomRotations(custom);
+          brApplyToLoggedDays(seasons, season);
+          closeSeasonModal(false);
+          brRefreshAfterSave();
+          if (pendingSaveAfterSeason) {
+            pendingSaveAfterSeason = false;
+            saveDay();
+          }
+          return;
+        }
+        if (brMode === 'season') {
+          // edit the season (name/start) together with its rotation
+          if (!brDraft) return;
+          const clash = seasonStartConflict(brDraft.start, brSeasonId);
+          if (clash) {
+            brSetHint(startConflictText(brDraft.start, clash));
+            return;
+          }
+          const seasons = loadSeasons();
+          const before = JSON.parse(JSON.stringify(seasons));
+          const idx = seasons.findIndex((x) => x.id === brSeasonId);
+          if (idx === -1) return;
+          seasons[idx] = {
+            ...seasons[idx],
+            name: brDraft.name,
+            start: brDraft.start,
+            number: brDraft.number,
+          };
+          seasons.sort((a, b) => a.start.localeCompare(b.start));
+          saveSeasons(seasons);
+          const custom = loadCustomRotations();
+          custom[brSeasonId] = {
+            anchor: brAnchorEl.value,
+            order: [...brOrder],
+          };
+          saveCustomRotations(custom);
+          reapplyBossesForMovedDays(before, seasons);
+          brApplyToLoggedDays(
+            seasons,
+            seasons.find((x) => x.id === brSeasonId),
+          );
+          closeSeasonModal(false);
+          brRefreshAfterSave();
+          return;
+        }
+        // rotation only: an existing season's rotation (asked for when saving)
+        const seasons = loadSeasons();
+        const season = seasons.find((x) => x.id === brSeasonId);
+        if (!season) return;
+        // Always stored as the player's own rotation once they press Save.
+        // That marks the season as "rotation set" so daily saves are allowed.
+        const custom = loadCustomRotations();
+        custom[season.id] = { anchor: brAnchorEl.value, order: [...brOrder] };
+        saveCustomRotations(custom);
+        brApplyToLoggedDays(seasons, season);
+        closeSeasonModal(false);
+        brRefreshAfterSave();
+        if (pendingSaveAfterRotation) {
+          pendingSaveAfterRotation = false;
+          saveDay();
+        }
       };
 
       const deleteSeasonModal = document.getElementById('deleteSeasonModal');
@@ -4540,6 +5539,8 @@
         renderSeason();
         renderHistory();
         renderOverall();
+        bossManualOverride = false;
+        syncBossFromDate();
       };
     </script>
   </body>
