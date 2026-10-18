@@ -1955,7 +1955,7 @@
             <input
               type="search"
               id="historySearch"
-              placeholder="Search date, month, boss, season, day…"
+              placeholder="Search by date or boss"
               autocomplete="off"
             />
             <span class="search-hint" id="historySearchHint"></span>
@@ -4609,9 +4609,7 @@
         const q = (searchEl?.value || '').trim().toLowerCase();
 
         const dates = q
-          ? allDates.filter((d) =>
-              historyMatchesQuery(d, days[d], seasons, q),
-            )
+          ? allDates.filter((d) => historyMatchesQuery(d, days[d], seasons, q))
           : allDates;
 
         if (hintEl) {
@@ -5322,8 +5320,7 @@
         modalSeasonName.value = season.name || '';
         modalSeasonName.placeholder = DEFAULT_SEASON_NAME_HINT;
         modalSeasonTitle.textContent = 'Edit season';
-        modalSeasonDesc.textContent =
-          'Change the season name or start date.';
+        modalSeasonDesc.textContent = 'Change the season name or start date.';
         modalSeasonStart.value = season.start || todayStr();
         syncModalStartLabel();
         document.getElementById('seasonStep1Label').hidden = true;
