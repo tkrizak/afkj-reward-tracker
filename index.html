@@ -962,11 +962,51 @@
       tr:hover td {
         background: rgba(255, 255, 255, 0.02);
       }
+      /* Scrollbars in the site's style: slim, rounded, dark track; the thumb
+         lights up blue on hover and gold while dragging. */
+      /* Firefox only: it has no ::-webkit-scrollbar, and Chrome would ignore
+         the detailed styling below if these were set there too. */
+      @supports not selector(::-webkit-scrollbar) {
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: #3a528a rgba(140, 162, 204, 0.06);
+        }
+      }
+      ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(140, 162, 204, 0.06);
+        border-radius: 999px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #3a528a;
+        border: 3px solid transparent;
+        background-clip: content-box;
+        border-radius: 999px;
+        transition: background-color 0.15s;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--cyan);
+      }
+      ::-webkit-scrollbar-thumb:active {
+        background-color: var(--gold);
+      }
+      ::-webkit-scrollbar-button {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+      ::-webkit-scrollbar-corner {
+        background: transparent;
+      }
       /* History: the list scrolls after as many rows as fit the screen:
          ~14 rows on a 1080p monitor, ~21 on 1440p (capped), fewer on phones */
       .history-scroll {
         max-height: clamp(320px, calc(100vh - 380px), 790px);
         overflow: auto;
+        border-radius: 10px;
       }
       @supports (height: 100dvh) {
         .history-scroll {
@@ -2862,63 +2902,52 @@
         return `${MONTHS_SHORT[m - 1]} ${d}, ${y}`;
       };
 
-      // Build a rich lowercase search blob for a logged day so history search
-      // matches natural date forms, month names, season labels, day numbers,
-      // and boss names — while still matching the real date under the hood.
-      const historySearchBlob = (dateStr, dayData, seasons) => {
-        const parts = [];
-        if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-          return '';
-        }
+      // Log history search: by DATE or BOSS name only (not the season, the
+      // season day or ranks). Dates can be typed in the usual ways: "oct 18",
+      // "18 october", "2026-10-18", "18.10.2026", "10/18/2026", "october",
+      // "2026" ...
+      const historyDateWords = (dateStr) => {
+        if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return [];
         const [y, m, d] = dateStr.split('-');
         const monthIdx = parseInt(m, 10) - 1;
-        const dayNum = parseInt(d, 10);
-        const shortM = MONTHS_SHORT[monthIdx] || '';
-        const fullM = MONTHS_FULL[monthIdx] || '';
-
-        // Canonical + common written forms of the date
-        parts.push(dateStr); // 2026-10-18
-        parts.push(formatDate(dateStr)); // Oct 18, 2026
-        parts.push(`${y}-${m}`); // 2026-10
-        parts.push(`${m}-${d}`); // 10-18
-        parts.push(`${d}-${m}-${y}`); // 18-10-2026
-        parts.push(`${d}.${m}.${y}`); // 18.10.2026
-        parts.push(`${d}/${m}/${y}`); // 18/10/2026
-        parts.push(`${m}/${d}/${y}`); // 10/18/2026 (US)
-        parts.push(`${d} ${shortM}`); // 18 Oct
-        parts.push(`${shortM} ${dayNum}`); // Oct 18
-        parts.push(`${d} ${fullM}`); // 18 October
-        parts.push(`${fullM} ${dayNum}`); // October 18
-        parts.push(`${shortM} ${dayNum} ${y}`); // Oct 18 2026
-        parts.push(`${fullM} ${dayNum} ${y}`); // October 18 2026
-        parts.push(`${fullM} ${y}`); // October 2026
-        parts.push(`${shortM} ${y}`); // Oct 2026
-        parts.push(shortM, fullM, y, m, d, String(dayNum));
-
-        // Boss
-        const boss = (dayData && dayData.boss) || bossForDate(dateStr) || '';
-        if (boss) parts.push(boss);
-
-        // Season name + season-day number ("Day 25", "day 25", just "25")
-        const season = findSeasonForDate(dateStr, seasons);
-        if (season) {
-          const sName = seasonLabel(season);
-          if (sName) parts.push(sName);
-          const sDay = seasonDayNumber(dateStr, season.start);
-          if (sDay != null) {
-            parts.push(`day ${sDay}`, `day${sDay}`, String(sDay));
-          }
-        }
-
-        return parts.join(' ').toLowerCase();
+        return [
+          dateStr, // 2026-10-18
+          `${m}-${d}`, // 10-18
+          `${d}-${m}-${y}`, // 18-10-2026
+          `${d}.${m}.${y}`, // 18.10.2026
+          `${d}/${m}/${y}`, // 18/10/2026
+          `${m}/${d}/${y}`, // 10/18/2026
+          (MONTHS_SHORT[monthIdx] || '').toLowerCase(), // oct
+          (MONTHS_FULL[monthIdx] || '').toLowerCase(), // october
+          String(parseInt(d, 10)), // 18
+          d, // 18 (05 for the 5th)
+          y, // 2026
+        ];
       };
-
+      // Each typed word must match the START of a date word (so "oct" finds
+      // October, "2026" the year) or be part of the boss name. A short number
+      // (1-2 digits) means the DAY of the month, so "5" finds the 5th and not
+      // every date that merely contains a 5.
       const historyMatchesQuery = (dateStr, dayData, seasons, q) => {
         if (!q) return true;
-        const blob = historySearchBlob(dateStr, dayData, seasons);
-        // Require every whitespace-separated token to appear (order-independent)
-        const tokens = q.split(/\s+/).filter(Boolean);
-        return tokens.every((t) => blob.includes(t));
+        const words = historyDateWords(dateStr);
+        const dayWords = dateStr
+          ? [dateStr.slice(8, 10), String(+dateStr.slice(8, 10))]
+          : [];
+        const boss = (
+          (dayData && dayData.boss) ||
+          bossForDate(dateStr) ||
+          ''
+        ).toLowerCase();
+        const tokens = q
+          .toLowerCase()
+          .split(/[\s,]+/)
+          .filter(Boolean);
+        return tokens.every((t) =>
+          /^\d{1,2}$/.test(t)
+            ? dayWords.includes(t)
+            : words.some((w) => w.startsWith(t)) || boss.includes(t),
+        );
       };
 
       const loadSeasons = () => {
