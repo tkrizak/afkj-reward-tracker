@@ -127,7 +127,7 @@
       }
       header h1 {
         margin: 0;
-        font-size: 22px;
+        font-size: 25px;
         font-weight: 800;
         color: var(--text);
         letter-spacing: -0.01em;
@@ -138,7 +138,7 @@
       }
       header .sub {
         color: var(--muted);
-        font-size: 13px;
+        font-size: 14px;
         margin-top: 5px;
         line-height: 1.35;
       }
@@ -153,10 +153,10 @@
           border-radius: 12px;
         }
         header h1 {
-          font-size: 17px;
+          font-size: 18px;
         }
         header .sub {
-          font-size: 12px;
+          font-size: 13px;
         }
       }
       .container {
@@ -174,6 +174,10 @@
         align-items: center;
       }
       .tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
         padding: 9px 16px;
         border-radius: 8px;
         border: 1px solid var(--panel-border);
@@ -183,6 +187,13 @@
         font-weight: 600;
         font-size: 13px;
         transition: all 0.15s;
+      }
+      .tab-icon {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 15px;
+        display: block;
+        opacity: .9;
       }
       .tab:hover {
         border-color: var(--cyan);
@@ -255,6 +266,62 @@
       .mode-input input:focus {
         outline: none;
         border-color: var(--cyan);
+      }
+
+      /* Daily Log form polish: clearer mode labels and calmer input surfaces. */
+      #rankInputs > .mode-input {
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid var(--panel-border);
+        border-radius: 11px;
+        /* Match Date and Dream Realm boss: blend the cards into the main ranking panel. */
+        background: var(--panel);
+        transition: border-color 0.16s ease, background-color 0.16s ease;
+      }
+      #rankInputs > .mode-input:focus-within {
+        border-color: rgba(110, 219, 248, 0.45);
+      }
+      #rankInputs > .mode-input > label:not(.mode-off-row) {
+        color: var(--cyan);
+        font-size: 13px;
+        line-height: 1.35;
+        letter-spacing: 0.01em;
+        margin-bottom: 8px;
+        font-weight: 700;
+      }
+      #rankInputs .mode-input input.tiered {
+        box-sizing: border-box;
+        min-height: 40px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border-color: rgba(140, 162, 204, 0.28);
+        background: #090f20;
+        color: #f1f5ff;
+        font-size: 15px;
+        font-weight: 650;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.16);
+      }
+      #rankInputs .mode-input input.tiered::placeholder {
+        color: #7483a2;
+        opacity: 1;
+        font-weight: 500;
+      }
+      #rankInputs .mode-input input.tiered:focus {
+        outline: none;
+        /* Keep the rank bracket's inline border, text colour and glow while typing. */
+      }
+      #rankInputs .mode-input input.tiered:disabled {
+        box-shadow: none;
+      }
+      input[type="date"] {
+        color-scheme: dark;
+      }
+      .mode-input input:not([type="checkbox"]):focus-visible,
+      .history-toolbar input:focus-visible {
+        outline: none;
+      }
+      @media (max-width: 520px) {
+        #rankInputs > .mode-input { padding: 11px; }
       }
       .mode-input input.tiered {
         font-weight: 700;
@@ -487,6 +554,10 @@
       }
 
       .day-miss-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
         flex-shrink: 0;
         font-size: 13px;
         font-weight: 600;
@@ -498,6 +569,16 @@
         color: var(--red);
         box-shadow: 0 0 6px rgba(251, 113, 133, 0.1);
         transition: all 0.2s ease;
+      }
+      .day-miss-toggle .reward-toggle-icon {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 15px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
       }
       .day-miss-toggle:hover {
         background: rgba(251, 113, 133, 0.25);
@@ -1049,11 +1130,13 @@
       .site-footer .footer-dim {
         color: var(--muted);
       }
-      .empty {
+      .empty,
+      .empty-state {
         color: var(--muted);
         text-align: center;
         padding: 30px;
         font-size: 13px;
+        line-height: 1.5;
       }
       .season-grid {
         display: flex;
@@ -1272,11 +1355,98 @@
       }
       .season-meta {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         flex-wrap: wrap;
         gap: 10px;
+        margin-bottom: 0;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--panel-border);
+      }
+      .season-selector-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
         margin-bottom: 14px;
+      }
+      .season-selector-row .season-actions {
+        position: relative;
+        flex: 0 0 auto;
+        padding: 0 14px 0 0;
+      }
+      .season-selector-row .season-actions::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        width: 1px;
+        height: 22px;
+        transform: translateY(-50%);
+        background: var(--panel-border);
+      }
+      #seasonTabs {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        gap: 8px;
+      }
+      /* Quiet vertical separators distinguish each season without adding more boxes or horizontal rules. */
+      #seasonTabs .season-tab-wrap {
+        position: relative;
+        padding-left: 9px;
+        margin-left: 1px;
+      }
+      #seasonTabs .season-tab-wrap:first-child {
+        padding-left: 0;
+        margin-left: 0;
+      }
+      #seasonTabs .season-tab-wrap:not(:first-child)::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 24px;
+        width: 1px;
+        transform: translateY(-50%);
+        background: var(--panel-border);
+      }
+      @media (max-width: 600px) {
+        .season-selector-row { gap: 10px; }
+        .season-selector-row .season-actions { padding-right: 10px; }
+        #seasonTabs { gap: 6px; }
+        #seasonTabs .season-tab-wrap { padding-left: 7px; }
+      }
+      /* Match the actual season-name buttons in size, while using blue for the action. */
+      #newSeasonBtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        box-sizing: border-box;
+        padding: 9px 14px;
+        min-height: 38px;
+        border-radius: 9px;
+        border: 1px solid rgba(83, 190, 245, 0.35);
+        background: rgba(83, 190, 245, 0.055);
+        color: var(--cyan);
+        font-size: 13px;
+        font-weight: 700;
+        line-height: normal;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      }
+      #newSeasonBtn:hover {
+        border-color: rgba(83, 190, 245, 0.7);
+        background: rgba(83, 190, 245, 0.11);
+        color: #a8e3ff;
+      }
+      #newSeasonBtn:active {
+        border-color: var(--cyan);
+        background: rgba(83, 190, 245, 0.15);
+        color: #a8e3ff;
+        box-shadow: 0 0 8px rgba(83, 190, 245, 0.2);
       }
       .season-info-bar[hidden] {
         display: none;
@@ -1347,9 +1517,22 @@
       .section-subnote {
         margin: 0;
         font-size: 16px;
-        color: var(--gold);
+        color: var(--muted);
         font-weight: 700;
       }
+      .section-subnote .subnote-highlight { color: var(--text); }
+      .dist-summary-title, .day-summary-title { font-family: inherit; font-size: 22px; line-height: 1.2; font-weight: 800; letter-spacing: -0.01em; }
+      .reward-state-title { color: var(--green) !important; }
+      .reward-state-title.is-lost { color: var(--red) !important; }
+      /* The totals headings have stronger gold heading rules, so explicitly
+         override those rules while leaving the season-name span gold. */
+      #overallSub-totals #overallTotalsTitle.reward-state-title { color: var(--green) !important; }
+      #overallSub-totals #overallTotalsTitle.reward-state-title.is-lost { color: var(--red) !important; }
+      #seasonSub-totals #seasonTotalsTitle.reward-state-title { color: var(--green) !important; }
+      #seasonSub-totals #seasonTotalsTitle.reward-state-title.is-lost { color: var(--red) !important; }
+      .reward-season-name { color: var(--gold); }
+      .recap-headline { color: var(--muted); }
+      .recap-headline .rank-value { color: var(--text); }
       .dist-grid {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1560,6 +1743,10 @@
         align-items: center;
       }
       .season-tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
         padding: 7px 12px;
         border-radius: 7px;
         border: 1px solid var(--panel-border);
@@ -1570,6 +1757,22 @@
         font-size: 12px;
         transition: all 0.15s;
       }
+      #seasonSubTabs .season-tab,
+      #overallSubTabs .season-tab {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .season-tab-icon {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 15px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: .9;
+      }
       .season-tab:hover {
         border-color: var(--cyan);
         color: var(--cyan);
@@ -1579,6 +1782,86 @@
         color: var(--gold);
         border-color: rgba(248, 194, 68, 0.45);
       }
+      #seasonProgressMode, #overallStatsMode {
+        appearance: none; -webkit-appearance: none;
+        background: var(--panel2);
+        color: var(--cyan);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 11px 40px 11px 13px;
+        font: inherit; font-size: 13px; font-weight: 650;
+        width: 100%; cursor: pointer; outline: none;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2399a9c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 13px center;
+        transition: border-color .15s, box-shadow .15s;
+      }
+      #seasonProgressMode:hover, #seasonProgressMode:focus,
+      #overallStatsMode:hover, #overallStatsMode:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(248,194,68,.09); }
+      #seasonProgressMode option, #overallStatsMode option { background: var(--panel2); color: var(--cyan); }
+      .season-progress-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; padding:15px 16px; border:1px solid var(--panel-border); border-radius:12px; background:linear-gradient(135deg,var(--panel2),var(--panel)); }
+      .season-progress-mode { min-width:220px; width:min(100%,290px); }
+      .season-progress-mode label { display:block; margin-bottom:7px; color:var(--gold); font-family:inherit; font-size:13px; font-weight:800; line-height:1.35; text-transform:none; letter-spacing:-.01em; }
+      .season-progress-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:0 0 14px; }
+      .season-progress-stat { min-width:0; padding:13px 15px; border:1px solid var(--panel-border); border-radius:11px; background:var(--panel2); position:relative; overflow:hidden; }
+      .season-progress-stat:before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--gold); opacity:.85; }
+      .season-progress-stat-label { color:var(--muted); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:7px; }
+      .season-progress-stat-value { color:var(--text); font-size:21px; line-height:1.2; font-weight:800; overflow-wrap:anywhere; }
+      .season-progress-stat-detail { color:var(--muted); font-size:11px; margin-top:5px; }
+      .season-progress-chart-wrap { width:100%; overflow-x:auto; border:1px solid var(--panel-border); border-radius:12px; padding:14px 8px 4px; background:linear-gradient(180deg,var(--panel2),var(--panel)); box-shadow: inset 0 1px 0 rgba(255,255,255,.025); }
+      .season-progress-svg { display: block; min-width: 0; width: 100%; height: auto; }
+      #overallStatsChart .season-progress-svg { min-width: 0; width: 100%; }
+      @media (max-width: 700px) { .season-progress-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .season-progress-head { align-items:flex-start; } .season-progress-mode { width:100%; } }
+      .season-progress-svg text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+      .season-progress-svg .gridline { stroke: var(--panel-border); stroke-dasharray: 3 5; stroke-opacity:.85; }
+      .season-progress-svg .rank-area { fill: url(#seasonRankFill); }
+      .season-progress-svg .rank-line { fill: none; stroke: var(--gold); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 2px 4px rgba(248,194,68,.18)); }
+      .season-progress-svg .rank-point { fill: var(--gold); stroke: var(--panel2); stroke-width: 2.5; transition:r .12s; }
+      .season-progress-svg .rank-point:hover { r: 6.5; }
+      .season-progress-svg .axis-label { fill: var(--muted); font-size:10px; }
+      .season-progress-head { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+      .season-progress-mode { min-width:220px; width:min(100%,280px); }
+      .season-progress-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:0 0 14px; }
+      .season-progress-stat { min-width:0; padding:12px 14px; border:1px solid var(--panel-border); border-radius:10px; background:var(--panel2); }
+      .season-progress-stat-label { color:var(--muted); font-family:inherit; font-size:13px; font-weight:800; text-transform:none; letter-spacing:-.01em; margin-bottom:5px; }
+      .season-progress-stat-value { color:var(--text); font-size:19px; line-height:1.2; font-weight:750; overflow-wrap:anywhere; }
+      .season-progress-stat-detail { color:var(--muted); font-size:11px; margin-top:4px; }
+      .season-trend-positive { color:var(--green); }
+      .season-trend-negative { color:var(--red); }
+      .season-trend-neutral { color:var(--text); }
+      .season-progress-recap { margin:16px 0 14px; padding:14px 16px; border:1px solid var(--panel-border); border-radius:10px; background:linear-gradient(135deg,var(--panel2),var(--panel)); }
+      .season-progress-recap-title { font-family:inherit; font-size:22px; line-height:1.2; font-weight:800; letter-spacing:-.01em; text-transform:none; color:var(--gold); margin-bottom:7px; }
+      .season-progress-recap-main { font-size:16px; font-weight:800; color:var(--text); margin-bottom:5px; }
+      .season-progress-recap-detail { color:var(--muted); font-size:12px; line-height:1.55; }
+      .overall-season-recaps { margin-top:16px; }
+      .overall-season-recaps-heading { font-family:inherit; font-size:22px; line-height:1.2; font-weight:800; letter-spacing:-.01em; color:var(--gold); margin:0 0 10px; }
+      .overall-season-recaps-note { color:var(--muted); font-size:12px; line-height:1.5; margin-bottom:10px; }
+      .overall-season-recap-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:9px; }
+      .overall-season-recap-item { border:1px solid var(--panel-border); background:var(--panel2); border-radius:10px; padding:12px 14px; min-width:0; }
+      .overall-season-recap-name { color:var(--gold); font-size:13px; font-weight:800; margin-bottom:6px; }
+      .overall-season-recap-result { color:var(--text); font-size:13px; font-weight:750; line-height:1.45; }
+      .overall-season-recap-detail { color:var(--muted); font-size:11px; margin-top:5px; line-height:1.45; }
+      .season-progress-chart-wrap { width:100%; min-width:0; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; scrollbar-width:thin; border:1px solid var(--panel-border); border-radius:10px; padding:8px 4px 0; background:var(--panel); }
+      .season-progress-chart-wrap > div { flex:none; }
+      .season-progress-svg { display:block; min-width:0; width:100%; height:auto; }
+
+      /* Desktop: use the full available panel width. Keep the fixed-width chart canvas only on phones, where it can be swiped horizontally. */
+      @media (min-width: 701px) {
+        #overallStatsChart, #seasonProgressChart { width: 100% !important; min-width: 0 !important; }
+        #overallStatsChart .season-progress-svg, #seasonProgressChart .season-progress-svg { width: 100% !important; min-width: 0 !important; height: auto !important; }
+      }
+      .season-progress-chart-wrap::after { content:''; display:none; }
+      @media (max-width:700px) {
+        .season-progress-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .season-progress-head { align-items:flex-start; }
+        .season-progress-mode { width:100%; min-width:0; }
+        .season-progress-chart-wrap { padding:8px 4px 0; scrollbar-width:thin; }
+        .season-progress-chart-wrap::after { content:'Swipe horizontally to explore the graph'; display:block; padding:8px 6px 7px; color:var(--muted); font-size:11px; text-align:center; }
+      }
+      .season-progress-svg text { fill: var(--muted); font-size: 11px; }
+      .season-progress-svg .gridline { stroke: var(--panel-border); stroke-dasharray: 3 5; }
+      .season-progress-svg .rank-line { fill: none; stroke: var(--gold); stroke-width: 2.8; stroke-linejoin: round; stroke-linecap: round; }
+      .season-progress-svg .rank-point { fill: var(--gold); stroke: var(--panel); stroke-width: 2; }
       .season-tab.season-pick {
         padding: 9px 14px;
         border-radius: 9px;
@@ -1600,16 +1883,16 @@
         box-shadow: 0 0 6px rgba(248, 194, 68, 0.15);
       }
       .season-tabs-picks {
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--panel-border);
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: 0;
       }
       .season-actions {
         display: flex;
         gap: 8px;
         align-items: center;
         flex-wrap: wrap;
-        margin-left: auto;
+        margin-left: 0;
       }
       select.season-select {
         padding: 7px 10px;
@@ -1655,25 +1938,36 @@
         align-items: stretch;
         gap: 8px;
       }
-      /* looks like the old dropdown, but the boss comes from the rotation */
+      /* Dream Realm boss: compact boss card instead of a plain input-like box */
+      .boss-row {
+        min-height: 40px;
+        align-items: center;
+      }
       .boss-field {
+        position: relative;
         flex: 1;
         min-width: 0;
-        padding: 9px 11px;
-        border-radius: 8px;
-        border: 1px solid var(--panel-border);
-        background-color: #0b1124;
+        padding: 9px 12px;
+        border-radius: 9px;
+        border: 1px solid rgba(110, 219, 248, 0.22);
+        border-left: 3px solid var(--cyan);
+        background: linear-gradient(105deg, rgba(110, 219, 248, 0.09), rgba(11, 17, 36, 0.96) 48%);
         color: var(--text);
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         cursor: default;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
       }
       .boss-field.unset {
         color: var(--muted);
         font-weight: 500;
+        border-color: var(--panel-border);
+        border-left-color: var(--muted);
+        background: rgba(11, 17, 36, 0.72);
       }
       .step-label {
         font-size: 11px;
@@ -1839,7 +2133,140 @@
           max-width: none;
         }
       }
-    </style>
+      /* Progress views: match the site's gold heading / pale supporting-text hierarchy. */
+      .progress-section-title,
+      #overallSub-totals .section-header-row h2, #seasonSub-totals .section-header-row h2,
+      #overallBossNote, #seasonBossNote { color: var(--gold) !important; font-family: inherit; font-size: 22px; line-height: 1.2; font-weight: 800; letter-spacing: -0.01em; text-transform:none; }
+      #overallSub-stats .section-subnote,
+      #seasonSub-progress .section-subnote { color: var(--muted); opacity: 1; }
+      #overallSub-stats .section-subnote .subnote-highlight,
+      #seasonSub-progress .section-subnote .subnote-highlight { color: var(--text); }
+      #seasonSub-progress .section-subnote .reward-season-name { color: var(--gold); }
+      #overallSub-stats .section-subnote .season-label-highlight { color: var(--gold); }
+      /* The generic .card h2 rule otherwise overrides the shared title sizing. */
+      .card h2.progress-section-title {
+        font-family: inherit !important;
+        font-size: 22px !important;
+        line-height: 1.2 !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.01em !important;
+      }
+      /* Empty distribution messages should occupy the whole grid and center like reward placeholders. */
+      #seasonDist > .empty,
+      #overallDist > .empty {
+        grid-column: 1 / -1;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      @media (max-width: 560px) {
+        .progress-section-title, .season-progress-recap-title, .overall-season-recaps-heading,
+        .dist-summary-title, .day-summary-title,
+        #overallSub-totals .section-header-row h2, #seasonSub-totals .section-header-row h2,
+        #overallBossNote, #seasonBossNote { font-size: 17px; }
+        .card h2.progress-section-title { font-size: 17px !important; }
+      }
+      .season-progress-mode label { display:block; margin-bottom:7px; color:var(--gold); font-family:inherit; font-size:13px; font-weight:600; text-transform:none; letter-spacing:0; }
+      #overallStatsMode { appearance:none; -webkit-appearance:none; background:var(--panel2); color:var(--cyan); border:1px solid var(--panel-border); border-radius:10px; padding:11px 40px 11px 13px; font:inherit; font-size:13px; font-weight:650; width:100%; cursor:pointer; outline:none; box-shadow:inset 0 1px 0 rgba(255,255,255,.025); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2399a9c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 13px center; transition:border-color .15s, box-shadow .15s; }
+    
+      /* Refined neutral Dream Realm boss selector and clearer entry-section heading spacing. */
+      .boss-field {
+        border: 1px solid var(--panel-border) !important;
+        border-left: 1px solid var(--panel-border) !important;
+        background: var(--panel2) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+      }
+      .boss-field.unset {
+        border-color: var(--panel-border) !important;
+        background: var(--panel2) !important;
+      }
+      .card > h2.progress-section-title {
+        margin-bottom: 20px !important;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--panel-border);
+      }
+      @media (max-width: 560px) {
+        .card > h2.progress-section-title {
+          margin-bottom: 16px !important;
+          padding-bottom: 10px;
+        }
+      }
+      /* Preview: keep Date and Dream Realm boss in separate cards, but blend their card surfaces into the main container. */
+      #view-today .date-row > .mode-input {
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid var(--panel-border);
+        border-radius: 11px;
+        background: var(--panel);
+        box-sizing: border-box;
+      }
+      #view-today .date-row > .mode-input:first-child {
+        max-width: 224px;
+      }
+      #view-today .date-row > .mode-input:nth-child(2) {
+        max-width: 264px !important;
+      }
+      @media (max-width: 520px) {
+        #view-today .date-row > .mode-input {
+          padding: 11px;
+        }
+      }
+
+      /* Make the Daily Log Date and Dream Realm boss labels match the stronger input-label hierarchy. */
+      #view-today .date-row > .mode-input > label {
+        font-size: 14px !important;
+        line-height: 1.3;
+        color: var(--cyan) !important;
+        font-weight: 700;
+        margin-bottom: 7px;
+      }
+
+      /* Keep the Daily Log's current Dream Realm boss label neutral and dark, matching the polished inputs. */
+      #view-today #bossCurrent.boss-field,
+      #view-today #bossCurrent.boss-field.unset {
+        background: #101318 !important;
+        border: 1px solid #303641 !important;
+        border-left: 1px solid #303641 !important;
+        color: var(--text) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+      }
+
+      /* Daily Log: use the same blue label hierarchy for every ranking input. */
+      #view-today #rankInputs > .mode-input > label:not(.mode-off-row) {
+        color: var(--cyan) !important;
+      }
+
+      /* Match the current Dream Realm boss tile to the actual ranking input surface. */
+      #view-today #bossCurrent.boss-field,
+      #view-today #bossCurrent.boss-field.unset {
+        background: #090f20 !important;
+        border: 1px solid rgba(140, 162, 204, 0.28) !important;
+        border-left: 1px solid rgba(140, 162, 204, 0.28) !important;
+        color: #f1f5ff !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.16) !important;
+      }
+
+      /* Unify Daily Log control surfaces with the Date picker background. */
+      #view-today #rankInputs .mode-input input.tiered,
+      #view-today #bossCurrent.boss-field,
+      #view-today #bossCurrent.boss-field.unset {
+        background: #0b1124 !important;
+      }
+      /* Do not override the rank input's live bracket colour or inline border colour. */
+      #view-today #rankInputs .mode-input input.tiered {
+        border-color: rgba(140, 162, 204, 0.28);
+        color: #f1f5ff;
+      }
+      #view-today #rankInputs > .mode-input:focus-within {
+        border-color: rgba(140, 162, 204, 0.18);
+      }
+      #view-today #bossCurrent.boss-field,
+      #view-today #bossCurrent.boss-field.unset {
+        border-left: 1px solid var(--panel-border) !important;
+      }
+</style>
   </head>
   <body>
     <header>
@@ -1871,16 +2298,16 @@
 
     <div class="container">
       <div class="tabs">
-        <button class="tab active" data-view="today">Daily log</button>
-        <button class="tab" data-view="season">Seasons</button>
-        <button class="tab" data-view="overall">Overall</button>
-        <button class="tab tab-end" data-view="history">Log history</button>
+        <button class="tab active" data-view="today"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 15l2 2 4-4"/></svg><span>Daily log</span></button>
+        <button class="tab" data-view="season"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V3"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg><span>Seasons</span></button>
+        <button class="tab" data-view="overall"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-7"/><path d="M16 6h4v4"/></svg><span>Overall</span></button>
+        <button class="tab tab-end" data-view="history"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg><span>Log history</span></button>
       </div>
 
       <!-- TODAY -->
       <div class="view active" id="view-today">
         <div class="card">
-          <h2>Enter daily rankings</h2>
+          <h2 class="progress-section-title">Enter daily rankings</h2>
           <div id="setupBanner" class="setup-banner" hidden>
             <div class="setup-banner-text" id="setupBannerText"></div>
             <button type="button" class="ghost" id="setupBannerBtn">
@@ -1932,17 +2359,23 @@
         <div class="section-stack">
           <div class="season-tabs" id="overallSubTabs">
             <button class="season-tab active" data-osub="totals">
-              All-time totals
+              <svg class="season-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><rect x="7" y="11" width="3" height="5" rx=".5"/><rect x="13" y="7" width="3" height="9" rx=".5"/><rect x="19" y="3" width="2" height="13" rx=".5"/></svg>
+              <span>All-time totals</span>
+            </button>
+            <button class="season-tab" data-osub="stats">
+              <svg class="season-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="13" r="1"/><circle cx="19" cy="6" r="1"/></svg>
+              <span>Overall progress</span>
             </button>
             <button class="season-tab" data-osub="bosses">
-              Dream realm bosses
+              <svg class="season-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v7a4 4 0 0 1-8 0V4Z"/><path d="M8 6H4v2a4 4 0 0 0 4 4M16 6h4v2a4 4 0 0 1-4 4M12 15v4M8 21h8M9 19h6"/></svg>
+              <span>Boss rankings</span>
             </button>
           </div>
           <div id="overallSub-totals" class="section-stack">
             <div class="section-box">
               <div class="section-header-row">
                 <div
-                  class="section-subnote"
+                  class="section-subnote dist-summary-title"
                   id="overallDistNote"
                   style="color: var(--green)"
                 >
@@ -1953,18 +2386,40 @@
                   class="day-miss-toggle"
                   id="overallToggleBtn"
                 >
-                  Show lost rewards
+                  <svg class="reward-toggle-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v18M3 7l4-4 4 4M17 21V3m-4 14 4 4 4-4"/></svg><span>Show lost rewards</span>
                 </button>
               </div>
               <div class="dist-grid" id="overallDist"></div>
             </div>
             <div class="section-box totals-window" id="overallTotalsBox">
               <div class="section-header-row">
-                <h2 id="overallTotalsTitle" style="color: var(--green)">
+                <h2 id="overallTotalsTitle" class="progress-section-title reward-state-title">
                   Total rewards gained
                 </h2>
               </div>
               <div class="season-grid" id="overallTotalsGrid"></div>
+            </div>
+          </div>
+          <div id="overallSub-stats" class="section-stack" style="display:none">
+            <div class="season-progress-head">
+              <div>
+                <h2 class="progress-section-title" style="margin:0 0 5px">Overall ranking progress</h2>
+                <div class="section-subnote">See how your rank changed across <span class="subnote-highlight season-label-highlight">all seasons</span>.</div>
+              </div>
+              <div class="season-progress-mode">
+                <label for="overallStatsMode">Game mode</label>
+                <select id="overallStatsMode" style="width:100%"></select>
+              </div>
+            </div>
+            <div id="overallStatsSummary" class="season-progress-stats"></div>
+            <div class="section-box" style="padding:14px">
+              <div class="section-header-row" style="margin-bottom:10px">
+                <div>
+                  <h2 class="progress-section-title" style="margin:0 0 4px">Each point shows your average rank for that week.</h2>
+                </div>
+              </div>
+              <div class="season-progress-chart-wrap"><div id="overallStatsChart" style="width:100%;overflow-x:auto"></div></div>
+              <div id="overallSeasonRecaps" class="overall-season-recaps"></div>
             </div>
           </div>
           <div id="overallSub-bosses" style="display: none">
@@ -2009,13 +2464,12 @@
       <!-- SEASONS -->
       <div class="view" id="view-season">
         <div class="card">
-          <div class="season-meta">
-            <h2 style="margin: 0">Seasons</h2>
+          <div class="season-selector-row">
             <div class="season-actions">
-              <button class="ghost" id="newSeasonBtn">+ New season</button>
+              <button class="ghost" id="newSeasonBtn"><svg class="new-season-icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.25" y="1.25" width="13.5" height="13.5" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V11.5M4.5 8H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>New season</span></button>
             </div>
+            <div class="season-tabs" id="seasonTabs"></div>
           </div>
-          <div class="season-tabs" id="seasonTabs"></div>
           <div class="season-info-bar" id="seasonInfoBar" hidden></div>
           <div class="empty" id="seasonEmpty" hidden>
             <div
@@ -2041,17 +2495,23 @@
         <div id="seasonContent" class="section-stack" style="margin-top: 12px">
           <div class="season-tabs" id="seasonSubTabs">
             <button class="season-tab active" data-ssub="totals">
-              Season totals
+              <svg class="season-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><rect x="7" y="11" width="3" height="5" rx=".5"/><rect x="13" y="7" width="3" height="9" rx=".5"/><rect x="19" y="3" width="2" height="13" rx=".5"/></svg>
+              <span>Season totals</span>
+            </button>
+            <button class="season-tab" data-ssub="progress">
+              <svg class="season-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 3 7-8"/><path d="M14 6h6v6"/></svg>
+              <span>Season progress</span>
             </button>
             <button class="season-tab" data-ssub="bosses">
-              Dream realm bosses
+              <svg class="season-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v7a4 4 0 0 1-8 0V4Z"/><path d="M8 6H4v2a4 4 0 0 0 4 4M16 6h4v2a4 4 0 0 1-4 4M12 15v4M8 21h8M9 19h6"/></svg>
+              <span>Boss rankings</span>
             </button>
           </div>
           <div id="seasonSub-totals" class="section-stack">
             <div class="section-box">
               <div class="section-header-row">
                 <div
-                  class="section-subnote"
+                  class="section-subnote dist-summary-title"
                   id="seasonDistNote"
                   style="color: var(--green)"
                 >
@@ -2062,18 +2522,35 @@
                   class="day-miss-toggle"
                   id="seasonToggleBtn"
                 >
-                  Show lost rewards
+                  <svg class="reward-toggle-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v18M3 7l4-4 4 4M17 21V3m-4 14 4 4 4-4"/></svg><span>Show lost rewards</span>
                 </button>
               </div>
               <div class="dist-grid" id="seasonDist"></div>
             </div>
             <div class="section-box totals-window" id="seasonTotalsBox">
               <div class="section-header-row">
-                <h2 id="seasonTotalsTitle" style="color: var(--green)">
+                <h2 id="seasonTotalsTitle" class="progress-section-title reward-state-title">
                   Rewards gained in season 8
                 </h2>
               </div>
               <div class="season-grid" id="seasonGrid"></div>
+            </div>
+          </div>
+          <div id="seasonSub-progress" style="display: none">
+            <div class="section-box">
+              <div class="season-progress-head">
+                <div>
+                  <h2 class="progress-section-title" style="margin: 0 0 4px">Season ranking progress</h2>
+                  <div class="section-subnote">See how your rank changed during <span id="seasonProgressSubnoteName" class="subnote-highlight reward-season-name">this season</span>.</div>
+                </div>
+                <div class="season-progress-mode">
+                  <label for="seasonProgressMode">Game mode</label>
+                  <select id="seasonProgressMode" style="width: 100%"></select>
+                </div>
+              </div>
+              <div id="seasonProgressSummary" class="season-progress-stats"></div>
+              <div class="season-progress-chart-wrap"><div id="seasonProgressChart" style="width: 100%; overflow-x: auto"></div></div>
+              <div id="seasonProgressRecap" class="season-progress-recap" style="display:none"></div>
             </div>
           </div>
           <div id="seasonSub-bosses" style="display: none">
@@ -2197,6 +2674,18 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm delete daily log entry modal -->
+    <div class="modal-overlay" id="deleteDayModal" hidden>
+      <div class="modal">
+        <h3>Delete this day?</h3>
+        <p class="modal-desc" id="deleteDayMsg">This will permanently delete the rankings logged for this day.</p>
+        <div class="modal-actions">
+          <button class="ghost" id="modalDeleteDayCancel" type="button">Cancel</button>
+          <button class="primary" id="modalDeleteDayConfirm" type="button" style="background: linear-gradient(180deg, #fb7185, #e11d48); color: #fff;">Delete day</button>
         </div>
       </div>
     </div>
@@ -3789,9 +4278,17 @@
         }
         const idx = getBracketIndex(key, rank);
         if (isNaN(rank) || idx === -1) {
-          input.style.borderColor = 'var(--panel-border)';
+          // Empty fields keep the subtle blue-grey focus treatment; as soon as
+          // a valid rank is entered, the bracket colour takes over below.
+          const empty = input.value.trim() === '';
+          const focused = document.activeElement === input;
+          input.style.borderColor = empty && focused
+            ? 'rgba(120, 164, 235, 0.72)'
+            : 'rgba(140, 162, 204, 0.28)';
           input.style.color = 'var(--text)';
-          input.style.boxShadow = 'none';
+          input.style.boxShadow = empty && focused
+            ? '0 0 0 1px rgba(120, 164, 235, 0.12)'
+            : 'none';
           return;
         }
         const c = tierColorForIndex(idx, MODES[key].brackets.length);
@@ -3800,13 +4297,17 @@
         input.style.boxShadow = `0 0 8px ${c}55`;
       };
       Object.keys(MODES).forEach((key) => {
-        document
-          .getElementById('rank_' + key)
-          .addEventListener('input', () => colorRankInput(key));
+        const rankInput = document.getElementById('rank_' + key);
+        rankInput.addEventListener('input', () => colorRankInput(key));
+        rankInput.addEventListener('focus', () => colorRankInput(key));
+        rankInput.addEventListener('blur', () => colorRankInput(key));
       });
 
       let showTodayLost = false;
       let lastRenderedDayData = null;
+
+      const rewardToggleLabel = (label) =>
+        `<svg class="reward-toggle-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v18M3 7l4-4 4 4M17 21V3m-4 14 4 4 4-4"/></svg><span>${label}</span>`;
 
       const renderResultsForDay = (dayData, container) => {
         lastRenderedDayData = dayData;
@@ -3823,9 +4324,9 @@
         toggleBtn.type = 'button';
         toggleBtn.className =
           'day-miss-toggle' + (showTodayLost ? ' active' : '');
-        toggleBtn.textContent = showTodayLost
-          ? 'Show gained rewards'
-          : 'Show lost rewards';
+        toggleBtn.innerHTML = rewardToggleLabel(
+          showTodayLost ? 'Show gained rewards' : 'Show lost rewards',
+        );
         toggleBtn.onclick = () => {
           showTodayLost = !showTodayLost;
           if (lastRenderedDayData) {
@@ -3841,8 +4342,8 @@
         const modesWrap = document.createElement('div');
         modesWrap.className = 'day-modes-wrap';
         const modesTitle = document.createElement('div');
-        modesTitle.className = 'day-summary-title';
-        modesTitle.style.color = showTodayLost ? 'var(--red)' : 'var(--green)';
+        modesTitle.className = 'day-summary-title reward-state-title';
+        modesTitle.classList.toggle('is-lost', showTodayLost);
         modesTitle.textContent = showTodayLost
           ? 'Rankings & rewards lost per mode'
           : 'Rankings & rewards gained per mode';
@@ -4045,24 +4546,10 @@
               groupDayRows(gainRowByKey) ||
               '<span class="bracket-note">No rewards gained</span>';
 
-            if (isPerfectDay) {
-              summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--green);">Rewards gained for the day</div>
-                <div class="day-summary-ok" style="margin-bottom: 12px;">100% of the rewards gained for the day, good job!</div>
-                <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
-              </div>`;
-            } else if (isTotalZeroDay) {
-              summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--green);">Rewards gained for the day</div>
-                <div class="day-summary-bad" style="margin-bottom: 12px;">100% of the rewards lost for the day, better luck next time!</div>
-                <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
-              </div>`;
-            } else {
-              summary.innerHTML = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--green);">Rewards gained for the day</div>
-                <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
-              </div>`;
-            }
+            summary.innerHTML = `<div class="day-summary-block">
+              <div class="day-summary-title reward-state-title">Rewards gained for the day</div>
+              <div class="day-summary-items horizontal-grid">${gainGrouped}</div>
+            </div>`;
           } else {
             const lostRowByKey = {};
             CURRENCY_KEYS.filter((c) => dayMax[c] > 0).forEach((c) => {
@@ -4102,23 +4589,10 @@
               (a, b) => a + b,
               0,
             );
-            if (totalLostSum === 0) {
-              html = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">Rewards lost for the day</div>
-                <div class="day-summary-ok">✨ PERFECT! NOTHING LOST (0%) - MAXIMUM REWARDS ACHIEVED! ✨</div>
-              </div>`;
-            } else if (totalLostSum === totalMaxSum && totalMaxSum > 0) {
-              html = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">Rewards lost for the day</div>
-                <div class="day-summary-bad" style="margin-bottom: 12px;">💥 100% REWARDS LOST (ALL REWARDS MISSED) 💥</div>
-                <div class="day-summary-items horizontal-grid">${lostGrouped}</div>
-              </div>`;
-            } else {
-              html = `<div class="day-summary-block">
-                <div class="day-summary-title" style="color: var(--red);">Rewards lost for the day</div>
-                <div class="day-summary-items horizontal-grid">${lostGrouped}</div>
-              </div>`;
-            }
+            html = `<div class="day-summary-block">
+              <div class="day-summary-title reward-state-title is-lost">Rewards lost for the day</div>
+              <div class="day-summary-items horizontal-grid">${lostGrouped}</div>
+            </div>`;
             summary.innerHTML = html;
           }
         }
@@ -4442,7 +4916,7 @@
         });
         if (!active.length) {
           container.innerHTML =
-            '<div class="empty" style="padding:16px;">No Dream Realm bosses logged for this period.</div>';
+            '<div class="empty" style="padding:16px;">No boss rankings logged for this period.</div>';
           return;
         }
         const cards = active
@@ -4533,6 +5007,195 @@
           showOverallLost,
           'this period',
         );
+        renderOverallStats(days);
+      };
+
+      const colorRecapHeadline = (headline) => `<span class="recap-headline">${headline
+        .replace(/(#[0-9][0-9,]*(?:\.[0-9]+)?)/g, '<span class="rank-value">$1</span>')
+        .replace(/\b(improved|improvement|improving|increased|increase)\b/gi, '<span class="season-trend-positive">$1</span>')
+        .replace(/\b(worsened|worsening|declined|decline|decreased|decrease)\b/gi, '<span class="season-trend-negative">$1</span>')}</span>`;
+
+      const buildSeasonRecap = (modeKey, seasonEntries, range) => {
+        const ordered = [...seasonEntries].sort((a, b) => a.date.localeCompare(b.date));
+        const fmt = (n) => `#${n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
+        if (!ordered.length) return { headline: 'No rankings recorded', detail: 'No results were recorded for this mode during this season.' };
+        const average = (items) => items.reduce((sum, item) => sum + item.numeric, 0) / items.length;
+        const compare = (early, late, label) => {
+          if (!early.length || !late.length) return { headline: 'Not enough data to compare', detail: 'Rankings are needed from both the early and late parts of the season.' };
+          const a = average(early), b = average(late);
+          const diff = a - b;
+          const headline = Math.abs(diff) < 0.05
+            ? `Average rank stayed similar: ${fmt(a)} → ${fmt(b)}`
+            : diff > 0
+              ? `Average rank improved: ${fmt(a)} → ${fmt(b)}`
+              : `Average rank worsened: ${fmt(a)} → ${fmt(b)}`;
+          const detail = 'Compared average ranks in the first and final quarters of the season.';
+          return { headline, detail };
+        };
+        if (modeKey === 'supremeLeague') {
+          if (ordered.length === 1) return { headline: `Latest recorded rank: ${ordered[0].display}`, detail: `One ranking recorded on ${formatDate(ordered[0].date)}; more results are needed to show a trend.` };
+          const first = ordered[0], last = ordered[ordered.length - 1];
+          const diff = first.numeric - last.numeric;
+          const headline = Math.abs(diff) < 0.05
+            ? `Rank stayed similar: ${first.display} → ${last.display}`
+            : diff > 0
+              ? `Rank improved: ${first.display} → ${last.display}`
+              : `Rank worsened: ${first.display} → ${last.display}`;
+          return { headline, detail: `First result: ${formatDate(first.date)} · Latest result: ${formatDate(last.date)} · ${ordered.length} rankings recorded.` };
+        }
+        const startDate = range?.start || ordered[0].date;
+        const endDate = range?.end || ordered[ordered.length - 1].date;
+        const startMs = Date.parse(startDate + 'T12:00:00Z');
+        const endMs = Date.parse(endDate + 'T12:00:00Z');
+        const duration = Math.max(86400000, endMs - startMs);
+        const firstQuarterEnd = startMs + duration * 0.25;
+        const finalQuarterStart = endMs - duration * 0.25;
+        const early = ordered.filter((entry) => { const ms = Date.parse(entry.date + 'T12:00:00Z'); return ms >= startMs && ms <= firstQuarterEnd; });
+        const late = ordered.filter((entry) => { const ms = Date.parse(entry.date + 'T12:00:00Z'); return ms >= finalQuarterStart && ms <= endMs; });
+        return compare(early, late, 'early-season');
+      };
+
+      let overallStatsSelectedMode = '';
+      const renderOverallStats = (days) => {
+        const select = document.getElementById('overallStatsMode');
+        const summary = document.getElementById('overallStatsSummary');
+        const chart = document.getElementById('overallStatsChart');
+        if (!select || !summary || !chart) return;
+        const modeKeys = Object.keys(MODES).filter((key) =>
+          Object.keys(days).some((date) => {
+            const raw = days[date].ranks && days[date].ranks[key];
+            return raw != null && (key !== 'supremeLeague' || rankNumText(key, raw) != null);
+          }),
+        );
+        const availableKeys = modeKeys.length ? modeKeys : Object.keys(MODES);
+        const previous = overallStatsSelectedMode || select.value;
+        select.innerHTML = availableKeys.map((key) => `<option value="${key}">${MODES[key].label}</option>`).join('');
+        select.value = availableKeys.includes(previous) ? previous : availableKeys[0];
+        overallStatsSelectedMode = select.value;
+        select.onchange = () => { overallStatsSelectedMode = select.value; renderOverallStats(days); };
+        const modeKey = select.value;
+        const entries = Object.keys(days).sort().filter((date) => {
+          const raw = days[date].ranks && days[date].ranks[modeKey];
+          return raw != null && (modeKey !== 'supremeLeague' || rankNumText(modeKey, raw) != null);
+        }).map((date) => {
+          const raw = days[date].ranks[modeKey];
+          const display = rankText(modeKey, raw);
+          const numericText = modeKey === 'supremeLeague' ? rankNumText(modeKey, raw) : String(raw);
+          const numeric = Number(String(numericText || '').replace('#', ''));
+          return { date, raw, display, numeric };
+        }).filter((entry) => Number.isFinite(entry.numeric) && entry.numeric > 0);
+        const stat = (label, value, detail='') => `<div class="season-progress-stat"><div class="season-progress-stat-label">${label}</div><div class="season-progress-stat-value">${value}</div>${detail ? `<div class="season-progress-stat-detail">${detail}</div>` : ''}</div>`;
+        const seasonRecaps = document.getElementById('overallSeasonRecaps');
+        const renderSeasonRecaps = () => {
+          if (!seasonRecaps) return;
+          const seasons = [...loadSeasons()].sort((a, b) => a.start.localeCompare(b.start));
+          const completed = seasons.map((season) => {
+            const range = getSeasonDateRange(seasons, season);
+            if (!range.end || todayStr() <= range.end) return null;
+            const seasonEntries = entries.filter((entry) => entry.date >= range.start && entry.date <= range.end);
+            return { name: seasonLabel(season), ...buildSeasonRecap(modeKey, seasonEntries, range) };
+          }).filter(Boolean).reverse();
+          seasonRecaps.innerHTML = `<div class="overall-season-recaps-heading">Overall season-by-season recap · ${escapeHtml(MODES[modeKey].label)}</div>${completed.length ? `<div class="overall-season-recap-list">${completed.map((item) => `<div class="overall-season-recap-item"><div class="overall-season-recap-name">${escapeHtml(item.name || 'Season')}</div><div class="overall-season-recap-result">${colorRecapHeadline(item.headline)}</div><div class="overall-season-recap-detail">${item.detail}</div></div>`).join('')}</div>` : '<div class="empty-state" style="padding:14px 12px">Your season recaps will appear here after a season ends.</div>'}`;
+        };
+        renderSeasonRecaps();
+        const getOverallTrend = () => {
+          const seasons = [...loadSeasons()].sort((a, b) => a.start.localeCompare(b.start));
+          const seasonalAverages = seasons.map((season) => {
+            const range = getSeasonDateRange(seasons, season);
+            const seasonEntries = entries.filter((entry) => entry.date >= range.start && (!range.end || entry.date <= range.end));
+            if (!seasonEntries.length) return null;
+            return { name: seasonLabel(season) || 'Season', average: seasonEntries.reduce((sum, entry) => sum + entry.numeric, 0) / seasonEntries.length };
+          }).filter(Boolean);
+          if (seasonalAverages.length < 2) return { value: 'Not enough data', detail: 'Results from 2 seasons are needed', cls: 'neutral' };
+          const previous = seasonalAverages[seasonalAverages.length - 2];
+          const current = seasonalAverages[seasonalAverages.length - 1];
+          const difference = previous.average - current.average;
+          const fmt = (n) => `#${n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
+          const cls = difference > 0.05 ? 'positive' : difference < -0.05 ? 'negative' : 'neutral';
+          const detail = `<span class="recap-headline">Average rank <span class="rank-value">${fmt(previous.average)}</span> → <span class="season-trend-${cls}">${fmt(current.average)}</span></span>`;
+          if (cls === 'positive') return { value: 'Improving ↑', detail, cls: 'positive' };
+          if (cls === 'negative') return { value: 'Declining ↓', detail, cls: 'negative' };
+          return { value: 'Stable →', detail, cls: 'neutral' };
+        };
+        const overallTrend = getOverallTrend();
+        if (!entries.length) {
+          summary.innerHTML = stat('Average rank', '—', 'No recorded results') + stat('Best rank', '—', 'No recorded results') + stat('Worst rank', '—', 'No recorded results') + stat('Overall trend · season average', 'Not enough data', 'Results from 2 seasons are needed');
+          chart.style.width = '100%'; chart.style.minWidth = '0';
+          chart.innerHTML = '<div class="empty-state" style="padding:26px 12px">Your rank history will appear here once you log a result for this mode.</div>';
+          return;
+        }
+        const average = entries.reduce((sum, entry) => sum + entry.numeric, 0) / entries.length;
+        const best = entries.reduce((a, b) => a.numeric < b.numeric ? a : b);
+        const worst = entries.reduce((a, b) => a.numeric > b.numeric ? a : b);
+        const avgLabel = `#${Math.round(average).toLocaleString('en-US')}`;
+        summary.innerHTML = stat('Average rank', avgLabel, `${entries.length} recorded result${entries.length === 1 ? '' : 's'}`) + stat('Best rank', best.display, formatDate(best.date)) + stat('Worst rank', worst.display, formatDate(worst.date)) + stat('Overall trend · season average', `<span class="season-trend-${overallTrend.cls}">${overallTrend.value}</span>`, overallTrend.detail);
+        // Compress the all-time timeline to one point per calendar week. This keeps
+        // several seasons readable without making the chart wider or overcrowded.
+        const weekStart = (date) => {
+          const d = new Date(date + 'T12:00:00Z');
+          const day = (d.getUTCDay() + 6) % 7;
+          d.setUTCDate(d.getUTCDate() - day);
+          return d.toISOString().slice(0, 10);
+        };
+        const buckets = new Map();
+        entries.forEach((entry) => {
+          const key = weekStart(entry.date);
+          if (!buckets.has(key)) buckets.set(key, []);
+          buckets.get(key).push(entry);
+        });
+        const weekly = [...buckets.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([start, items]) => {
+          const endDateObj = new Date(start + 'T12:00:00Z');
+          endDateObj.setUTCDate(endDateObj.getUTCDate() + 6);
+          const end = endDateObj.toISOString().slice(0, 10);
+          return { date: start, end, numeric: items.reduce((sum, item) => sum + item.numeric, 0) / items.length, count: items.length };
+        });
+        const W = Math.max(800, weekly.length * 26 + 76), H = 270;
+        const pad = { l: 54, r: 22, t: 20, b: 42 };
+        const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+        let min = Math.min(...weekly.map((entry) => entry.numeric));
+        let max = Math.max(...weekly.map((entry) => entry.numeric));
+        if (min === max) { min = Math.max(1, min - 1); max += 1; }
+        const range = max - min || 1;
+        const yMin = Math.max(1, min - range * .12), yMax = max + range * .12;
+        const firstMs = Date.parse(weekly[0].date + 'T12:00:00Z');
+        const lastMs = Date.parse(weekly[weekly.length - 1].date + 'T12:00:00Z');
+        const span = Math.max(86400000, lastMs - firstMs);
+        const x = (date) => pad.l + ((Date.parse(date + 'T12:00:00Z') - firstMs) / span) * plotW;
+        const y = (rank) => pad.t + ((yMax - rank) / (yMax - yMin)) * plotH;
+        let svg = `<svg class="season-progress-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly average rank history across all seasons for ${MODES[modeKey].label}"><defs><linearGradient id="overallRankFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8c244" stop-opacity=".14"/><stop offset="100%" stop-color="#f8c244" stop-opacity="0"/></linearGradient></defs>`;
+        for (let i = 0; i <= 4; i++) {
+          const value = yMin + ((yMax - yMin) * i / 4), yy = y(value);
+          svg += `<line class="gridline" x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}"/><text x="${pad.l-10}" y="${yy+4}" text-anchor="end">#${Math.round(value)}</text>`;
+        }
+        // Mark season boundaries so the all-time graph is easy to read across multiple seasons.
+        const chartSeasons = [...loadSeasons()].sort((a, b) => a.start.localeCompare(b.start));
+        const visibleSeasons = chartSeasons.filter((season) => season.start <= weekly[weekly.length - 1].date && (!getSeasonDateRange(chartSeasons, season).end || getSeasonDateRange(chartSeasons, season).end >= weekly[0].date));
+        const seasonSegments = visibleSeasons.map((season) => ({
+          season,
+          start: season.start < weekly[0].date ? weekly[0].date : season.start,
+          end: (() => { const range = getSeasonDateRange(chartSeasons, season); return !range.end || range.end > weekly[weekly.length - 1].date ? weekly[weekly.length - 1].date : range.end; })(),
+        })).filter((segment) => segment.start <= segment.end);
+        seasonSegments.forEach((segment, index) => {
+          const startX = x(segment.start);
+          const endX = x(segment.end);
+          if (index > 0 && segment.start >= weekly[0].date && segment.start <= weekly[weekly.length - 1].date) {
+            svg += `<line x1="${startX}" y1="${pad.t}" x2="${startX}" y2="${pad.t + plotH}" stroke="var(--gold)" stroke-opacity=".6" stroke-width="1.2" stroke-dasharray="4 4"><title>${escapeHtml(seasonLabel(segment.season))} begins</title></line>`;
+          }
+          const segmentWidth = endX - startX;
+          if (segmentWidth > 44) {
+            const label = seasonLabel(segment.season) || 'Season';
+            svg += `<text x="${(startX + endX) / 2}" y="12" text-anchor="middle" fill="var(--gold)" style="font-size:10px;font-weight:700">${escapeHtml(label)}</text>`;
+          }
+        });
+        const points = weekly.map((entry) => `${x(entry.date)},${y(entry.numeric)}`).join(' ');
+        if (weekly.length > 1) svg += `<polygon points="${x(weekly[0].date)},${pad.t+plotH} ${points} ${x(weekly[weekly.length-1].date)},${pad.t+plotH}" fill="url(#overallRankFill)"/>`;
+        if (weekly.length > 1) svg += `<polyline class="rank-line" points="${points}"/>`;
+        weekly.forEach((entry) => { svg += `<circle class="rank-point" cx="${x(entry.date)}" cy="${y(entry.numeric)}" r="3.5"><title>Week of ${formatDate(entry.date)} · Average rank #${Math.round(entry.numeric)} · ${entry.count} result${entry.count === 1 ? '' : 's'}</title></circle>`; });
+        const labels = [weekly[0].date, weekly[Math.floor((weekly.length - 1) / 2)].date, weekly[weekly.length - 1].date].filter((date, i, arr) => arr.indexOf(date) === i);
+        labels.forEach((date) => { const [, month, day] = date.split('-').map(Number); svg += `<text x="${x(date)}" y="${H-15}" text-anchor="middle">${MONTHS_SHORT[month-1]} ${day}</text>`; });
+        svg += '</svg>';
+        chart.style.width = `${W}px`; chart.style.minWidth = `${W}px`;
+        chart.innerHTML = svg;
       };
 
       const overallToggleBtn = document.getElementById('overallToggleBtn');
@@ -4540,16 +5203,14 @@
         overallToggleBtn.onclick = () => {
           showOverallLost = !showOverallLost;
           overallToggleBtn.classList.toggle('active', showOverallLost);
-          overallToggleBtn.textContent = showOverallLost
-            ? 'Show gained rewards'
-            : 'Show lost rewards';
+          overallToggleBtn.innerHTML = rewardToggleLabel(
+            showOverallLost ? 'Show gained rewards' : 'Show lost rewards',
+          );
           const overallBox = document.getElementById('overallTotalsBox');
           if (overallBox) overallBox.classList.toggle('lost', showOverallLost);
           const titleEl = document.getElementById('overallTotalsTitle');
           if (titleEl) {
-            titleEl.style.color = showOverallLost
-              ? 'var(--red)'
-              : 'var(--green)';
+            titleEl.classList.toggle('is-lost', showOverallLost);
             titleEl.textContent = showOverallLost
               ? 'Total rewards lost'
               : 'Total rewards gained';
@@ -4565,7 +5226,7 @@
           const on = t.dataset[attr] === key;
           t.classList.toggle('active', on);
         });
-        ['bosses', 'totals'].forEach((k) => {
+        ['bosses', 'totals', 'progress', 'stats'].forEach((k) => {
           const el = document.getElementById(prefix + k);
           if (el) el.style.display = k === key ? '' : 'none';
         });
@@ -4606,7 +5267,7 @@
         tabsEl.innerHTML = items
           .map((it) => {
             const active = it.id === historySeasonFilter ? ' active' : '';
-            const pick = it.id !== 'all' ? ' season-pick' : '';
+            const pick = ' season-pick';
             return `<button class="season-tab${pick}${active}" data-hid="${it.id}">${it.label}</button>`;
           })
           .join('');
@@ -4756,15 +5417,33 @@
         }
       };
 
+      let pendingDeleteDayDate = null;
+      const deleteDayModal = document.getElementById('deleteDayModal');
+      const deleteDayMsg = document.getElementById('deleteDayMsg');
+
       window.deleteDay = (date) => {
+        if (!loadDays()[date]) return;
+        pendingDeleteDayDate = date;
+        deleteDayMsg.textContent = `This will permanently delete the rankings logged for ${formatDate(date)}. This action cannot be undone.`;
+        deleteDayModal.hidden = false;
+      };
+
+      document.getElementById('modalDeleteDayCancel').onclick = () => {
+        deleteDayModal.hidden = true;
+        pendingDeleteDayDate = null;
+      };
+      document.getElementById('modalDeleteDayConfirm').onclick = () => {
+        if (!pendingDeleteDayDate) return;
+        const date = pendingDeleteDayDate;
         const days = loadDays();
         delete days[date];
         saveDays(days);
+        deleteDayModal.hidden = true;
+        pendingDeleteDayDate = null;
         renderHistory();
         renderOverall();
         renderSeason();
-        // if that date is open in the Daily log, empty it too (inputs and
-        // results); other dates are left alone
+        // If this date is open in Daily Log, clear its inputs and results too.
         if (document.getElementById('entryDate').value === date) {
           preloadToday();
         }
@@ -4841,7 +5520,128 @@
         titleEl.style.color = showSeasonLost ? 'var(--red)' : 'var(--green)';
         const seasonBox = document.getElementById('seasonTotalsBox');
         if (seasonBox) seasonBox.classList.toggle('lost', showSeasonLost);
-        titleEl.innerHTML = `Rewards ${showSeasonLost ? 'lost' : 'gained'} in ${goldName(seasonLabel(season) || 'this season')}`;
+        titleEl.classList.toggle('is-lost', showSeasonLost);
+        titleEl.innerHTML = `Rewards ${showSeasonLost ? 'lost' : 'gained'} in <span class="reward-season-name">${goldName(seasonLabel(season) || 'this season')}</span>`;
+      };
+
+      let seasonProgressSelectedMode = '';
+      const renderSeasonProgress = (days, filterFn, range) => {
+        const select = document.getElementById('seasonProgressMode');
+        const chart = document.getElementById('seasonProgressChart');
+        const summary = document.getElementById('seasonProgressSummary');
+        const recap = document.getElementById('seasonProgressRecap');
+        if (!select || !chart || !summary) return;
+        const modeKeys = Object.keys(MODES).filter((key) =>
+          Object.keys(days).some((date) => filterFn(date) && days[date].ranks && days[date].ranks[key] != null && (key !== 'supremeLeague' || rankNumText(key, days[date].ranks[key]) != null)),
+        );
+        const availableKeys = modeKeys.length ? modeKeys : Object.keys(MODES);
+        const previous = seasonProgressSelectedMode || select.value;
+        select.innerHTML = availableKeys.map((key) => `<option value="${key}">${MODES[key].label}</option>`).join('');
+        select.value = availableKeys.includes(previous) ? previous : availableKeys[0];
+        seasonProgressSelectedMode = select.value;
+        select.onchange = () => { seasonProgressSelectedMode = select.value; renderSeasonProgress(days, filterFn, range); };
+        const modeKey = select.value;
+        const entries = Object.keys(days).sort().filter((date) => {
+          const d = days[date];
+          return filterFn(date) && d.ranks && d.ranks[modeKey] != null && (modeKey !== 'supremeLeague' || rankNumText(modeKey, d.ranks[modeKey]) != null);
+        }).map((date) => {
+          const raw = days[date].ranks[modeKey];
+          const display = rankText(modeKey, raw);
+          const numeric = modeKey === 'supremeLeague' ? Number((rankNumText(modeKey, raw) || '').replace('#', '')) : Number(raw);
+          return { date, raw, display, numeric };
+        }).filter((p) => Number.isFinite(p.numeric) && p.numeric > 0);
+        if (!entries.length) {
+          summary.innerHTML = '<div class="season-progress-stat"><div class="season-progress-stat-label">No rankings yet</div><div class="season-progress-stat-value" style="font-size:15px">Nothing to chart</div><div class="season-progress-stat-detail">Add a daily rank for this mode.</div></div>';
+          if (recap) { recap.style.display = 'none'; recap.innerHTML = ''; }
+          chart.style.width = '100%'; chart.style.minWidth = '0';
+          chart.innerHTML = '<div class="empty-state" style="padding: 28px 12px">Your ranking history will appear here once you log a rank.</div>';
+          return;
+        }
+        const best = entries.reduce((a, b) => a.numeric < b.numeric ? a : b);
+        const worst = entries.reduce((a, b) => a.numeric > b.numeric ? a : b);
+        const last = entries[entries.length - 1];
+        const stat = (label, value, detail='') => `<div class="season-progress-stat"><div class="season-progress-stat-label">${label}</div><div class="season-progress-stat-value">${value}</div>${detail ? `<div class="season-progress-stat-detail">${detail}</div>` : ''}</div>`;
+        // Compare average ranks in two adjacent 7-calendar-day windows,
+        // anchored on the latest recorded result. Lower average rank is better.
+        const latestMs = Date.parse(last.date + 'T12:00:00Z');
+        const ageInDays = (p) => Math.round((latestMs - Date.parse(p.date + 'T12:00:00Z')) / 86400000);
+        const recentEntries = entries.filter((p) => ageInDays(p) >= 0 && ageInDays(p) <= 6);
+        const previousEntries = entries.filter((p) => ageInDays(p) >= 7 && ageInDays(p) <= 13);
+        const average = (items) => items.reduce((sum, p) => sum + p.numeric, 0) / items.length;
+        const avgLabel = (n) => `#${n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
+        let trendValue = 'Not enough data';
+        let trendDetail = 'Need at least 2 results in each 7-day period';
+        let trendClass = 'neutral';
+        if (recentEntries.length >= 2 && previousEntries.length >= 2) {
+          const recentAvg = average(recentEntries);
+          const previousAvg = average(previousEntries);
+          const improvement = previousAvg - recentAvg;
+          const change = Math.abs(improvement);
+          // Compare the change with the previous average so the threshold scales with rank.
+          const changePercent = previousAvg > 0 ? (improvement / previousAvg) * 100 : 0;
+          if (changePercent >= 5) {
+            trendValue = 'Improving ↑';
+            trendClass = 'positive';
+          } else if (changePercent <= -5) {
+            trendValue = 'Declining ↓';
+            trendClass = 'negative';
+          } else {
+            trendValue = 'Stable →';
+            trendClass = 'neutral';
+          }
+          trendDetail = `<span class="recap-headline">Average rank <span class="rank-value">${avgLabel(previousAvg)}</span> → <span class="season-trend-${trendClass}">${avgLabel(recentAvg)}</span></span>`;
+        }
+        const seasonAverage = entries.reduce((sum, entry) => sum + entry.numeric, 0) / entries.length;
+        const seasonAverageLabel = `#${Math.round(seasonAverage).toLocaleString('en-US')}`;
+        summary.innerHTML = stat('Average rank', seasonAverageLabel, `${entries.length} recorded result${entries.length === 1 ? '' : 's'}`) + stat('Best rank', best.display, formatDate(best.date)) + stat('Worst rank', worst.display, formatDate(worst.date)) + stat('Season trend · 1-week average', `<span class="season-trend-${trendClass}">${trendValue}</span>`, trendDetail);
+        const seasonEnded = Boolean(range && range.end && todayStr() > range.end);
+        if (recap) {
+          if (seasonEnded) {
+            const seasonRecap = buildSeasonRecap(modeKey, entries, range);
+            recap.innerHTML = `<div class="season-progress-recap-title">Season recap · ${MODES[modeKey].label}</div><div class="season-progress-recap-main">${colorRecapHeadline(seasonRecap.headline)}</div><div class="season-progress-recap-detail">${seasonRecap.detail}</div>`;
+            recap.style.display = '';
+          } else {
+            recap.style.display = 'none';
+            recap.innerHTML = '';
+          }
+        }
+        const W = Math.max(800, Math.min(2400, entries.length * 24 + 76)), H = 300;
+        const pad = { l: 54, r: 22, t: 20, b: 42 };
+        const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+        const vals = entries.map((p) => p.numeric);
+        let min = Math.min(...vals), max = Math.max(...vals);
+        if (min === max) { min = Math.max(1, min * 0.7); max = max * 1.3 + 1; }
+        const yMin = Math.max(1, min - (max - min) * 0.12), yMax = max + (max - min) * 0.12;
+        const startMs = Date.parse((range.start || entries[0].date) + 'T12:00:00Z');
+        const endMs = Date.parse((range.end || (todayStr() > entries[entries.length-1].date ? todayStr() : entries[entries.length-1].date)) + 'T12:00:00Z');
+        const span = Math.max(86400000, endMs - startMs);
+        const x = (date) => pad.l + ((Date.parse(date + 'T12:00:00Z') - startMs) / span) * plotW;
+        const y = (rank) => pad.t + ((rank - yMin) / (yMax - yMin)) * plotH;
+        const ticks = 4;
+        let svg = `<svg class="season-progress-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Rank progression for ${MODES[modeKey].label}"><defs><linearGradient id="seasonRankFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8c244" stop-opacity=".20"/><stop offset="100%" stop-color="#f8c244" stop-opacity="0"/></linearGradient></defs>`;
+        // Reverse vertical mapping so smaller rank numbers appear higher.
+        const yRank = (rank) => pad.t + ((yMax - rank) / (yMax - yMin)) * plotH;
+        for (let i = 0; i <= ticks; i++) {
+          const value = yMin + ((yMax - yMin) * i / ticks), yy = yRank(value);
+          svg += `<line class="gridline" x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}"/><text x="${pad.l-10}" y="${yy+4}" text-anchor="end">#${Math.round(value)}</text>`;
+        }
+        const points = entries.map((p) => `${x(p.date)},${yRank(p.numeric)}`).join(' ');
+        if (entries.length > 1) svg += `<polygon class="rank-area" points="${x(entries[0].date)},${pad.t + plotH} ${points} ${x(entries[entries.length-1].date)},${pad.t + plotH}"/>`;
+        svg += `<polyline class="rank-line" points="${points}"/>`;
+        entries.forEach((p) => {
+          const xx = x(p.date), yy = yRank(p.numeric);
+          const seasonDay = seasonDayNumber(p.date, range.start);
+          svg += `<circle class="rank-point" cx="${xx}" cy="${yy}" r="4.5"><title>${formatDate(p.date)} · Season Day ${seasonDay} · Rank ${p.display}</title></circle>`;
+        });
+        const dateLabels = [entries[0].date, entries[Math.floor((entries.length-1)/2)].date, entries[entries.length-1].date].filter((d, i, a) => a.indexOf(d) === i);
+        dateLabels.forEach((date) => {
+          const [, month, day] = date.split('-').map(Number);
+          const shortDate = `${MONTHS_SHORT[month - 1]} ${day}`;
+          svg += `<text x="${x(date)}" y="${H-15}" text-anchor="middle">${shortDate}</text>`;
+        });
+        svg += '</svg>';
+        chart.style.width = `${W}px`; chart.style.minWidth = `${W}px`;
+        chart.innerHTML = svg;
       };
 
       const renderSeason = () => {
@@ -4866,6 +5666,8 @@
         updateSeasonTotalsTitle(season);
 
         const seasonName = seasonLabel(season) || 'this season';
+        const progressSubnoteName = document.getElementById('seasonProgressSubnoteName');
+        if (progressSubnoteName) progressSubnoteName.textContent = seasonName;
         const seasonSuffix = ` in ${goldName(seasonName)}`;
         const distNote = document.getElementById('seasonDistNote');
         if (distNote) {
@@ -4895,6 +5697,7 @@
           showSeasonLost,
           'this season',
         );
+        renderSeasonProgress(days, filterFn, range);
       };
 
       const seasonToggleBtn = document.getElementById('seasonToggleBtn');
@@ -4902,9 +5705,9 @@
         seasonToggleBtn.onclick = () => {
           showSeasonLost = !showSeasonLost;
           seasonToggleBtn.classList.toggle('active', showSeasonLost);
-          seasonToggleBtn.textContent = showSeasonLost
-            ? 'Show gained rewards'
-            : 'Show lost rewards';
+          seasonToggleBtn.innerHTML = rewardToggleLabel(
+            showSeasonLost ? 'Show gained rewards' : 'Show lost rewards',
+          );
           renderSeason();
         };
       }
