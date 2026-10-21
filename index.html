@@ -5640,11 +5640,19 @@
           const seasonDay = seasonDayNumber(p.date, range.start);
           svg += `<circle class="rank-point" cx="${xx}" cy="${yy}" r="4.5"><title>${formatDate(p.date)} · Season Day ${seasonDay} · Rank ${p.display}</title></circle>`;
         });
-        const dateLabels = [entries[0].date, entries[Math.floor((entries.length-1)/2)].date, entries[entries.length-1].date].filter((d, i, a) => a.indexOf(d) === i);
-        dateLabels.forEach((date) => {
+        // Keep the plotted line tied to real recorded results, but label the full
+        // season boundaries on the x-axis even when they aren't 7 days apart
+        // from the nearest weekly/result label.
+        const chartStartDate = range.start || entries[0].date;
+        const chartEndDate = range.end || (todayStr() > entries[entries.length - 1].date ? todayStr() : entries[entries.length - 1].date);
+        const middleDate = entries[Math.floor((entries.length - 1) / 2)].date;
+        const dateLabels = [chartStartDate, middleDate, chartEndDate].filter((d, i, a) => a.indexOf(d) === i);
+        dateLabels.forEach((date, i) => {
           const [, month, day] = date.split('-').map(Number);
           const shortDate = `${MONTHS_SHORT[month - 1]} ${day}`;
-          svg += `<text x="${x(date)}" y="${H-15}" text-anchor="middle">${shortDate}</text>`;
+          const anchor = date === chartStartDate ? 'start' : date === chartEndDate ? 'end' : 'middle';
+          const labelX = date === chartStartDate ? pad.l : date === chartEndDate ? W - pad.r : x(date);
+          svg += `<text x="${labelX}" y="${H-15}" text-anchor="${anchor}">${shortDate}</text>`;
         });
         svg += '</svg>';
         chart.style.width = `${W}px`; chart.style.minWidth = `${W}px`;
