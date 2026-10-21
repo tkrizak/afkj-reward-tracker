@@ -5561,39 +5561,46 @@
         const worst = entries.reduce((a, b) => a.numeric > b.numeric ? a : b);
         const last = entries[entries.length - 1];
         const stat = (label, value, detail='') => `<div class="season-progress-stat"><div class="season-progress-stat-label">${label}</div><div class="season-progress-stat-value">${value}</div>${detail ? `<div class="season-progress-stat-detail">${detail}</div>` : ''}</div>`;
-        // Compare average ranks in two adjacent 7-calendar-day windows,
-        // anchored on the latest recorded result. Lower average rank is better.
-        const latestMs = Date.parse(last.date + 'T12:00:00Z');
-        const ageInDays = (p) => Math.round((latestMs - Date.parse(p.date + 'T12:00:00Z')) / 86400000);
-        const recentEntries = entries.filter((p) => ageInDays(p) >= 0 && ageInDays(p) <= 6);
-        const previousEntries = entries.filter((p) => ageInDays(p) >= 7 && ageInDays(p) <= 13);
         const average = (items) => items.reduce((sum, p) => sum + p.numeric, 0) / items.length;
         const avgLabel = (n) => `#${n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
         let trendValue = 'Not enough data';
         let trendDetail = 'Need at least 2 results in each 7-day period';
         let trendClass = 'neutral';
-        if (recentEntries.length >= 2 && previousEntries.length >= 2) {
-          const recentAvg = average(recentEntries);
-          const previousAvg = average(previousEntries);
-          const improvement = previousAvg - recentAvg;
-          const change = Math.abs(improvement);
-          // Compare the change with the previous average so the threshold scales with rank.
-          const changePercent = previousAvg > 0 ? (improvement / previousAvg) * 100 : 0;
-          if (changePercent >= 5) {
-            trendValue = 'Improving ↑';
-            trendClass = 'positive';
-          } else if (changePercent <= -5) {
-            trendValue = 'Declining ↓';
-            trendClass = 'negative';
-          } else {
-            trendValue = 'Stable →';
-            trendClass = 'neutral';
+        let trendLabel = 'Season trend · 1-week average';
+        if (modeKey === 'supremeLeague') {
+          // Supreme League rewards are periodic, not weekly: compare the two latest recorded events.
+          trendLabel = 'Season trend · between events';
+          trendDetail = 'Need at least 2 recorded Supreme League results';
+          if (entries.length >= 2) {
+            const previous = entries[entries.length - 2];
+            const current = entries[entries.length - 1];
+            const improvement = previous.numeric - current.numeric;
+            const changePercent = previous.numeric > 0 ? (improvement / previous.numeric) * 100 : 0;
+            if (changePercent >= 5) { trendValue = 'Improving ↑'; trendClass = 'positive'; }
+            else if (changePercent <= -5) { trendValue = 'Declining ↓'; trendClass = 'negative'; }
+            else { trendValue = 'Stable →'; trendClass = 'neutral'; }
+            trendDetail = `<span class="recap-headline">Rank <span class="rank-value">${previous.display}</span> → <span class="season-trend-${trendClass}">${current.display}</span></span><span class="season-progress-stat-detail">Compared with your previous recorded event</span>`;
           }
-          trendDetail = `<span class="recap-headline">Average rank <span class="rank-value">${avgLabel(previousAvg)}</span> → <span class="season-trend-${trendClass}">${avgLabel(recentAvg)}</span></span>`;
+        } else {
+          // Compare average ranks in two adjacent 7-calendar-day windows, anchored on the latest result.
+          const latestMs = Date.parse(last.date + 'T12:00:00Z');
+          const ageInDays = (p) => Math.round((latestMs - Date.parse(p.date + 'T12:00:00Z')) / 86400000);
+          const recentEntries = entries.filter((p) => ageInDays(p) >= 0 && ageInDays(p) <= 6);
+          const previousEntries = entries.filter((p) => ageInDays(p) >= 7 && ageInDays(p) <= 13);
+          if (recentEntries.length >= 2 && previousEntries.length >= 2) {
+            const recentAvg = average(recentEntries);
+            const previousAvg = average(previousEntries);
+            const improvement = previousAvg - recentAvg;
+            const changePercent = previousAvg > 0 ? (improvement / previousAvg) * 100 : 0;
+            if (changePercent >= 5) { trendValue = 'Improving ↑'; trendClass = 'positive'; }
+            else if (changePercent <= -5) { trendValue = 'Declining ↓'; trendClass = 'negative'; }
+            else { trendValue = 'Stable →'; trendClass = 'neutral'; }
+            trendDetail = `<span class="recap-headline">Average rank <span class="rank-value">${avgLabel(previousAvg)}</span> → <span class="season-trend-${trendClass}">${avgLabel(recentAvg)}</span></span>`;
+          }
         }
         const seasonAverage = entries.reduce((sum, entry) => sum + entry.numeric, 0) / entries.length;
         const seasonAverageLabel = `#${Math.round(seasonAverage).toLocaleString('en-US')}`;
-        summary.innerHTML = stat('Average rank', seasonAverageLabel, `${entries.length} recorded result${entries.length === 1 ? '' : 's'}`) + stat('Best rank', best.display, formatDate(best.date)) + stat('Worst rank', worst.display, formatDate(worst.date)) + stat('Season trend · 1-week average', `<span class="season-trend-${trendClass}">${trendValue}</span>`, trendDetail);
+        summary.innerHTML = stat('Average rank', seasonAverageLabel, `${entries.length} recorded result${entries.length === 1 ? '' : 's'}`) + stat('Best rank', best.display, formatDate(best.date)) + stat('Worst rank', worst.display, formatDate(worst.date)) + stat(trendLabel, `<span class="season-trend-${trendClass}">${trendValue}</span>`, trendDetail);
         const seasonEnded = Boolean(range && range.end && todayStr() > range.end);
         if (recap) {
           if (seasonEnded) {
